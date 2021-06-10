@@ -1,0 +1,15 @@
+{
+    "paramsGroup": {
+        "amount": "1",
+        "itemSubGroup": {
+            "shapeType": "1",
+            "size": "10",
+            "styleSubGroup": {
+                "color": "0, 0, 0, 1",
+                "fill": "1",
+                "lineWidth": "10"
+            }
+        },
+        "separation": "10"
+    }
+}
