@@ -1,37 +1,49 @@
-# ofxAddon
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Stage: beta](https://img.shields.io/badge/-alpha-red)
+# ofxSurfingPresets
 
 ## Overview
-ofxFboMixerBlend is an addon template for openFrameworks to make other addons.
+
+Simple presets systems for **openFrameworks** with an **ImGui** based GUI.
 
 ## Screenshot
-![Alt text](docs/screenshot1.JPG?raw=true "MoebiusSurfing")
+![image](docs/Capture1.PNG?raw=true "image")
 
 ## Features
-- can have some app modes  (2 by default). So it can have multiple behaviour modes. (Edit/Use).
+- De/Serialize JSON files to an ofParameterGroup.
 
 ## Usage
-- copy the folder '/ofxFboMixerBlend'.
-- rename the folder to the name of your addon
+```c++
+// ofApp.h
+#include "ofxSurfingPresets.h"
+ofxSurfingPresets dataPresets;
+
+// ofApp.cpp
+void ofApp::setup() {
+    // param group
+    params.setName("paramsGroup");
+    params.add(fill.set("fill", true));
+    params.add(lineWidth.set("lineWidth", 1, 0.1, 10));
+    params.add(size.set("size", 100, 5, 200));
+
+    dataPresets.addGroup(params);
+}
+```
 
 ## Dependencies
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)  
-* [ofxScaleDragRect](https://github.com/moebiussurfing/ofxScaleDragRect)
+* [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui)
 
-The above add-ons already packed somewhere into **OF_ADDON/libs**.  
-No need to add them manually with the **OF Project Generator**:  
-* [ofxColorQuantizerHelper](https://github.com/moebiussurfing/ofxColorQuantizerHelper)
-
-## Tested systems
+## Tested Systems
 * **Windows 10** / **VS 2017** / **OF ~0.11**
-* **macOS**. **High Sierra** / **Xcode9** & **Xcode10** / **OF ~0.11**
 
 ## Author
 An addon by **@moebiusSurfing**  
-*( ManuMolina ) 2019-2021*  
+*( ManuMolina ) 2021*  
 
 <br/>
+
+[Twitter](https://twitter.com/moebiussurfing/)  
+[Instagram](https://www.instagram.com/moebiussurfing/)  
+[YouTube](https://www.youtube.com/channel/UCzUw96_wjmNxyIoFXf84hQg)  
 
 ## License
 [**MIT License**](https://github.com/LICENSE)

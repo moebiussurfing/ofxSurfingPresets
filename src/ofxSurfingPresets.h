@@ -8,7 +8,7 @@
 
 #include "ofxSurfingImGui.h"
 using namespace ofxSurfing;
-using namespace ofxSurfingHelpers;
+//using namespace ofxSurfingHelpers;
 
 class ofxSurfingPresets
 {

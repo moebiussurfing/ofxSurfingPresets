@@ -82,6 +82,7 @@ void ofxSurfingPresets::setup()
 	params_Internal.add(MODE_Active);
 	params_Internal.add(ENABLE_AutoSave);
 	params_Internal.add(guiManager.auto_resize);
+	params_Internal.add(guiManager.bExtra);
 	//params_Internal.add(ENABLE_keys);
 	//params_Internal.add(MODE_App);
 	//params_Internal.add(MODE_App_Name);
@@ -217,16 +218,18 @@ void ofxSurfingPresets::draw_ImGui()
 
 				//-
 
+				// text
 				//ImGui::Text(path_Global.data());
 				//ImGui::Text(filePath.data());
 				ImGui::Text(fileName.data());
 				ImGui::Text(path_Presets.data());
 				ImGui::Dummy(ImVec2(0, 1));
 
+				// index
 				ofxSurfing::AddParameter(index);
-				//ofxImGui::AddParameter(index);
+				ofxSurfing::AddIntStepped(index);
+				//widgetsManager.Add(index, SurfingWidgetTypes::IM_DRAG); // crash
 				//widgetsManager.Add(index, SurfingWidgetTypes::IM_DEFAULT);
-				//widgetsManager.Add(index, SurfingWidgetTypes::IM_DRAG);
 				//widgetsManager.Add(index, SurfingWidgetTypes::IM_STEPPER);
 
 				//// spinner
@@ -247,32 +250,13 @@ void ofxSurfingPresets::draw_ImGui()
 					}
 				}
 				ImGui::PopButtonRepeat();
-
 				ImGui::Dummy(ImVec2(0, 1));
 
-				widgetsManager.Add(bSave, SurfingWidgetTypes::IM_BUTTON_BIG, true, 2);
-				widgetsManager.Add(bLoad, SurfingWidgetTypes::IM_BUTTON_BIG, false, 2);
+				widgetsManager.Add(bSave, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
+				widgetsManager.Add(bLoad, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
 				widgetsManager.Add(bSetPathPresets, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
 				widgetsManager.Add(bRefresh, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
-
 				ImGui::Dummy(ImVec2(0, 5));
-
-				//// buttons select
-				//int _i;//TODO:
-				//if (Surfing::SelectFile(path_Presets, nameSelected/*, _i*/)) {
-				//	ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected;
-				//	load(nameSelected);
-				//	int i = 0;
-				//	for (auto n : fileNames) {
-				//		string name = path_Presets + "/" + n;
-				//		ofLogNotice(__FUNCTION__) << "name: " << name;
-				//		if (nameSelected == name) {
-				//			index.setWithoutEventNotifications(i);
-				//		}
-				//		i++;
-				//	}
-				//}
-				//ImGui::Dummy(ImVec2(0, 5));
 
 				//--
 
@@ -281,9 +265,8 @@ void ofxSurfingPresets::draw_ImGui()
 				if (!fileNames.empty())
 				{
 					int _i = index;
-
+					
 					ImGui::PushItemWidth(_w100 - 20);
-
 					if (ofxImGui::VectorCombo(" ", &_i, fileNames))
 					{
 						ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
@@ -302,37 +285,92 @@ void ofxSurfingPresets::draw_ImGui()
 							//}
 						}
 					}
-
 					ImGui::PopItemWidth();
 				}
+				ImGui::Dummy(ImVec2(0, 5));
 
 				//-
 
-				// all
-				ImGui::Dummy(ImVec2(0, 20));
-				ofxSurfingHelpers::ToggleRoundedButton("Debug", &bDebug);
-				if (bDebug) {
-					ImGuiTreeNodeFlags flagst;
-					flagst = ImGuiTreeNodeFlags_None;
-					flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-					flagst |= ImGuiTreeNodeFlags_Framed;
+				// extra
 
-					ofxSurfing::AddGroup(params, flagst);
+				ofxSurfing::AddToggleRoundedButton(guiManager.bExtra);
+				//ImGui::Dummy(ImVec2(0, 5));
+
+				if (guiManager.bExtra)
+				{
+					//-
+
+					// buttons select
+					int _i; //TODO:
+					if (Surfing::SelectFile(path_Presets, nameSelected/*, _i*/)) {
+						ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected;
+						load(nameSelected);
+						int i = 0;
+						for (auto n : fileNames) {
+							string name = path_Presets + "/" + n;
+							ofLogNotice(__FUNCTION__) << "name: " << name;
+							if (nameSelected == name) {
+								index.setWithoutEventNotifications(i);
+							}
+							i++;
+						}
+					}
+					ImGui::Dummy(ImVec2(0, 5));
+
+					//-
+
+					// debug
+
+					ofxSurfing::ToggleRoundedButton("Debug", &bDebug);
+
+					//-
+
+					// all
+
+					//if (bDebug) {
+					//	xx += ww + pad;
+					//	ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
+					//	ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
+
+					//	n = "ofxSurfingPresets";
+					//	guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
+					//	{
+					//		ImGuiTreeNodeFlags flagst;
+					//		flagst = ImGuiTreeNodeFlags_None;
+					//		flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+					//		flagst |= ImGuiTreeNodeFlags_Framed;
+
+					//		ofxSurfing::AddGroup(params_Internal, flagst);
+					//		ofxSurfing::AddGroup(params_Control, flagst);
+					//	}
+					//	guiManager.endWindow();
+					//}
+
+					//-
+
+					// extra panel
+
+					if (bDebug) guiManager.drawAdvancedSubPanel();
+
+					if (bDebug) {
+						ImGuiTreeNodeFlags flagst;
+						flagst = ImGuiTreeNodeFlags_None;
+						flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+						flagst |= ImGuiTreeNodeFlags_Framed;
+
+						ofxSurfing::AddGroup(params, flagst);
+					}
 				}
-
-				//-
-
-				// extra panel
-				if (bDebug) guiManager.drawAdvancedSubPanel();
 			}
 			guiManager.endWindow();
 
 			//----
 
 			// preset params
+
 			if (params_Preset.getName() != "-1")
 			{
-				xx += ww + 100;
+				xx += ww + pad;
 				ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 				ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
@@ -349,30 +387,6 @@ void ofxSurfingPresets::draw_ImGui()
 				}
 				guiManager.endWindow();
 			}
-
-			//----
-
-			// all
-
-			if (bDebug) {
-				xx += ww + pad;
-				ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
-				ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
-
-				n = "ofxSurfingPresets";
-				guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
-				{
-					ImGuiTreeNodeFlags flagst;
-					flagst = ImGuiTreeNodeFlags_None;
-					flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-					flagst |= ImGuiTreeNodeFlags_Framed;
-
-					ofxSurfing::AddGroup(params_Internal, flagst);
-					ofxSurfing::AddGroup(params_Control, flagst);
-				}
-				guiManager.endWindow();
-			}
-
 		}
 	}
 	guiManager.end();
@@ -572,9 +586,6 @@ void ofxSurfingPresets::setGuiVisible(bool b)
 {
 	SHOW_Gui = b;
 }
-
-
-#pragma mark - CALLBACKS
 
 // all params
 //--------------------------------------------------------------
