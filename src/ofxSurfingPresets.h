@@ -3,18 +3,43 @@
 
 #include "ofMain.h"
 
+
+/*
+
++ add text input to rename preset names
++ new preset adds counter at name end
++ batch rename all files
+
+*/
+
+
 //#include "ofxGui.h"
 #include "ofxSurfingHelpers.h"
 
 #include "ofxSurfingImGui.h"
-using namespace ofxSurfing;
-//using namespace ofxSurfingHelpers;
 
 class ofxSurfingPresets
 {
+	//-
 
 public:
-	bool bDebug = false;
+	ofxSurfingPresets();
+	~ofxSurfingPresets();
+
+private:
+	void setup();
+	void update(ofEventArgs & args);
+	void draw(ofEventArgs & args);
+	void exit();
+	void startup();
+
+public:
+	void draw_ImGui();
+
+	//-
+
+private:
+	//bool bDebug = false;
 
 	string nameSelected;
 
@@ -22,10 +47,19 @@ public:
 
 	// preset params
 	ofParameterGroup params_Preset{ "-1" };
+
+	//-
+
+	// api
+
+public:
 	void addGroup(ofParameterGroup &group) {
 		params_Preset = group;
 	}
 
+	//-
+
+private:
 	ofParameterGroup params;
 	ofParameterGroup params_Control;
 	ofParameterGroup params_Internal;
@@ -34,45 +68,40 @@ public:
 	ofParameter<bool> bLoad;
 	ofParameter<bool> bSetPathPresets;
 	ofParameter<bool> bRefresh;
+	ofParameter<bool> bDebug;
+	ofParameter<bool> bShowParameters;
 	ofParameter<int> index;
 
-	//----
-
-	ofxSurfingPresets();
-	~ofxSurfingPresets();
-
-	void setup();
-	void update(ofEventArgs & args);
-	void draw(ofEventArgs & args);
-	void exit();
-	void startup();
-
-	void draw_ImGui();
 	bool bOpen0 = true;
 	bool bOpen1 = true;
 	bool bOpen2 = true;
 
-	//void windowResized(int w, int h);
-
+public:
 	void setActive(bool b);
 	void setGuiVisible(bool b);
 	void setLogLevel(ofLogLevel level);
 	void setAutoSave(bool b)
 	{
-		ENABLE_AutoSave = b;
+		bAutoSave = b;
 	}
-
 	//void setKey_MODE_App(int k);
 
+public:
+	void load(int _index);
 	void load(string path);
 	void save(string path);
-	
+	void newPreset();
+	void copyPreset();
+	void deletePreset();
+	void refreshFiles();
+	void setPath();
+
+private:
 	// files browser
 	ofDirectory dir;
 	std::string fileName;
 	std::string filePath;
 	vector<std::string> fileNames;
-	void refreshFiles();
 
 	//-
 
@@ -81,7 +110,7 @@ private:
 	//int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
 
 	// autosave
-	ofParameter<bool> ENABLE_AutoSave;
+	ofParameter<bool> bAutoSave;
 	uint64_t timerLast_Autosave = 0;
 	int timeToAutosave = 5000;
 
@@ -97,10 +126,15 @@ private:
 	//-
 
 	// control params
+
+public:
+	ofParameter<bool> bGui;
+	//ofParameter<bool> bShowParameters;
+
+private:
 	ofParameter<bool> MODE_Active;
 	ofParameter<bool> ENABLE_Debug;
-	ofParameter<bool> SHOW_Gui;
-	ofParameter<bool> SHOW_GuiPresets;
+
 	//ofParameter<bool> ENABLE_keys;
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> SHOW_Help;
@@ -110,9 +144,11 @@ private:
 	void Changed_Internal(ofAbstractParameter &e);
 	void Changed_Params(ofAbstractParameter &e);
 
+public:
 	void setPathGlobal(string s);//must cal before setup. disabled by default
 	void setPathPresets(string s);//must cal before setup. disabled by default
 
+private:
 	std::string path_Global; // this is to folder all files to avoid mixing with other addons data
 	std::string path_Params_Control;
 	std::string path_Presets;//this is to folder all files to avoid mixing with other addons data

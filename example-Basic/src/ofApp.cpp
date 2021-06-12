@@ -13,7 +13,7 @@ void ofApp::setup() {
 	params.add(amount.set("amount", 10, 1, 24));
 	params.add(separation.set("separation", 10, 1, 100));
 
-	dataPresets.addGroup(params);
+	presets.addGroup(params);
 }
 
 //--------------------------------------------------------------
@@ -49,4 +49,8 @@ void ofApp::exit() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
+
+	if (key == 'g') {
+		presets.bGui = !presets.bGui;
+	}
 }

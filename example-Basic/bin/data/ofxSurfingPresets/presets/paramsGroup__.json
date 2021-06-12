@@ -3,9 +3,9 @@
         "amount": "10",
         "color": "0, 0, 0, 1",
         "fill": "1",
-        "lineWidth": "10",
+        "lineWidth": "1",
         "separation": "10",
-        "shapeType": "2",
-        "size": "176"
+        "shapeType": "1",
+        "size": "100"
     }
 }

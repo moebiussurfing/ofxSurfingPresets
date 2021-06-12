@@ -13,7 +13,7 @@ public:
 		void exit();
 		void keyPressed(int key);
 
-		ofxSurfingPresets dataPresets;
+		ofxSurfingPresets presets;
 
 		// scene parameters 
 		ofParameter<bool> fill;

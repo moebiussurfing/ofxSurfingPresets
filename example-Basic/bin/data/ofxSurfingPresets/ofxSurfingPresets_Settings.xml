@@ -1,10 +1,11 @@
 {
     "INTERNAL": {
-        "ACTIVE": "0",
-        "AUTO_SAVE": "0",
         "Auto_Resize": "1",
+        "Auto_Save": "0",
+        "Debug": "0",
         "Extra": "0",
         "GUI": "1",
-        "PARAMETERS": "0"
+        "Minimize": "1",
+        "Show_Parameters": "1"
     }
 }
