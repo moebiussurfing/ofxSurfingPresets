@@ -6,17 +6,18 @@
 
 /*
 
-+ add text input to rename preset names
++ fix next cycled button
++ fix autosave
 + new preset adds counter at name end
++ add text input to rename preset names
 + batch rename all files
 
 */
 
 
-//#include "ofxGui.h"
 #include "ofxSurfingHelpers.h"
-
 #include "ofxSurfingImGui.h"
+//#include "ofxGui.h"
 
 class ofxSurfingPresets
 {
@@ -35,6 +36,8 @@ private:
 
 public:
 	void draw_ImGui();
+	void draw_ImGui_Minimal();
+	void draw_ImGui_Editor();
 
 	//-
 
@@ -55,14 +58,23 @@ private:
 public:
 	void addGroup(ofParameterGroup &group) {
 		params_Preset = group;
+
+		//refresh
+		startup();
 	}
 
 	//-
 
 private:
-	ofParameterGroup params;
+	// gui params
+	ofParameterGroup params; 
 	ofParameterGroup params_Control;
 	ofParameterGroup params_Internal;
+
+	ofParameter<bool> bCycled;
+
+	ofParameter<bool> bAutoSave;
+	int index_PRE = -1;
 
 	ofParameter<bool> bSave;
 	ofParameter<bool> bLoad;
@@ -110,7 +122,7 @@ private:
 	//int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
 
 	// autosave
-	ofParameter<bool> bAutoSave;
+	ofParameter<bool> bAutoSaveTimer;
 	uint64_t timerLast_Autosave = 0;
 	int timeToAutosave = 5000;
 
@@ -152,6 +164,8 @@ private:
 	std::string path_Global; // this is to folder all files to avoid mixing with other addons data
 	std::string path_Params_Control;
 	std::string path_Presets;//this is to folder all files to avoid mixing with other addons data
+	
+	std::string _ext = ".json";
 
 	//ofxPanel gui_Control;
 
