@@ -8,7 +8,8 @@ Simple presets system for **openFrameworks** with an **ImGui** based GUI.
 ![image](docs/Capture1.PNG?raw=true "image")
 
 ## Features
-- De/Serialize JSON files to an ofParameterGroup.
+- De/Serialize JSON files to an ofParameterGroup.  
+- ImGui based GUI: minimizable
 
 ## Usage
 
@@ -47,8 +48,6 @@ void ofApp::setup() {
 ## Author
 An addon by **@moebiusSurfing**  
 *( ManuMolina ) 2021*  
-
-<br/>
 
 [Twitter](https://twitter.com/moebiussurfing/)  
 [Instagram](https://www.instagram.com/moebiussurfing/)  

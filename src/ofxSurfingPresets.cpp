@@ -4,18 +4,24 @@
 //--------------------------------------------------------------
 ofxSurfingPresets::ofxSurfingPresets()
 {
+	// -> TODO: BUG?: 
+	// it seems than requires to be false when using multi-context/instances
+	// if is setted to true, sometimes it hangs and gui do not refresh/freezes.
+	bAutoDraw = false;
+
 	ofAddListener(ofEvents().update, this, &ofxSurfingPresets::update);
 	ofAddListener(ofEvents().draw, this, &ofxSurfingPresets::draw, OF_EVENT_ORDER_AFTER_APP);
 
 	path_Global = "ofxSurfingPresets/"; // this is to folder all files to avoid mixing with other addons data
-	path_Presets = "ofxSurfingPresets/presets";//t
+	path_Presets = "ofxSurfingPresets/presets";
 	path_Params_Control = "ofxSurfingPresets_Settings.xml";
+	path_filePreset = "Preset";
 
 	DISABLE_Callbacks = true;
 
 	setActive(true); // add key and mouse listeners
 
-	setup();
+	//setup();
 }
 
 //--------------------------------------------------------------
@@ -32,6 +38,8 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	ofRemoveListener(params_Control.parameterChangedE(), this, &ofxSurfingPresets::Changed_Control);
 
 	ofxSurfingHelpers::saveGroup(params_Internal, path_Global + path_Params_Control);
+
+	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	exit();
 }
@@ -113,12 +121,12 @@ void ofxSurfingPresets::setup()
 	//--
 
 	// gui
-	guiManager.setImGuiAutodraw(true);
+	guiManager.setImGuiAutodraw(bAutoDraw);
 	guiManager.setup(); // this instantiates and configurates ofxImGui inside the class object.
 	//guiManager.bAutoResize = false;
 
 	// files
-	refreshFiles();
+	doRefreshFiles();
 
 	//--
 
@@ -146,19 +154,26 @@ void ofxSurfingPresets::startup()
 	ofxSurfingHelpers::CheckFolder(path_Presets);
 
 	// create first prest if folder it's empty
-	if (dir.size() == 0) {
-		string _name = params_Preset.getName() + "_00";
-		string _ext = ".json";
-		filePath = path_Presets + "/" + _name + _ext;
+	if (dir.size() == 0)
+	{
+		doNewPreset();
 
-		save(filePath);
-		refreshFiles();
+		//string _name = params_Preset.getName() + "_00";
+		//string _ext = ".json";
+		//filePath = path_Presets + "/" + _name + _ext;
 
-		index = 0;
+		//save(filePath);
+		//doRefreshFiles();
+
+		//index = 0;
 	}
 
+	ofxSurfingHelpers::loadGroup(params_Preset, path_Global + path_filePreset + _ext);
+
+	// workflow
 	// load first
 	index = 0;
+
 }
 
 //--------------------------------------------------------------
@@ -228,7 +243,6 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 		guiManager.beginWindow(n.c_str(), &bOpen0, flagsw);
 		{
 			widgetsManager.refreshPanelShape();
-
 			_w100 = getWidgetsWidth(1);
 			_w50 = getWidgetsWidth(2);
 			_w33 = getWidgetsWidth(3);
@@ -238,35 +252,86 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 			if (!guiManager.bMinimize)
 			{
-				// text
+				//--
 
-				//// input text
-				//static int keyboardFocus;
-				////static char str0[128] = fileName.c_str();
-				////std::string fileName = "Name";
-				//char *cstr = new char[fileName.length() + 1];
-				//strcpy(cstr, fileName.c_str());
-				//ImGui::InputText("Name", cstr, IM_ARRAYSIZE(cstr));
-				////if (ImGui::IsItemClicked()) {
-				////	keyboardFocus = 0;
-				////}
-				////if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive()) {
-				////	ImGui::SetKeyboardFocusHere(keyboardFocus);
-				////}
+				//widgetsManager.refreshPanelShape();
+				//_w100 = getWidgetsWidth(1);
+				//_w50 = getWidgetsWidth(2);
+				//_w33 = getWidgetsWidth(3);
+				//_w25 = getWidgetsWidth(4);
+
+				//--
+
+				//// textinput
+				//{
+				//	// input text
+				//	static int keyboardFocus;
+				//	//static char str0[128] = fileName.c_str();
+				//	//std::string fileName = "Name";
+				//	char *cstr = new char[fileName.length() + 1];
+				//	strcpy(cstr, fileName.c_str());
+				//	ImGui::InputText("Name", cstr, IM_ARRAYSIZE(cstr));
+				//	//if (ImGui::IsItemClicked()) {
+				//	//	keyboardFocus = 0;
+				//	//}
+				//	//if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive()) {
+				//	//	ImGui::SetKeyboardFocusHere(keyboardFocus);
+				//	//}
+				//}
 
 				//ImGui::Text(path_Global.data());
 				//ImGui::Text(filePath.data());
-				string ss = ofToString(index) + "/" + ofToString(dir.size() - 1);
+				string ss = ofToString(index) + "/" + ofToString(index.getMax());
 				ImGui::Text(ss.data());
-				ImGui::Text(fileName.data());//->using text input above
+				if (guiManager.bMinimize) ImGui::Text(fileName.data()); // -> using text input below
 				if (guiManager.bExtra) ImGui::Text(path_Presets.data());
 				ImGui::Dummy(ImVec2(0, 1));
-
-				// index
-				ofxImGuiSurfing::AddIntStepped(index);
 			}
+			//--
+
+			// 1. scrollable list
+
+			if (!fileNames.empty())
+			{
+				int _i = index;
+				ImGui::PushItemWidth(_w100 - 20);
+				if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
+				{
+					ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
+
+					if (_i < fileNames.size())
+					{
+						index = _i;
+					}
+				}
+				ImGui::PopItemWidth();
+			}
+
+			//ImGui::Dummy(ImVec2(0, 5));
+
+			// index
+			if (!guiManager.bMinimize) ofxImGuiSurfing::AddIntStepped(index);
+
 			// index
 			ofxImGuiSurfing::AddParameter(index);
+
+			// next
+			if (guiManager.bMinimize)
+			{
+				ImGui::PushButtonRepeat(true);
+				{
+					if (ImGui::Button("<", ImVec2(_w50, _h / 2)))
+					{
+						doLoadPrevious();
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(">", ImVec2(_w50, _h / 2)))
+					{
+						doLoadNext();
+					}
+				}
+				ImGui::PopButtonRepeat();
+			}
 
 			//widgetsManager.Add(index, SurfingWidgetTypes::IM_DRAG); // crash
 			//widgetsManager.Add(index, SurfingWidgetTypes::IM_DEFAULT);
@@ -283,72 +348,63 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				{
 					if (ImGui::Button("<", ImVec2(_w50, _h)))
 					{
-						if (bCycled) {
-							if (index.get() == index.getMin()) index = index.getMax();
-						}
-						else index--;
+						doLoadPrevious();
 					}
 					ImGui::SameLine();
 					if (ImGui::Button(">", ImVec2(_w50, _h)))
 					{
-						if (bCycled) {
-							if (index.get() == index.getMax()) index = index.getMin();
-						}
-						else index++;
+						doLoadNext();
 					}
 				}
 				ImGui::PopButtonRepeat();
-				ImGui::Dummy(ImVec2(0, 1));
+				//ImGui::Dummy(ImVec2(0, 1));
 
 				widgetsManager.Add(bSave, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
 				widgetsManager.Add(bLoad, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
-				if (ImGui::Button("NEW", ImVec2(_w50, _h / 2)))
+
+				bool bOpen = false;
+				ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+				_flagt |= ImGuiTreeNodeFlags_Framed;
+				if (ImGui::TreeNodeEx("TOOLS", _flagt))
 				{
-					newPreset();
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("COPY", ImVec2(_w50, _h / 2)))
-				{
-					copyPreset();
-				}
-				if (ImGui::Button("DELETE", ImVec2(_w100, _h / 2)))
-				{
-					deletePreset();
-				}
-				widgetsManager.Add(bSetPathPresets, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
-				widgetsManager.Add(bRefresh, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
-				ImGui::Dummy(ImVec2(0, 5));
-			}
+					widgetsManager.refreshPanelShape();
+					_w100 = getWidgetsWidth(1);
+					_w50 = getWidgetsWidth(2);
+					_w33 = getWidgetsWidth(3);
+					_w25 = getWidgetsWidth(4);
 
-			//--
-
-			// 1. scrollable list
-
-			if (!fileNames.empty())
-			{
-				int _i = index;
-
-				ImGui::PushItemWidth(_w100 - 20);
-				if (ofxImGui::VectorCombo(" ", &_i, fileNames))
-				{
-					ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
-
-					if (_i < fileNames.size())
+					if (ImGui::Button("NEW", ImVec2(_w50, _h / 2)))
 					{
-						index = _i;
-
-						//fileName = dir.getName(index);
-						//ofLogNotice(__FUNCTION__) << "Combo select: " << _i;
-
-						//if (dir.size() > 0 && index < dir.size())
-						//{
-						//	fileName = dir.getName(index);
-						//	filePath = dir.getPath(index);
-						//}
+						doNewPreset();
 					}
+					ImGui::SameLine();
+					if (ImGui::Button("RESET", ImVec2(_w50, _h / 2)))
+					{
+						doResetParams();
+					}
+
+					//if (ImGui::Button("COPY", ImVec2(_w50, _h / 2)))
+					//{
+					//	doCopyPreset();
+					//}
+
+					if (ImGui::Button("DELETE", ImVec2(_w50, _h / 2)))
+					{
+						doDeletePreset();
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("CLEAR", ImVec2(_w50, _h / 2)))
+					{
+						doClearPresets();
+					}
+
+					widgetsManager.Add(bSetPathPresets, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
+					widgetsManager.Add(bRefresh, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
+					ImGui::TreePop();
 				}
-				ImGui::PopItemWidth();
+
 			}
+
 			ImGui::Dummy(ImVec2(0, 5));
 
 			//-
@@ -363,8 +419,12 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				{
 					//-
 
-					// buttons select
-					int _i; //TODO:
+					// buttons selector
+
+					//TODO:
+					//customize label
+
+					int _i;
 					if (ofxImGuiSurfing::SelectFile(path_Presets, nameSelected/*, _i*/)) {
 						ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected;
 						load(nameSelected);
@@ -386,13 +446,11 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				}
 			}
 
-			// minimize
-			ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
-
 			if (!guiManager.bMinimize)
 			{
 				ofxImGuiSurfing::AddToggleRoundedButton(bShowParameters);
 				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
+
 				if (guiManager.bExtra) {
 					ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
 					ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
@@ -400,6 +458,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				}
 				//ofxImGuiSurfing::ToggleRoundedButton("Debug", &bDebug);
 			}
+
+			// minimize
+			ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
 
 			//-
 
@@ -409,7 +470,6 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			//	xx += ww + pad;
 			//	ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 			//	ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
-
 			//	n = "ofxSurfingPresets";
 			//	guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
 			//	{
@@ -417,7 +477,6 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			//		flagst = ImGuiTreeNodeFlags_None;
 			//		flagst |= ImGuiTreeNodeFlags_DefaultOpen;
 			//		flagst |= ImGuiTreeNodeFlags_Framed;
-
 			//		ofxImGuiSurfing::AddGroup(params_Internal, flagst);
 			//		ofxImGuiSurfing::AddGroup(params_Control, flagst);
 			//	}
@@ -479,9 +538,11 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
 	_flagt |= ImGuiTreeNodeFlags_Framed;
 
-	if (ImGui::TreeNodeEx("ANIMATOR PRESETS", _flagt))
+	if (ImGui::TreeNodeEx("PRESETS", _flagt))
 	{
 		float _w100 = ofxImGuiSurfing::getWidgetsWidth(1);
+		float _w50 = ofxImGuiSurfing::getWidgetsWidth(2);
+		float _h = BUTTON_BIG_HEIGHT;
 
 		//ImGui::Dummy(ImVec2(0, 5));
 
@@ -494,7 +555,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 			int _i = index;
 
 			ImGui::PushItemWidth(_w100 - 20);
-			if (ofxImGui::VectorCombo(" ", &_i, fileNames))
+			if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
 			{
 				ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
 
@@ -515,6 +576,20 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 			ImGui::PopItemWidth();
 		}
 
+		ImGui::PushButtonRepeat(true);
+		{
+			if (ImGui::Button("<", ImVec2(_w50, _h / 2)))
+			{
+				doLoadPrevious();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(">", ImVec2(_w50, _h / 2)))
+			{
+				doLoadNext();
+			}
+		}
+		ImGui::PopButtonRepeat();
+
 		//static bool bEdit = false;
 		//ofxImGuiSurfing::ToggleRoundedButton("Edit", &bEdit);
 		//if (bEdit) {
@@ -522,9 +597,10 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 		//}
 
 		ImGui::TreePop();
+
+		ofxImGuiSurfing::AddToggleRoundedButton(bGui);
 	}
 }
-
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui()
@@ -541,6 +617,20 @@ void ofxSurfingPresets::draw_ImGui()
 }
 
 //--------------------------------------------------------------
+void ofxSurfingPresets::keyPressed(int key)
+{
+	if (key == OF_KEY_LEFT) {
+		doLoadPrevious();
+	}
+	if (key == OF_KEY_RIGHT) {
+		doLoadNext();
+	}
+	if (key == OF_KEY_RETURN) {
+		doSaveCurrent();
+	}
+}
+
+//--------------------------------------------------------------
 void ofxSurfingPresets::exit()
 {
 
@@ -551,7 +641,6 @@ void ofxSurfingPresets::setLogLevel(ofLogLevel level)
 {
 	ofSetLogLevel(__FUNCTION__, level);
 }
-
 
 ////--------------------------------------------------------------
 //void ofxSurfingPresets::windowResized(int w, int h)
@@ -762,6 +851,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		string name = e.getName();
 
 		// exclude debugs
+
 		if (name != "exclude" && name != "exclude")
 		{
 			ofLogNotice(__FUNCTION__) << name << " : " << e;
@@ -774,24 +864,25 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 			index = ofClamp(index.get(), index.getMin(), index.getMax());
 
 			// changed and autosave
+
 			if (index.get() != index_PRE)
 			{
 				index_PRE = index;
 				ofLogNotice(__FUNCTION__) << "Changed index: " << ofToString(index_PRE) << " > " << ofToString(index);
 
-				if (bAutoSave) {
+				//if (bAutoSave) {
 
-					if (dir.size() > 0 && index_PRE < dir.size())
-					{
-						//string _fileName = dir.getName(index_PRE);
-						string _filePath = dir.getPath(index_PRE);
-						save(_filePath);
-					}
-					else
-					{
-						ofLogError(__FUNCTION__) << "File out of range";
-					}
-				}
+				//	if (dir.size() > 0 && index_PRE < dir.size())
+				//	{
+				//		//string _fileName = dir.getName(index_PRE);
+				//		string _filePath = dir.getPath(index_PRE);
+				//		save(_filePath);
+				//	}
+				//	else
+				//	{
+				//		ofLogError(__FUNCTION__) << "File out of range";
+				//	}
+				//}
 
 			}
 
@@ -801,8 +892,16 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 			if (dir.size() > 0 && index < dir.size())
 			{
-				fileName = dir.getName(index);
-				filePath = dir.getPath(index);
+				//fileName = dir.getName(index);
+				//filePath = dir.getPath(index);
+
+				int _i = index;
+				string s = ofToString(_i);
+				if (_i < 10) s = "0" + s;
+				string ss = nameRoot + "_" + s;
+				fileName = ss;
+				filePath = path_Presets + "/" + ss + _ext;
+				ofLogNotice(__FUNCTION__) << filePath;
 
 				load(filePath);
 			}
@@ -825,7 +924,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		if (name == bRefresh.getName() && bRefresh)
 		{
 			bRefresh = false;
-			refreshFiles();
+			doRefreshFiles();
 		}
 		if (name == bSetPathPresets.getName() && bSetPathPresets)
 		{
@@ -918,7 +1017,13 @@ void ofxSurfingPresets::setPathPresets(string s)//must call before setup. disabl
 	ofxSurfingHelpers::CheckFolder(path_Presets);
 }
 
-//TODO:
+//--------------------------------------------------------------
+void ofxSurfingPresets::doSaveCurrent()
+{
+	ofLogNotice(__FUNCTION__) << filePath;
+	save(filePath);
+}
+
 //--------------------------------------------------------------
 void ofxSurfingPresets::load(int _index)
 {
@@ -931,6 +1036,7 @@ void ofxSurfingPresets::load(string path)
 	ofLogNotice(__FUNCTION__) << path;
 	ofxSurfingHelpers::loadGroup(params_Preset, path);
 }
+
 //--------------------------------------------------------------
 void ofxSurfingPresets::save(string path)
 {
@@ -939,17 +1045,21 @@ void ofxSurfingPresets::save(string path)
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::newPreset()
+void ofxSurfingPresets::doNewPreset()
 {
-	string ss = fileNames[index];
-	ss += "_" /*+ ofToString(index)*/;
-	filePath = path_Presets + "/" + ss + _ext;
+	//string ss = fileNames[index];
 
+	int _i = dir.size();
+	string s = ofToString(_i);
+	if (_i < 10) s = "0" + s;
+	string ss = nameRoot + "_" + s;
 	fileName = ss;
+	filePath = path_Presets + "/" + ss + _ext;
+	ofLogNotice(__FUNCTION__) << filePath;
 
 	ofxSurfingHelpers::saveGroup(params_Preset, filePath);
-	ofLogNotice(__FUNCTION__) << filePath;
-	refreshFiles();
+
+	doRefreshFiles();
 
 	for (int i = 0; i < fileNames.size(); i++)
 	{
@@ -963,13 +1073,13 @@ void ofxSurfingPresets::newPreset()
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::deletePreset()
+void ofxSurfingPresets::doDeletePreset()
 {
 	int pre = index;
 
 	ofFile::removeFile(filePath);
 	ofLogNotice(__FUNCTION__) << filePath;
-	refreshFiles();
+	doRefreshFiles();
 
 	//TODO: set index to new one
 
@@ -980,48 +1090,67 @@ void ofxSurfingPresets::deletePreset()
 	// load first file in dir
 	if (dir.size() > 0) index = 0;
 	//else index = -1;
-
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::copyPreset()
+void ofxSurfingPresets::doClearPresets()
 {
-	string ss = fileNames[index];
-	ss += "_" /*+ ofToString(index)*/;
-	string _ext = ".json";
-	filePath = path_Presets + "/" + ss + _ext;
+	ofLogNotice(__FUNCTION__);
 
-	ofxSurfingHelpers::saveGroup(params_Preset, filePath);
-	ofLogNotice(__FUNCTION__) << filePath;
-
-	refreshFiles();
-	//TODO: fix name extension
-	//TODO: set index to new one
-
-	//TODO: set index to new one
-	for (int i = 0; i < fileNames.size(); i++)
+	// remove all files
+	for (int i = 0; i < dir.size(); i++)
 	{
-		auto _ss = ofSplitString(fileNames[i], ".");
-		string _filename = "NoName";
-		if (_ss.size() > 0) _filename = _ss[0];
-
-		if (fileNames[i] == _filename)
-		{
-			ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
-			index = i;
-		}
+		ofFile file = dir[i];
+		file.remove();
 	}
+	doRefreshFiles();
+
+	doNewPreset();
+
+	index = 0;
+
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::refreshFiles()
+void ofxSurfingPresets::doCopyPreset()
+{
+	//string ss = fileNames[index];
+	//ss += "_";
+	//ss += ofToString(dir.size());
+	////ss += ofToString(index);
+
+	//fileName = ss;
+	//filePath = path_Presets + "/" + fileName + _ext;
+	//ofLogNotice(__FUNCTION__) << filePath;
+
+	//ofxSurfingHelpers::saveGroup(params_Preset, filePath);
+
+	//doRefreshFiles();
+
+	////TODO: fix name extension
+	////TODO: set index to new one
+	//
+	//for (int i = 0; i < fileNames.size(); i++)
+	//{
+	//	auto _ss = ofSplitString(fileNames[i], ".");
+	//	string _filename = "NoName";
+	//	if (_ss.size() > 0) _filename = _ss[0];
+
+	//	if (fileNames[i] == _filename)
+	//	{
+	//		ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
+	//		index = i;
+	//	}
+	//}
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doRefreshFiles()
 {
 	// load dragged images folder
 	ofLogNotice(__FUNCTION__) << "list files " << path_Presets;
 
 	dir.listDir(path_Presets);
-	//dir.allowExt("xml");
-	//dir.allowExt("XML");
 	dir.allowExt("JSON");
 	dir.allowExt("json");
 	dir.sort();
@@ -1041,7 +1170,11 @@ void ofxSurfingPresets::refreshFiles()
 	}
 
 	index.setMin(0);
-	index.setMax(MAX(dir.size() - 1, 0));
+
+	if (dir.size() == 0) index.setMax(0);
+	else {
+		index.setMax(dir.size() - 1);
+	}
 }
 
 //--------------------------------------------------------------
@@ -1060,10 +1193,85 @@ void ofxSurfingPresets::setPath()
 		path_Presets += "\\"; // windows
 		ofLogNotice(__FUNCTION__) << "User selected a path: " << path_Presets;
 
-		refreshFiles();
+		doRefreshFiles();
 	}
 	else
 	{
 		ofLogNotice(__FUNCTION__) << "User hit cancel";
 	}
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doLoadPrevious()
+{
+	if (dir.size() == 0) return;
+
+	ofLogNotice(__FUNCTION__);
+	if (bCycled)
+	{
+		int i = index.get();
+		if (i == index.getMin())
+		{
+			index.set(index.getMax());
+		}
+	}
+	else index--;
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doLoadNext()
+{
+	if (dir.size() == 0) return;
+
+	ofLogNotice(__FUNCTION__);
+	if (bCycled)
+	{
+		int i = index.get();
+		if (i == index.getMax())
+		{
+			index.set(index.getMin());
+		}
+	}
+	else index++;
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doResetParams() {
+	ofLogNotice(__FUNCTION__);
+
+	//TODO:
+
+	//for (int i = 0; i<params_Preset.size(); i++)
+	//{
+	//	for (auto p : enablersForParams)
+	//	{
+	//		if (!p.get()) continue;//only reset this param if it's enabled
+
+	//		//-
+
+	//		string name = p.getName();//name
+	//		auto &g = params_EditorGroups.getGroup(name);//ofParameterGroup
+	//		auto &e = g.get(name);//ofAbstractParameter
+
+	//		auto type = e.type();
+	//		bool isFloat = type == typeid(ofParameter<float>).name();
+	//		bool isInt = type == typeid(ofParameter<int>).name();
+
+	//		if (isFloat)
+	//		{
+	//			auto pmin = g.getFloat("Min").get();
+	//			auto pmax = g.getFloat("Max").get();
+	//			ofParameter<float> p0 = e.cast<float>();
+	//			p0.set(pmin);//reset to min
+	//		}
+
+	//		else if (isInt)
+	//		{
+	//			auto pmin = g.getInt("Min").get();
+	//			auto pmax = g.getInt("Max").get();
+	//			ofParameter<int> p0 = e.cast<int>();
+	//			p0.set(pmin);//reset to min
+	//		}
+	//	}
+	//}
 }

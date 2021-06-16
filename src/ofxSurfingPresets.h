@@ -8,9 +8,9 @@
 
 + fix next cycled button
 + fix autosave
-+ new preset adds counter at name end
 + add text input to rename preset names
 + batch rename all files
++ delete a file shoul push sorting the gap?
 
 */
 
@@ -27,12 +27,28 @@ public:
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
 
-private:
+public:
+	bool bAutoDraw; // must be false when multiple ImGui instances created!
+
+	// required to set to false when only one ImGui instance is created. By default is setted to ImGui multi instances
+	//--------------------------------------------------------------
+	void setImGuiAutodraw(bool b) {
+//#ifdef USE_SURFING_TWEENER__GUI_LOCAL
+		bAutoDraw = b;
+//#endif
+	}
 	void setup();
+	
+	string nameRoot;
+
+private:
 	void update(ofEventArgs & args);
 	void draw(ofEventArgs & args);
 	void exit();
 	void startup();
+	
+public:
+	void keyPressed(int key);
 
 public:
 	void draw_ImGui();
@@ -57,7 +73,11 @@ private:
 
 public:
 	void addGroup(ofParameterGroup &group) {
+		setup();
+
 		params_Preset = group;
+
+		nameRoot = params_Preset.getName();
 
 		//refresh
 		startup();
@@ -99,13 +119,18 @@ public:
 	//void setKey_MODE_App(int k);
 
 public:
+	void doSaveCurrent();
+	void doLoadNext();
+	void doLoadPrevious();
 	void load(int _index);
 	void load(string path);
 	void save(string path);
-	void newPreset();
-	void copyPreset();
-	void deletePreset();
-	void refreshFiles();
+	void doNewPreset();
+	void doCopyPreset();
+	void doDeletePreset();
+	void doClearPresets();
+	void doResetParams();
+	void doRefreshFiles();
 	void setPath();
 
 private:
@@ -163,7 +188,8 @@ public:
 private:
 	std::string path_Global; // this is to folder all files to avoid mixing with other addons data
 	std::string path_Params_Control;
-	std::string path_Presets;//this is to folder all files to avoid mixing with other addons data
+	std::string path_Presets; // this is to folder all files to avoid mixing with other addons data
+	std::string path_filePreset; 
 	
 	std::string _ext = ".json";
 

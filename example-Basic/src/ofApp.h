@@ -10,18 +10,16 @@ public:
 		void setup();
 		void update();
 		void draw();
+		void drawScene();
 		void exit();
 		void keyPressed(int key);
 
 		ofxSurfingPresets presets;
 
 		// scene parameters 
-		ofParameter<bool> fill;
-		ofParameter<float> lineWidth;
-		ofParameter<ofFloatColor> color;
-		ofParameter<int> shapeType;
-		ofParameter<int> amount;
-		ofParameter<int> separation;
-		ofParameter<int> size;
 		ofParameterGroup params;
+		ofParameter<float> size1;
+		ofParameter<float> rotation;
+		ofParameter<float> rotationOffset;
+		ofParameter<int> size2;
 };
