@@ -94,11 +94,11 @@ void ofxSurfingPresets::setup()
 	params_Internal.add(bGui);
 	params_Internal.add(bShowParameters);
 	params_Internal.add(bAutoSave);
-	params_Internal.add(bDebug);
 	params_Internal.add(bCycled);
 	params_Internal.add(guiManager.bAutoResize);
 	params_Internal.add(guiManager.bExtra);
 	params_Internal.add(guiManager.bMinimize);
+	//params_Internal.add(bDebug);
 	//params_Internal.add(MODE_Active);
 	//params_Internal.add(ENABLE_keys);
 	//params_Internal.add(MODE_App);
@@ -454,7 +454,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				if (guiManager.bExtra) {
 					ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
 					ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
-					ofxImGuiSurfing::AddToggleRoundedButton(bDebug);
+					//ofxImGuiSurfing::AddToggleRoundedButton(bDebug);
 				}
 				//ofxImGuiSurfing::ToggleRoundedButton("Debug", &bDebug);
 			}
@@ -488,16 +488,16 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			// extra panel
 			if (!guiManager.bMinimize)
 			{
-				if (bDebug) guiManager.drawAdvancedSubPanel();
+				guiManager.drawAdvancedSubPanel();
 
-				if (bDebug) {
-					ImGuiTreeNodeFlags flagst;
-					flagst = ImGuiTreeNodeFlags_None;
-					flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-					flagst |= ImGuiTreeNodeFlags_Framed;
-
-					ofxImGuiSurfing::AddGroup(params, flagst);
-				}
+				//if (bDebug) guiManager.drawAdvancedSubPanel();
+				//if (bDebug) {
+				//	ImGuiTreeNodeFlags flagst;
+				//	flagst = ImGuiTreeNodeFlags_None;
+				//	flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+				//	flagst |= ImGuiTreeNodeFlags_Framed;
+				//	ofxImGuiSurfing::AddGroup(params, flagst);
+				//}
 			}
 
 		}
