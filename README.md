@@ -17,7 +17,7 @@ ofApp.h
 ```c++
 #include "ofxSurfingPresets.h"
 
-ofxSurfingPresets presetsSystem;
+ofxSurfingPresets presets;
 ofParameterGroup params;
 ```
 
@@ -30,7 +30,7 @@ void ofApp::setup() {
     params.add(lineWidth.set("lineWidth", 1, 0.1, 10));
     params.add(size.set("size", 100, 5, 200));
     ..
-    presetsSystem.addGroup(params);
+    presets.addGroup(params);
 }
 ```
 
