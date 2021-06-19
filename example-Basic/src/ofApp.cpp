@@ -2,6 +2,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
+	ofSetWindowPosition(-1920, 20);
+	
 	ofSetCircleResolution(200);
 
 	// group
@@ -32,7 +34,7 @@ void ofApp::exit() {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	presets.keyPressed(key);
+	//presets.keyPressed(key);
 
 	if (key == 'g') {
 		presets.bGui = !presets.bGui;
@@ -49,7 +51,8 @@ void ofApp::drawScene()
 
 	//--
 
-	static ofColor colorBg = 32;
+	static ofColor colorBg = 255;
+	//static ofColor colorBg = 32;
 	ofClear(colorBg);
 
 	ofPushStyle();
@@ -61,9 +64,12 @@ void ofApp::drawScene()
 	ofParameter<ofFloatColor> foreground{ "Foreground", ofFloatColor::black };
 	ImVec4 color = { 0,0,0,1.0 };
 
-	int a = ofMap(_size1, 0, 2, 255, 170);
+	int a1 = ofMap(_size1, 0, 2, 255, 170);
+	int a2 = ofMap(_size2, 0, size2.getMax(), 255, 170);
 
-	ofSetColor(color.x * 255, color.y * 255, color.z * 255, color.w * a);
+	//-
+
+	ofSetColor(color.x * 255, color.y * 255, color.z * 255, color.w * a1);
 	float _scale = 0.1f;
 	float r = ofGetHeight()*_scale*_size1*(1);
 	ofDrawCircle(ofGetWidth()*0.5f, ofGetHeight()*0.5f, r);
@@ -82,7 +88,6 @@ void ofApp::drawScene()
 	ofScale(1.3);
 	ofRotateDeg(rot);
 
-	int a2 = ofMap(_size2, 0, size2.getMax(), 255, 225);
 
 	ofSetColor(background->r * 255, background->g * 255, background->b * 255, background->a * a2);
 	ofDrawRectangle(-rectSize * .5f, -rectSize * .5f, rectSize, rectSize);

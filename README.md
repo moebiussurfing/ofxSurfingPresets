@@ -5,11 +5,12 @@
 Simple presets system for **openFrameworks** with an **ImGui** based GUI.
 
 ## Screenshot
-![image](docs/Capture1.PNG?raw=true "image")
+![gif](docs/ofxSurfingPresets.gif?raw=true "gif")
 
 ## Features
 - De/Serialize JSON files to an ofParameterGroup.  
-- ImGui based GUI: minimizable
+- ImGui based GUI: minimizable.
+- Reset and randomize parameters.
 
 ## Usage
 

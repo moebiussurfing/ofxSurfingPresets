@@ -1,12 +1,13 @@
 {
     "INTERNAL": {
+        "Active": "0",
         "Auto_Resize": "1",
-        "Auto_Save": "0",
-        "Cycled": "0",
-        "Debug": "0",
-        "Extra": "1",
+        "Auto_Save": "1",
+        "Cycled": "1",
+        "Extra": "0",
         "GUI": "1",
+        "Keys": "1",
         "Minimize": "0",
-        "Show_Parameters": "1"
+        "PARAMETERS": "1"
     }
 }

@@ -6,9 +6,7 @@
 
 /*
 
-+ fix next cycled button
-+ fix autosave
-+ add text input to rename preset names
++ add text input to rename preset names/pre
 + batch rename all files
 + delete a file shoul push sorting the gap?
 
@@ -27,9 +25,10 @@ public:
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
 
-public:
+private:
 	bool bAutoDraw; // must be false when multiple ImGui instances created!
 
+public:
 	// required to set to false when only one ImGui instance is created. By default is setted to ImGui multi instances
 	//--------------------------------------------------------------
 	void setImGuiAutodraw(bool b) {
@@ -38,7 +37,8 @@ public:
 //#endif
 	}
 	void setup();
-	
+
+private:
 	string nameRoot;
 
 private:
@@ -46,11 +46,9 @@ private:
 	void draw(ofEventArgs & args);
 	void exit();
 	void startup();
-	
-public:
-	void keyPressed(int key);
 
-public:
+private:
+//public:
 	void draw_ImGui();
 	void draw_ImGui_Minimal();
 	void draw_ImGui_Editor();
@@ -72,7 +70,8 @@ private:
 	// api
 
 public:
-	void addGroup(ofParameterGroup &group) {
+	//--------------------------------------------------------------
+	void addGroup(ofParameterGroup &group) { // main group add
 		setup();
 
 		params_Preset = group;
@@ -82,6 +81,24 @@ public:
 		//refresh
 		startup();
 	}
+
+public:
+	void doSaveCurrent();
+	void doLoadNext();
+	void doLoadPrevious();
+	void load(int _index);
+	void load(string path);
+	void save(string path);
+	void doStoreState();
+	void doRecallState();
+	void doNewPreset();
+	void doCopyPreset();
+	void doDeletePreset();
+	void doClearPresets();
+	void doResetParams();
+	void doRandomizeParams();
+	void doRefreshFiles();
+	void setPath();
 
 	//-
 
@@ -118,21 +135,6 @@ public:
 	}
 	//void setKey_MODE_App(int k);
 
-public:
-	void doSaveCurrent();
-	void doLoadNext();
-	void doLoadPrevious();
-	void load(int _index);
-	void load(string path);
-	void save(string path);
-	void doNewPreset();
-	void doCopyPreset();
-	void doDeletePreset();
-	void doClearPresets();
-	void doResetParams();
-	void doRefreshFiles();
-	void setPath();
-
 private:
 	// files browser
 	ofDirectory dir;
@@ -165,14 +167,13 @@ private:
 	// control params
 
 public:
-	ofParameter<bool> bGui;
+	ofParameter<bool> bGui; // exposed public to use on external gui's
 	//ofParameter<bool> bShowParameters;
 
 private:
 	ofParameter<bool> MODE_Active;
 	ofParameter<bool> ENABLE_Debug;
-
-	//ofParameter<bool> ENABLE_keys;
+	ofParameter<bool> ENABLE_keys;
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> SHOW_Help;
 	//ofParameter<int> MODE_App;
@@ -194,12 +195,16 @@ private:
 	std::string _ext = ".json";
 
 	//ofxPanel gui_Control;
+	
+//public:
+//	void keyPressed(int key);
 
-	//// keys
-	 //void keyPressed(ofKeyEventArgs &eventArgs);
-	 //void keyReleased(ofKeyEventArgs &eventArgs);
-	 //void addKeysListeners();
-	 //void removeKeysListeners();
+private:
+	// keys
+	 void keyPressed(ofKeyEventArgs &eventArgs);
+	 void keyReleased(ofKeyEventArgs &eventArgs);
+	 void addKeysListeners();
+	 void removeKeysListeners();
 
 	//// mouse
 	 //void mouseDragged(ofMouseEventArgs &eventArgs);
