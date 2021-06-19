@@ -11,6 +11,8 @@ Simple presets system for **openFrameworks** with an **ImGui** based GUI.
 - De/Serialize JSON files to an ofParameterGroup.  
 - ImGui based GUI: minimizable.
 - Reset and randomize parameters.
+- Minimizable. Easy to integrate to your projects/add-ons.
+- One memory slot to Store/Recall and copy presets.
 
 ## Usage
 
