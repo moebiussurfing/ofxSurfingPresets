@@ -54,16 +54,16 @@ void ofxSurfingPresets::setup()
 	//--
 
 	// params 
-	bCycled.set("Cycled", false);
-	bAutoSave.set("Auto Save", false);
+	bCycled.set("Cycled", true);
+	bAutoSave.set("Auto Save", true);
 	bSave.set("SAVE", false);
 	bLoad.set("LOAD", false);
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 	index.set("INDEX", 0, 0, 0);
-	bShowParameters.set("PARAMETERS", true);
+	bShowParameters.set("PARAMETERS", false);
 	MODE_Active.set("Active", true);
-	bGui.set("GUI", true);
+	bGui.set("SURFING PRESETS", true);
 	bAutoSave.set("Auto Save", false);
 	bDebug.set("Debug", true);
 
@@ -372,6 +372,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				widgetsManager.Add(bSave, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
 				widgetsManager.Add(bLoad, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
 
+				// parameters
+				if (!guiManager.bMinimize) ofxImGuiSurfing::AddToggleRoundedButton(bShowParameters);
+
 				bool bOpen = false;
 				ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
 				_flagt |= ImGuiTreeNodeFlags_Framed;
@@ -441,6 +444,53 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 			//-
 
+			// minimize
+			ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
+			//ImGui::Dummy(ImVec2(0, 2));
+
+			//-
+
+			if (!guiManager.bMinimize)
+			{
+				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
+
+				if (guiManager.bExtra) 
+				{
+					ImGui::Indent();
+					ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
+					ofxImGuiSurfing::AddToggleRoundedButton(ENABLE_keys);
+					//ofxImGuiSurfing::AddToggleRoundedButton(MODE_Active);
+					ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
+					ImGui::Text(path_Presets.data()); // -> show path
+					//ofxImGuiSurfing::AddToggleRoundedButton(bDebug);
+					ImGui::Unindent();
+				}
+				//ofxImGuiSurfing::ToggleRoundedButton("Debug", &bDebug);
+			}
+
+			//-
+
+			// all
+
+			//if (bDebug) {
+			//	xx += ww + pad;
+			//	ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
+			//	ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
+			//	n = "ofxSurfingPresets";
+			//	guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
+			//	{
+			//		ImGuiTreeNodeFlags flagst;
+			//		flagst = ImGuiTreeNodeFlags_None;
+			//		flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+			//		flagst |= ImGuiTreeNodeFlags_Framed;
+			//		ofxImGuiSurfing::AddGroup(params_Internal, flagst);
+			//		ofxImGuiSurfing::AddGroup(params_Control, flagst);
+			//	}
+			//	guiManager.endWindow();
+			//}
+
+			//-
+
 			// extra
 
 			if (!guiManager.bMinimize)
@@ -476,53 +526,6 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					// debug
 				}
 			}
-
-			//-
-
-			// parameters
-			ofxImGuiSurfing::AddToggleRoundedButton(bShowParameters);
-
-			// minimize
-			ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
-			//ImGui::Dummy(ImVec2(0, 2));
-
-			//-
-
-			if (!guiManager.bMinimize)
-			{
-				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
-
-				if (guiManager.bExtra) {
-					ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
-					ofxImGuiSurfing::AddToggleRoundedButton(ENABLE_keys);
-					//ofxImGuiSurfing::AddToggleRoundedButton(MODE_Active);
-					ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
-					ImGui::Text(path_Presets.data()); // -> show path
-					//ofxImGuiSurfing::AddToggleRoundedButton(bDebug);
-				}
-				//ofxImGuiSurfing::ToggleRoundedButton("Debug", &bDebug);
-			}
-
-			//-
-
-			// all
-
-			//if (bDebug) {
-			//	xx += ww + pad;
-			//	ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
-			//	ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
-			//	n = "ofxSurfingPresets";
-			//	guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
-			//	{
-			//		ImGuiTreeNodeFlags flagst;
-			//		flagst = ImGuiTreeNodeFlags_None;
-			//		flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-			//		flagst |= ImGuiTreeNodeFlags_Framed;
-			//		ofxImGuiSurfing::AddGroup(params_Internal, flagst);
-			//		ofxImGuiSurfing::AddGroup(params_Control, flagst);
-			//	}
-			//	guiManager.endWindow();
-			//}
 
 			//-
 
@@ -1121,6 +1124,8 @@ void ofxSurfingPresets::doSaveCurrent()
 void ofxSurfingPresets::load(int _index)
 {
 	ofLogNotice(__FUNCTION__) << _index;
+
+	index = _index;
 }
 
 //--------------------------------------------------------------

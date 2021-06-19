@@ -13,7 +13,7 @@ void ofApp::setup() {
 	params.add(rotation.set("rotation", 1, 0, 2));
 	params.add(rotationOffset.set("rotationOffset", 180, 0, 360));
 
-	presets.setImGuiAutodraw(true); // -> required when using only one ImGui instance inside the add-ons of your ofApp
+	presets.setImGuiAutodraw(true); // -> required true when using only one ImGui instance inside the add-ons of your ofApp
 	presets.addGroup(params);
 }
 
@@ -36,6 +36,9 @@ void ofApp::keyPressed(int key)
 {
 	if (key == 'g') {
 		presets.bGui = !presets.bGui;
+	}
+	if (key == ' ') {
+		presets.doLoadNext();
 	}
 }
 

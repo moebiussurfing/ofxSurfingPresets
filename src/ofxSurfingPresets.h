@@ -6,9 +6,12 @@
 
 /*
 
++ add buttons clickers like ofxPresetsManager
++ fix that file clicker set index and respects auto save
++ add key commands 1-2-3-..
 + add text input to rename preset names/pre
 + batch rename all files
-+ delete a file shoul push sorting the gap?
++ delete a file should push sorting the gap?
 
 */
 
@@ -32,9 +35,7 @@ public:
 	// required to set to false when only one ImGui instance is created. By default is setted to ImGui multi instances
 	//--------------------------------------------------------------
 	void setImGuiAutodraw(bool b) {
-//#ifdef USE_SURFING_TWEENER__GUI_LOCAL
 		bAutoDraw = b;
-//#endif
 	}
 	void setup();
 

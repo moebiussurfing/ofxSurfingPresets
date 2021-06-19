@@ -1,13 +1,13 @@
 {
     "INTERNAL": {
-        "Active": "0",
+        "Active": "1",
         "Auto_Resize": "1",
         "Auto_Save": "1",
         "Cycled": "1",
         "Extra": "0",
-        "GUI": "1",
         "Keys": "1",
         "Minimize": "1",
-        "PARAMETERS": "1"
+        "PARAMETERS": "1",
+        "SURFING_PRESETS": "1"
     }
 }
