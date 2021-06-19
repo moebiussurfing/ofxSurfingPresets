@@ -34,8 +34,6 @@ void ofApp::exit() {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	//presets.keyPressed(key);
-
 	if (key == 'g') {
 		presets.bGui = !presets.bGui;
 	}

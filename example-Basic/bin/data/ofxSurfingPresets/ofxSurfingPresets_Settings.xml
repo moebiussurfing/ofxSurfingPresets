@@ -7,7 +7,7 @@
         "Extra": "0",
         "GUI": "1",
         "Keys": "1",
-        "Minimize": "0",
+        "Minimize": "1",
         "PARAMETERS": "1"
     }
 }
