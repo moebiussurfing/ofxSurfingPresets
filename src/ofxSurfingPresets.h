@@ -47,10 +47,11 @@ private:
 	void exit();
 	void startup();
 
-private:
-//public:
-	void draw_ImGui();
+public:
 	void draw_ImGui_Minimal();
+
+private:
+	void draw_ImGui();
 	void draw_ImGui_Editor();
 
 	//-
