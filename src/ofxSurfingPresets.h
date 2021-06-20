@@ -6,6 +6,7 @@
 
 /*
 
++ add undo engine
 + add buttons clickers like ofxPresetsManager
 + fix that file clicker set index and respects auto save
 + add key commands 1-2-3-..

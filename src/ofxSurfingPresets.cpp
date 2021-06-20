@@ -448,7 +448,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					//}
 
 					//TODO: show only on last preset
-					if (index == index.getMax())
+					//if (index == index.getMax())
 					{
 						if (ImGui::Button("CLEAR", ImVec2(_w50, _h / 2)))
 						{
