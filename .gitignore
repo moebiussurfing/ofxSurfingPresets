@@ -553,3 +553,12 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+example-Basic/bin/data/ofxSurfingPresets/presets/paramsGroup_00.json
+example-Basic/bin/data/ofxSurfingPresets/presets/paramsGroup_01.json
+example-Basic/bin/data/ofxSurfingPresets/presets/paramsGroup_02.json
+example-Basic/bin/data/ofxSurfingPresets/presets/paramsGroup_03.json
+example-Basic/bin/data/ofxSurfingPresets/presets/paramsGroup_04.json
+example-Basic/bin/data/ofxSurfingPresets/presets/paramsGroup_05.json
+example-Basic/bin/data/ofxSurfingPresets/Preset.json
+example-Basic/bin/data/ofxSurfingPresets/ofxSurfingPresets_Settings.xml
+example-Basic/bin/imgui.ini

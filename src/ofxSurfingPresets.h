@@ -20,6 +20,8 @@
 #include "ofxSurfingImGui.h"
 //#include "ofxGui.h"
 
+#define NUM_KEY_COMMANDS 19
+
 class ofxSurfingPresets
 {
 	//-
@@ -29,14 +31,19 @@ public:
 	~ofxSurfingPresets();
 
 private:
-	bool bAutoDraw; // must be false when multiple ImGui instances created!
+	char keyCommands[NUM_KEY_COMMANDS] = {
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+		'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' };
 
+private:
+	bool bAutoDraw; // must be false when multiple ImGui instances created!
 public:
 	// required to set to false when only one ImGui instance is created. By default is setted to ImGui multi instances
 	//--------------------------------------------------------------
 	void setImGuiAutodraw(bool b) {
 		bAutoDraw = b;
 	}
+
 	void setup();
 
 private:
@@ -97,6 +104,7 @@ public:
 	void doCopyPreset();
 	void doDeletePreset();
 	void doClearPresets();
+	void doPopulatePresets();
 	void doResetParams();
 	void doRandomizeParams();
 	void doRefreshFiles();
@@ -121,6 +129,7 @@ private:
 	ofParameter<bool> bRefresh;
 	ofParameter<bool> bDebug;
 	ofParameter<bool> bShowParameters;
+	ofParameter<bool> bShowClicker;
 	ofParameter<int> index;
 
 	bool bOpen0 = true;
@@ -175,7 +184,7 @@ public:
 private:
 	ofParameter<bool> MODE_Active;
 	ofParameter<bool> ENABLE_Debug;
-	ofParameter<bool> ENABLE_keys;
+	ofParameter<bool> bKeys;
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> SHOW_Help;
 	//ofParameter<int> MODE_App;

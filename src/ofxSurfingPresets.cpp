@@ -56,15 +56,16 @@ void ofxSurfingPresets::setup()
 	// params 
 	bCycled.set("Cycled", true);
 	bAutoSave.set("Auto Save", true);
+	bAutoSaveTimer.set("Auto Save Timed", false);
 	bSave.set("SAVE", false);
 	bLoad.set("LOAD", false);
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 	index.set("INDEX", 0, 0, 0);
+	bShowClicker.set("Clicker", false);
 	bShowParameters.set("PARAMETERS", false);
 	MODE_Active.set("Active", true);
 	bGui.set("SURFING PRESETS", true);
-	bAutoSave.set("Auto Save", false);
 	bDebug.set("Debug", true);
 
 	params_Control.setName("PRESETS CONTROL");
@@ -72,8 +73,10 @@ void ofxSurfingPresets::setup()
 	params_Control.add(bLoad);
 	params_Control.add(bSetPathPresets);
 	params_Control.add(bShowParameters);
+	params_Control.add(bShowClicker);
 	params_Control.add(bRefresh);
 	params_Control.add(bAutoSave);
+	params_Control.add(bAutoSaveTimer);
 	params_Control.add(bCycled);
 	params_Control.add(index);
 
@@ -82,7 +85,7 @@ void ofxSurfingPresets::setup()
 	//-
 
 	// params
-	ENABLE_keys.set("Keys", true);
+	bKeys.set("Keys", true);
 	//SHOW_Help.set("HELP", false);	
 	//MODE_App.set("APP MODE", 0, 0, NUM_MODES_APP - 1);
 	//MODE_App_Name.set("", "");
@@ -93,12 +96,14 @@ void ofxSurfingPresets::setup()
 	params_Internal.setName("INTERNAL");
 	params_Internal.add(bGui);
 	params_Internal.add(bShowParameters);
+	params_Internal.add(bShowClicker);
 	params_Internal.add(bAutoSave);
+	params_Internal.add(bAutoSaveTimer);
 	params_Internal.add(bCycled);
 	params_Internal.add(guiManager.bAutoResize);
 	params_Internal.add(guiManager.bExtra);
 	params_Internal.add(guiManager.bMinimize);
-	params_Internal.add(ENABLE_keys);
+	params_Internal.add(bKeys);
 	params_Internal.add(MODE_Active);
 	//params_Internal.add(bDebug);
 	//params_Internal.add(MODE_App);
@@ -113,6 +118,7 @@ void ofxSurfingPresets::setup()
 	bLoad.setSerializable(false);
 	bSetPathPresets.setSerializable(false);
 	bRefresh.setSerializable(false);
+	MODE_Active.setSerializable(false);
 
 	//-
 
@@ -130,6 +136,8 @@ void ofxSurfingPresets::setup()
 	guiManager.setImGuiAutodraw(bAutoDraw);
 	guiManager.setup(); // this instantiates and configurates ofxImGui inside the class object.
 	//guiManager.bAutoResize = false;
+
+	//-
 
 	// files
 	doRefreshFiles();
@@ -187,7 +195,7 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 {
 	// autosave
 	//bAutoSave = false;
-	if (bAutoSave && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave)
+	if (bAutoSaveTimer && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave)
 	{
 		DISABLE_Callbacks = true;
 
@@ -342,6 +350,17 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				ImGui::PopButtonRepeat();
 			}
 
+			//--
+
+			// TODO: copy this code to my ImGui hewlpers..
+
+			if (bShowClicker)
+			{
+				ofxImGuiSurfing::AddMatrixClicker(index, "Clicker", true);
+			}
+
+			//--
+
 			//widgetsManager.Add(index, SurfingWidgetTypes::IM_DRAG); // crash
 			//widgetsManager.Add(index, SurfingWidgetTypes::IM_DEFAULT);
 			//widgetsManager.Add(index, SurfingWidgetTypes::IM_STEPPER);
@@ -414,30 +433,38 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 						doNewPreset();
 					}
 					ImGui::SameLine();
-					if (ImGui::Button("CLEAR", ImVec2(_w50, _h / 2)))
+					if (ImGui::Button("DELETE", ImVec2(_w50, _h / 2)))
 					{
-						doClearPresets();
+						doDeletePreset();
 					}
+
+					widgetsManager.Add(bRefresh, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
+					widgetsManager.Add(bSetPathPresets, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
 
 					//TODO:
 					//if (ImGui::Button("COPY", ImVec2(_w50, _h / 2)))
 					//{
 					//	doCopyPreset();
 					//}
-					//TODO:
-					//if (ImGui::Button("DELETE", ImVec2(_w50, _h / 2)))
-					//{
-					//	doDeletePreset();
-					//}
 
-					widgetsManager.Add(bRefresh, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
-					widgetsManager.Add(bSetPathPresets, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
+					//TODO: show only on last preset
+					if (index == index.getMax())
+					{
+						if (ImGui::Button("CLEAR", ImVec2(_w50, _h / 2)))
+						{
+							doClearPresets();
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("POPULATE", ImVec2(_w50, _h / 2)))
+						{
+							doPopulatePresets();
+						}
+					}
 
 					//ImGui::Dummy(ImVec2(0, 2));
 
 					ImGui::TreePop();
 				}
-
 			}
 
 			//ImGui::Dummy(ImVec2(0, 2));
@@ -454,15 +481,17 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			{
 				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
 
-				if (guiManager.bExtra) 
+				if (guiManager.bExtra)
 				{
 					ImGui::Indent();
+					ofxImGuiSurfing::AddToggleRoundedButton(bShowClicker);
 					ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
-					ofxImGuiSurfing::AddToggleRoundedButton(ENABLE_keys);
-					//ofxImGuiSurfing::AddToggleRoundedButton(MODE_Active);
+					ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
 					ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
-					ImGui::Text(path_Presets.data()); // -> show path
+					ofxImGuiSurfing::AddToggleRoundedButton(bAutoSaveTimer);
+					//ofxImGuiSurfing::AddToggleRoundedButton(MODE_Active);
 					//ofxImGuiSurfing::AddToggleRoundedButton(bDebug);
+					ImGui::Text(path_Presets.data()); // -> show path
 					ImGui::Unindent();
 				}
 				//ofxImGuiSurfing::ToggleRoundedButton("Debug", &bDebug);
@@ -501,29 +530,38 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					// buttons selector
 
-					//TODO:
-					//customize label
+					if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
+					{
+						//TODO. index back not working
+						// this is a workaround
+						// could fail on macOS/Linux -> requires fix paths slashes
+						for (int i = 0; i < dir.size(); i++)
+						{
+							string si = ofToString(i);
+							if (i < 10) si = "0" + si;
+							string ss = nameRoot + "_" + si;
+							fileName = ss;
 
-					int _i;
-					if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, { "json" })) {
-						ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected;
-						load(nameSelected);
-						int i = 0;
-						for (auto n : fileNames) {
-							string name = path_Presets + "/" + n;
-							ofLogNotice(__FUNCTION__) << "name: " << name;
-							if (nameSelected == name) {
-								index.setWithoutEventNotifications(i);
+							auto s0 = ofSplitString(nameSelected, "\\", true);
+							string s1 = s0[s0.size() - 1]; // filename
+							auto s = ofSplitString(s1, ".json");
+
+							string _nameSelected = s[0];
+
+							if (_nameSelected == fileName)
+							{
+								index = i;
 							}
-							i++;
 						}
+
+						ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
+
+						//-
+
+						//load(nameSelected);
 					}
 
 					//ImGui::Dummy(ImVec2(0, 5));
-
-					//-
-
-					// debug
 				}
 			}
 
@@ -664,10 +702,12 @@ void ofxSurfingPresets::draw_ImGui()
 //void ofxSurfingPresets::keyPressed(int key)
 void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 {
+	if (!bKeys) return;
+
 	const int &key = eventArgs.key;
 	ofLogNotice(__FUNCTION__) << (char)key << " [" << key << "]";
 
-	//modifiers
+	// modifiers
 	bool mod_COMMAND = eventArgs.hasModifier(OF_KEY_COMMAND);
 	bool mod_CONTROL = eventArgs.hasModifier(OF_KEY_CONTROL);
 	bool mod_ALT = eventArgs.hasModifier(OF_KEY_ALT);
@@ -682,17 +722,27 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 		ofLogNotice(__FUNCTION__) << "mod_SHIFT: " << (mod_SHIFT ? "ON" : "OFF");
 	}
 
-	if (!ENABLE_keys) return;
-
 	if (key == OF_KEY_LEFT) {
 		doLoadPrevious();
 	}
-	if (key == OF_KEY_RIGHT) {
+	else if (key == OF_KEY_RIGHT) {
 		doLoadNext();
 	}
-	if (key == OF_KEY_RETURN) {
+	else if (key == OF_KEY_RETURN) {
 		doSaveCurrent();
 	}
+	else if (key == OF_KEY_BACKSPACE) {
+		doRandomizeParams();
+	}
+
+	else
+		for (int i = 0; i < NUM_KEY_COMMANDS; i++) {
+			if (key == keyCommands[i]) {
+				load(i);
+				//continue;
+				return;
+			}
+		}
 }
 
 //--------------------------------------------------------------
@@ -749,7 +799,7 @@ void ofxSurfingPresets::setLogLevel(ofLogLevel level)
 //	//-
 //
 //	//disabler for all keys. (independent from MODE_Active)
-//	if (ENABLE_keys)
+//	if (bKeys)
 //	{
 //		//custom
 //		if (key == ' ')
@@ -796,10 +846,10 @@ void ofxSurfingPresets::setLogLevel(ofLogLevel level)
 //	//key enabler
 //	if (key == 'k')
 //	{
-//		ENABLE_keys = !ENABLE_keys;
-//		ofLogNotice(__FUNCTION__) << "KEYS: " << (ENABLE_keys ? "ON" : "OFF");
+//		bKeys = !bKeys;
+//		ofLogNotice(__FUNCTION__) << "KEYS: " << (bKeys ? "ON" : "OFF");
 //
-//		if (!ENABLE_keys)
+//		if (!bKeys)
 //		{
 //			ofLogNotice(__FUNCTION__) << "ALL KEYS DISABLED. PRESS 'k' TO ENABLE GAIN!";
 //		}
@@ -894,7 +944,7 @@ void ofxSurfingPresets::Changed_Params(ofAbstractParameter &e)
 	{
 		string name = e.getName();
 
-		//exclude debugs
+		// exclude debugs
 		if (name != "exclude"
 			&& name != "exclude")
 		{
@@ -902,7 +952,7 @@ void ofxSurfingPresets::Changed_Params(ofAbstractParameter &e)
 
 		}
 
-		//params
+		// params
 		if (name == "")
 		{
 		}
@@ -1019,7 +1069,7 @@ void ofxSurfingPresets::Changed_Internal(ofAbstractParameter &e)
 	{
 		string name = e.getName();
 
-		//exclude debugs
+		// exclude debugs
 		if (name != "exclude"
 			&& name != "exclude")
 		{
@@ -1032,7 +1082,7 @@ void ofxSurfingPresets::Changed_Internal(ofAbstractParameter &e)
 			setActive(MODE_Active);
 		}
 
-		////control params
+		//// control params
 		//if (name == "")
 		//{
 		//}
@@ -1054,7 +1104,7 @@ void ofxSurfingPresets::Changed_Internal(ofAbstractParameter &e)
 		//	}
 		//}
 
-		////filter params
+		//// filter params
 		//if (name == "GUI POSITION")
 		//{
 		//	gui_Control.setPosition(Gui_Position.get().x, Gui_Position.get().y);
@@ -1081,7 +1131,7 @@ void ofxSurfingPresets::Changed_Internal(ofAbstractParameter &e)
 //}
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::setPathGlobal(string s)//must call before setup. disabled by default
+void ofxSurfingPresets::setPathGlobal(string s) // must call before setup. disabled by default
 {
 	ofLogNotice(__FUNCTION__) << s;
 	path_Global = s;
@@ -1089,7 +1139,7 @@ void ofxSurfingPresets::setPathGlobal(string s)//must call before setup. disable
 	ofxSurfingHelpers::CheckFolder(path_Global);
 }
 //--------------------------------------------------------------
-void ofxSurfingPresets::setPathPresets(string s)//must call before setup. disabled by default
+void ofxSurfingPresets::setPathPresets(string s) // must call before setup. disabled by default
 {
 	ofLogNotice(__FUNCTION__) << s;
 	path_Presets = s;
@@ -1173,21 +1223,37 @@ void ofxSurfingPresets::doNewPreset()
 //--------------------------------------------------------------
 void ofxSurfingPresets::doDeletePreset()
 {
-	int pre = index;
+	//int pre = index;
 
 	ofFile::removeFile(filePath);
 	ofLogNotice(__FUNCTION__) << filePath;
 	doRefreshFiles();
 
 	//TODO: set index to new one
-	//should re sort and rename all the presets 
+	// should re sort and rename all the presets 
 	// workflow
 
 	//if (dir.size() > 0) index = pre;
 
 	// load first file in dir
-	if (dir.size() > 0) index = 0;
+	//if (dir.size() > 0) index = 0;
 	//else index = -1;
+
+	// load last
+	if (dir.size() > 0) index = index.getMax();
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doPopulatePresets()
+{
+	//doClearPresets();
+
+	for (int i = 0; i < dir.size(); i++)
+	{
+		index = i;
+		doRandomizeParams();
+		doSaveCurrent();
+	}
 }
 
 //--------------------------------------------------------------
@@ -1268,9 +1334,9 @@ void ofxSurfingPresets::doRefreshFiles()
 	}
 
 	index.setMin(0);
-
 	if (dir.size() == 0) index.setMax(0);
-	else {
+	else
+	{
 		index.setMax(dir.size() - 1);
 	}
 }

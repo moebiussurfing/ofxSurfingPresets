@@ -2,7 +2,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	ofSetWindowPosition(-1920, 20);
+	ofSetWindowPosition(-1920, 26);
 	
 	ofSetCircleResolution(200);
 
