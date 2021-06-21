@@ -16,6 +16,11 @@
 
 */
 
+#define USE_MIDI_PARAMS__SURFING_PRESETS
+
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+#include "ofxMidiParams.h"
+#endif
 
 #include "ofxSurfingHelpers.h"
 #include "ofxSurfingImGui.h"
@@ -30,6 +35,15 @@ class ofxSurfingPresets
 public:
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
+
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+private:
+	ofxMidiParams mMidiParams;
+	vector<ofParameter<bool>> notesIndex;
+	ofParameterGroup params_PresetToggles{ "Presets" };
+	void Changed_Params_PresetToggles(ofAbstractParameter &e);
+	void refreshToggleNotes();
+#endif
 
 private:
 	char keyCommands[NUM_KEY_COMMANDS] = {
@@ -88,6 +102,8 @@ public:
 
 		nameRoot = params_Preset.getName();
 
+		//-
+
 		//refresh
 		startup();
 	}
@@ -115,7 +131,7 @@ public:
 
 private:
 	// gui params
-	ofParameterGroup params; 
+	ofParameterGroup params;
 	ofParameterGroup params_Control;
 	ofParameterGroup params_Internal;
 
@@ -202,21 +218,21 @@ private:
 	std::string path_Global; // this is to folder all files to avoid mixing with other addons data
 	std::string path_Params_Control;
 	std::string path_Presets; // this is to folder all files to avoid mixing with other addons data
-	std::string path_filePreset; 
-	
+	std::string path_filePreset;
+
 	std::string _ext = ".json";
 
 	//ofxPanel gui_Control;
-	
+
 //public:
 //	void keyPressed(int key);
 
 private:
 	// keys
-	 void keyPressed(ofKeyEventArgs &eventArgs);
-	 void keyReleased(ofKeyEventArgs &eventArgs);
-	 void addKeysListeners();
-	 void removeKeysListeners();
+	void keyPressed(ofKeyEventArgs &eventArgs);
+	void keyReleased(ofKeyEventArgs &eventArgs);
+	void addKeysListeners();
+	void removeKeysListeners();
 
 	//// mouse
 	 //void mouseDragged(ofMouseEventArgs &eventArgs);

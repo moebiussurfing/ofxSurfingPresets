@@ -41,7 +41,8 @@ void ofApp::setup() {
 ## Dependencies
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)  
 * [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui)
-* [ofxImGui](https://github.com/Daandelange/ofxImGui/tree/ofParameters-Helpers-Test) from @**Daandelange**  
+* [ofxImGui](https://github.com/Daandelange/ofxImGui/) FORK from @**Daandelange**  
+* [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams) FORK [Optional]  
 
 ## A more powerful and compatible alternative:
 * [ofxPresetsManager](https://github.com/moebiussurfing/ofxPresetsManager)

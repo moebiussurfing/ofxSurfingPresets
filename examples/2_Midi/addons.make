@@ -1,0 +1,7 @@
+ofxGui
+ofxImGui
+ofxMidi
+ofxMidiParams
+ofxSurfingHelpers
+ofxSurfingImGui
+ofxSurfingPresets

@@ -37,12 +37,30 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	ofRemoveListener(params_Internal.parameterChangedE(), this, &ofxSurfingPresets::Changed_Internal);
 	ofRemoveListener(params_Control.parameterChangedE(), this, &ofxSurfingPresets::Changed_Control);
 
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+#endif
+
 	ofxSurfingHelpers::saveGroup(params_Internal, path_Global + path_Params_Control);
 
 	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	exit();
 }
+
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//--------------------------------------------------------------
+void ofxSurfingPresets::refreshToggleNotes()
+{
+	if (DISABLE_Callbacks) return;
+
+	for (int i = 0; i <= index.getMax(); i++)
+	{
+		if (i == index.get()) notesIndex[i] = true;
+		else notesIndex[i] = false;
+	}
+}
+#endif
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::setup()
@@ -154,6 +172,32 @@ void ofxSurfingPresets::startup()
 {
 	ofLogNotice(__FUNCTION__);
 
+	//-
+
+	// midi
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+	notesIndex.clear();
+	params_PresetToggles.clear();
+	for (int i = 0; i <= index.getMax(); i++)
+	{
+		string n = "Preset ";
+		//n += ofToString(i < 10 ? "0" : "");
+		n += ofToString(i);
+
+		ofParameter<bool> b{ n, false };
+		notesIndex.push_back(b);
+		params_PresetToggles.add(b);
+	}
+	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+
+	mMidiParams.connect();
+	mMidiParams.add(params_Preset); // -> to control preset params
+	mMidiParams.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
+	//mMidiParams.add(index);
+#endif
+
+	//-
+
 	DISABLE_Callbacks = false;
 
 	//-
@@ -171,15 +215,6 @@ void ofxSurfingPresets::startup()
 	if (dir.size() == 0)
 	{
 		doNewPreset();
-
-		//string _name = params_Preset.getName() + "_00";
-		//string _ext = ".json";
-		//filePath = path_Presets + "/" + _name + _ext;
-
-		//save(filePath);
-		//doRefreshFiles();
-
-		//index = 0;
 	}
 
 	ofxSurfingHelpers::loadGroup(params_Preset, path_Global + path_filePreset + _ext);
@@ -187,7 +222,6 @@ void ofxSurfingPresets::startup()
 	// workflow
 	// load first
 	index = 0;
-
 }
 
 //--------------------------------------------------------------
@@ -214,6 +248,12 @@ void ofxSurfingPresets::draw(ofEventArgs & args)
 	if (bGui)
 	{
 		draw_ImGui();
+
+		//-
+
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+		mMidiParams.draw();
+#endif
 	}
 }
 
@@ -393,6 +433,11 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 				// parameters
 				if (!guiManager.bMinimize) ofxImGuiSurfing::AddToggleRoundedButton(bShowParameters);
+
+				// midi
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+				ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui);
+#endif
 
 				bool bOpen = false;
 				ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
@@ -1012,30 +1057,39 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 				}
 
 				index_PRE = index;
-			}
+				//}
 
-			// load
+				//-
 
-			ofLogNotice(__FUNCTION__) << "index: " << ofToString(index);
+				// load
 
-			if (dir.size() > 0 && index < dir.size())
-			{
-				//fileName = dir.getName(index);
-				//filePath = dir.getPath(index);
+				ofLogNotice(__FUNCTION__) << "index: " << ofToString(index);
 
-				int i = index;
-				string si = ofToString(i);
-				if (i < 10) si = "0" + si;
-				string ss = nameRoot + "_" + si;
-				fileName = ss;
-				filePath = path_Presets + "/" + ss + _ext;
-				ofLogNotice(__FUNCTION__) << filePath;
+				if (dir.size() > 0 && index < dir.size())
+				{
+					//fileName = dir.getName(index);
+					//filePath = dir.getPath(index);
 
-				load(filePath);
-			}
-			else
-			{
-				ofLogError(__FUNCTION__) << "File out of range";
+					int i = index;
+					string si = ofToString(i);
+					if (i < 10) si = "0" + si;
+					string ss = nameRoot + "_" + si;
+					fileName = ss;
+					filePath = path_Presets + "/" + ss + _ext;
+					ofLogNotice(__FUNCTION__) << filePath;
+
+					load(filePath);
+
+					//-
+
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+					refreshToggleNotes();
+#endif
+				}
+				else
+				{
+					ofLogError(__FUNCTION__) << "File out of range";
+				}
 			}
 		}
 
@@ -1123,6 +1177,34 @@ void ofxSurfingPresets::Changed_Internal(ofAbstractParameter &e)
 		//}
 	}
 }
+
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//--------------------------------------------------------------
+void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
+{
+	if (DISABLE_Callbacks) return;
+
+	string name = e.getName();
+
+	for (int i = 0; i <= index.getMax(); i++)
+	{
+		if (notesIndex[i].get() && name == notesIndex[i].getName())
+		{
+			index = i;
+			//continue;
+		}
+	}
+
+	// make exclusive
+	for (int i = 0; i <= index.getMax(); i++)
+	{
+		if (index != i && notesIndex[i].get())
+		{
+			notesIndex[i] = false;
+		}
+	}
+}
+#endif
 
 ////--------------------------------------------------------------
 //void ofxSurfingPresets::setKey_MODE_App(int k)
