@@ -1,15 +1,2 @@
 <?xml version="1.0"?>
-<midiparams>
-	<param paramName="size1" group="paramsGroup" midiid="-1" displayName="" />
-	<param paramName="size2" group="paramsGroup" midiid="-1" displayName="" />
-	<param paramName="rotation1" group="paramsGroup" midiid="-1" displayName="" />
-	<param paramName="rotation2" group="paramsGroup" midiid="-1" displayName="" />
-	<param paramName="Preset_0" group="Presets" midiid="572" displayName="Note 60" />
-	<param paramName="Preset_1" group="Presets" midiid="573" displayName="Note 61" />
-	<param paramName="Preset_2" group="Presets" midiid="574" displayName="Note 62" />
-	<param paramName="Preset_3" group="Presets" midiid="575" displayName="Note 63" />
-	<param paramName="Preset_4" group="Presets" midiid="564" displayName="Note 52" />
-	<param paramName="Preset_5" group="Presets" midiid="565" displayName="Note 53" />
-	<param paramName="Preset_6" group="Presets" midiid="566" displayName="Note 54" />
-	<param paramName="Preset_7" group="Presets" midiid="567" displayName="Note 55" />
-</midiparams>
+<midiparams />

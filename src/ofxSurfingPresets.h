@@ -6,17 +6,24 @@
 
 /*
 
++ make float clicker full responsible h/v
 + add undo engine
-+ add buttons clickers like ofxPresetsManager
-+ fix that file clicker set index and respects auto save
-+ add key commands 1-2-3-..
+
 + add text input to rename preset names/pre
 + batch rename all files
 + delete a file should push sorting the gap?
 
 */
 
-#define USE_MIDI_PARAMS__SURFING_PRESETS
+
+//--------------------------------------
+
+// OPTIONAL
+
+//#define USE_MIDI_PARAMS__SURFING_PRESETS
+
+//--------------------------------------
+
 
 #ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 #include "ofxMidiParams.h"
@@ -104,7 +111,7 @@ public:
 
 		//-
 
-		//refresh
+		// refresh
 		startup();
 	}
 
@@ -133,7 +140,7 @@ private:
 	// gui params
 	ofParameterGroup params;
 	ofParameterGroup params_Control;
-	ofParameterGroup params_Internal;
+	ofParameterGroup params_AppSettings;
 
 	ofParameter<bool> bCycled;
 
@@ -147,6 +154,7 @@ private:
 	ofParameter<bool> bDebug;
 	ofParameter<bool> bShowParameters;
 	ofParameter<bool> bShowClicker;
+	ofParameter<bool> bShowControl;
 	ofParameter<int> index;
 
 	bool bOpen0 = true;
@@ -202,13 +210,20 @@ private:
 	ofParameter<bool> MODE_Active;
 	ofParameter<bool> ENABLE_Debug;
 	ofParameter<bool> bKeys;
+	ofParameter<bool> bFloatingClicker;
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> SHOW_Help;
 	//ofParameter<int> MODE_App;
 	//ofParameter<string> MODE_App_Name;
 
-	void Changed_Internal(ofAbstractParameter &e);
-	void Changed_Params(ofAbstractParameter &e);
+	ofParameter<int> __amntBtns{ "Max Buttons", 1, 1, 1 };
+	ofParameter<bool> __respBtns{ "Responsive", true };
+	ofParameter<bool> __bExtra{ "Extra", false };
+	ofParameter<bool> __bAutoResize{ "Auto Resize", true };
+	ofParameterGroup params_FloatClicker;
+
+	//void Changed_AppSettings(ofAbstractParameter &e);
+	//void Changed_Params(ofAbstractParameter &e);
 
 public:
 	void setPathGlobal(string s);//must cal before setup. disabled by default

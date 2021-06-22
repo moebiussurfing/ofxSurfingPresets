@@ -3,10 +3,10 @@
         "Auto_Name_Learn": "1",
         "Auto_Save": "1",
         "LOAD": "0",
-        "MAPPING": "1",
+        "MAPPING": "0",
         "MIDI_PARAMS": "1",
         "Minimize": "0",
-        "Position_GUI": "310, 17",
+        "Position_GUI": "1308, 50",
         "Show_Internal": "1"
     }
 }
