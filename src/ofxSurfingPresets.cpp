@@ -54,10 +54,10 @@ void ofxSurfingPresets::refreshToggleNotes()
 {
 	if (DISABLE_Callbacks) return;
 
-	for (int i = 0; i <= index.getMax(); i++)
+	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
-		if (i == index.get()) notesIndex[i] = true;
-		else notesIndex[i] = false;
+		if (i == index.get()) notesIndex[i].set(true);
+		else notesIndex[i].set(false);
 	}
 }
 #endif
@@ -274,6 +274,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 	float _w25;
 	float _h = WIDGETS_HEIGHT;
 
+	static int amntBtns = 4;
+	static bool respBtns = true;
+
 	//-
 
 	std::string n;
@@ -396,7 +399,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 			if (bShowClicker)
 			{
-				ofxImGuiSurfing::AddMatrixClicker(index, "Clicker", true);
+				ofxImGuiSurfing::AddMatrixClicker(index, "CLICKER", true, respBtns, amntBtns);
 			}
 
 			//--
@@ -529,7 +532,18 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				if (guiManager.bExtra)
 				{
 					ImGui::Indent();
+
 					ofxImGuiSurfing::AddToggleRoundedButton(bShowClicker);
+					if (bShowClicker) {
+						ImGui::Indent();
+						ofxImGuiSurfing::ToggleRoundedButton("Responsive", &respBtns);
+						if (respBtns) {
+							ImGui::PushItemWidth(_w50);
+							ImGui::SliderInt("Max Buttons", &amntBtns, 1, index.getMax());
+							ImGui::PopItemWidth();
+						}
+						ImGui::Unindent();
+					}
 					ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
 					ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
 					ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
@@ -537,6 +551,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					//ofxImGuiSurfing::AddToggleRoundedButton(MODE_Active);
 					//ofxImGuiSurfing::AddToggleRoundedButton(bDebug);
 					ImGui::Text(path_Presets.data()); // -> show path
+
 					ImGui::Unindent();
 				}
 				//ofxImGuiSurfing::ToggleRoundedButton("Debug", &bDebug);
@@ -1186,7 +1201,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 
 	string name = e.getName();
 
-	for (int i = 0; i <= index.getMax(); i++)
+	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
 		if (notesIndex[i].get() && name == notesIndex[i].getName())
 		{
@@ -1196,7 +1211,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 	}
 
 	// make exclusive
-	for (int i = 0; i <= index.getMax(); i++)
+	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
 		if (index != i && notesIndex[i].get())
 		{
@@ -1300,6 +1315,24 @@ void ofxSurfingPresets::doNewPreset()
 			continue;
 		}
 	}
+
+	//-
+
+	//TODO:
+
+	int diff = index.getMax() - (notesIndex.size() - 1);
+	if (diff <= 0) return;
+
+	for (int i = 0; i < diff; i++) {
+		string n = "Preset ";
+		n += ofToString(notesIndex.size() + i);
+		ofParameter<bool> b{ n, false };
+		notesIndex.push_back(b);
+		params_PresetToggles.add(b);
+
+		mMidiParams.add(b);
+	}
+
 }
 
 //--------------------------------------------------------------
@@ -1421,6 +1454,30 @@ void ofxSurfingPresets::doRefreshFiles()
 	{
 		index.setMax(dir.size() - 1);
 	}
+
+	//-
+
+//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+//	notesIndex.clear();
+//	params_PresetToggles.clear();
+//	for (int i = 0; i <= index.getMax(); i++)
+//	{
+//		string n = "Preset ";
+//		//n += ofToString(i < 10 ? "0" : "");
+//		n += ofToString(i);
+//
+//		ofParameter<bool> b{ n, false };
+//		notesIndex.push_back(b);
+//		params_PresetToggles.add(b);
+//	}
+//	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+//
+//	mMidiParams.clear();
+//	mMidiParams.add(params_Preset); // -> to control preset params
+//	mMidiParams.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
+//#endif
+
 }
 
 //--------------------------------------------------------------
