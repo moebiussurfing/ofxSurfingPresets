@@ -84,6 +84,7 @@ private:
 
 public:
 	void draw_ImGui_Minimal();
+	void draw_ImGui_Floating();
 
 private:
 	void draw_ImGui();

@@ -294,9 +294,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 	static int amntBtns = 4;
 	static bool respBtns = true;
 
-	//-
-
 	std::string n;
+
+	//-
 
 	ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
 	if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
@@ -314,7 +314,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 			ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
-			n = params_Control.getName();
+			n = params_Control.getName() + "  |" + params_Preset.getName();
+			//n = params_Control.getName();
 
 			guiManager.beginWindow(n.c_str(), &bOpen0, flagsw);
 			{
@@ -724,47 +725,67 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				guiManager.endWindow();
 			}
 		}
+	}
+}
 
-		//---
+//--------------------------------------------------------------
+void ofxSurfingPresets::draw_ImGui_Floating()
+{
+	// panels sizes
+	float xx = 10;
+	float yy = 10;
+	float ww = PANEL_WIDGETS_WIDTH;
+	float hh = PANEL_WIDGETS_HEIGHT * 2;
+	int pad = 10;
 
-		// 3. floating clicker
+	// widgets sizes
+	float _w100;
+	float _w50;
+	float _w33;
+	float _w25;
+	float _h = WIDGETS_HEIGHT;
 
-		if (bFloatingClicker)
+	std::string n;
+
+	// 3. floating clicker
+
+	if (bFloatingClicker)
+	{
+		ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
+		if (__bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
+		//if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
+
+		n = "PRESETS CLICKER  |" + params_Preset.getName();
+		//n = "PRESETS CLICKER";
+
+		guiManager.beginWindow(n.c_str(), (bool*)&bFloatingClicker.get(), flagsw);
 		{
-			ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
-			if (__bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
-			//if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
+			widgetsManager.refreshPanelShape();
+			_w100 = getWidgetsWidth(1);
+			_w50 = getWidgetsWidth(2);
 
-			n = "PRESETS CLICKER";
-			guiManager.beginWindow(n.c_str(), (bool*)&bFloatingClicker.get(), flagsw);
+			ofxImGuiSurfing::AddMatrixClicker(index, __respBtns, __amntBtns);
+
+			ofxImGuiSurfing::AddToggleRoundedButton(__bExtra);
+			if (__bExtra)
 			{
-				widgetsManager.refreshPanelShape();
-				_w100 = getWidgetsWidth(1);
-				_w50 = getWidgetsWidth(2);
+				ImGui::Indent();
 
-				ofxImGuiSurfing::AddMatrixClicker(index, __respBtns, __amntBtns);
-
-				ofxImGuiSurfing::AddToggleRoundedButton(__bExtra);
-				if (__bExtra)
+				ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
+				ofxImGuiSurfing::AddToggleRoundedButton(__bAutoResize);
+				ofxImGuiSurfing::AddToggleRoundedButton(__respBtns);
+				if (__respBtns)
 				{
-					ImGui::Indent();
-
-					ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
-					ofxImGuiSurfing::AddToggleRoundedButton(__bAutoResize);
-					ofxImGuiSurfing::AddToggleRoundedButton(__respBtns);
-					if (__respBtns)
-					{
-						ImGui::PushItemWidth(_w50 - 20);
-						ofxImGuiSurfing::AddIntStepped(__amntBtns);
-						//ofxImGuiSurfing::AddParameter(__amntBtns);
-						ImGui::PopItemWidth();
-					}
-
-					ImGui::Unindent();
+					ImGui::PushItemWidth(_w50 - 20);
+					ofxImGuiSurfing::AddIntStepped(__amntBtns);
+					//ofxImGuiSurfing::AddParameter(__amntBtns);
+					ImGui::PopItemWidth();
 				}
+
+				ImGui::Unindent();
 			}
-			guiManager.endWindow();
 		}
+		guiManager.endWindow();
 	}
 }
 
@@ -845,6 +866,10 @@ void ofxSurfingPresets::draw_ImGui()
 	guiManager.begin();
 	{
 		draw_ImGui_Editor();
+
+		//---
+
+		draw_ImGui_Floating();
 	}
 	guiManager.end();
 
