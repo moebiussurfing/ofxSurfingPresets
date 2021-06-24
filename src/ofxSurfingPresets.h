@@ -6,8 +6,9 @@
 
 /*
 
-+ make float clicker full responsible h/v
++ float clicker full responsible height too
 + add undo engine
++ get copy/drag preset sorting from ofxPresetsManager
 
 + add text input to rename preset names/pre
 + batch rename all files
@@ -46,11 +47,15 @@ public:
 #ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 private:
 	ofxMidiParams mMidiParams;
+#endif
+public:
 	vector<ofParameter<bool>> notesIndex;
 	ofParameterGroup params_PresetToggles{ "Presets" };
 	void Changed_Params_PresetToggles(ofAbstractParameter &e);
 	void refreshToggleNotes();
-#endif
+	ofParameterGroup & getParametersSelectorToggles() { // to select index preset using bool toggle parameters
+		return params_PresetToggles;
+	}
 
 private:
 	char keyCommands[NUM_KEY_COMMANDS] = {

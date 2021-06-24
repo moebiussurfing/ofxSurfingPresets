@@ -37,9 +37,9 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	//ofRemoveListener(params_AppSettings.parameterChangedE(), this, &ofxSurfingPresets::Changed_AppSettings);
 	ofRemoveListener(params_Control.parameterChangedE(), this, &ofxSurfingPresets::Changed_Control);
 
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+	//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-#endif
+	//#endif
 
 	ofxSurfingHelpers::saveGroup(params_AppSettings, path_Global + path_Params_Control);
 
@@ -48,7 +48,7 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	exit();
 }
 
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 //--------------------------------------------------------------
 void ofxSurfingPresets::refreshToggleNotes()
 {
@@ -60,7 +60,7 @@ void ofxSurfingPresets::refreshToggleNotes()
 		else notesIndex[i].set(false);
 	}
 }
-#endif
+//#endif
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::setup()
@@ -192,7 +192,6 @@ void ofxSurfingPresets::startup()
 	//-
 
 	// midi
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 	notesIndex.clear();
 	params_PresetToggles.clear();
 	for (int i = 0; i <= index.getMax(); i++)
@@ -207,6 +206,7 @@ void ofxSurfingPresets::startup()
 	}
 	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 	mMidiParams.connect();
 	mMidiParams.add(params_Preset); // -> to control preset params
 	mMidiParams.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
@@ -738,21 +738,28 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			n = "PRESETS CLICKER";
 			guiManager.beginWindow(n.c_str(), (bool*)&bFloatingClicker.get(), flagsw);
 			{
+				widgetsManager.refreshPanelShape();
+				_w100 = getWidgetsWidth(1);
+				_w50 = getWidgetsWidth(2);
+
 				ofxImGuiSurfing::AddMatrixClicker(index, __respBtns, __amntBtns);
 
-				ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
 				ofxImGuiSurfing::AddToggleRoundedButton(__bExtra);
 				if (__bExtra)
 				{
 					ImGui::Indent();
+
+					ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
 					ofxImGuiSurfing::AddToggleRoundedButton(__bAutoResize);
 					ofxImGuiSurfing::AddToggleRoundedButton(__respBtns);
 					if (__respBtns)
 					{
 						ImGui::PushItemWidth(_w50 - 20);
-						ofxImGuiSurfing::AddParameter(__amntBtns);
+						ofxImGuiSurfing::AddIntStepped(__amntBtns);
+						//ofxImGuiSurfing::AddParameter(__amntBtns);
 						ImGui::PopItemWidth();
 					}
+
 					ImGui::Unindent();
 				}
 			}
@@ -1184,9 +1191,9 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 					//-
 
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 					refreshToggleNotes();
-#endif
+					//#endif
 				}
 				else
 				{
@@ -1278,7 +1285,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 //	}
 //}
 
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 //--------------------------------------------------------------
 void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 {
@@ -1304,7 +1311,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 		}
 	}
 }
-#endif
+//#endif
 
 ////--------------------------------------------------------------
 //void ofxSurfingPresets::setKey_MODE_App(int k)
@@ -1404,7 +1411,6 @@ void ofxSurfingPresets::doNewPreset()
 	//-
 
 	//TODO:
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 	int diff = index.getMax() - (notesIndex.size() - 1);
 	if (diff <= 0) return;
 
@@ -1415,9 +1421,10 @@ void ofxSurfingPresets::doNewPreset()
 		notesIndex.push_back(b);
 		params_PresetToggles.add(b);
 
+#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 		mMidiParams.add(b);
-	}
 #endif
+	}
 
 }
 
