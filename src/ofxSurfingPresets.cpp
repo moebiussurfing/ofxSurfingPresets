@@ -73,6 +73,7 @@ void ofxSurfingPresets::setup()
 
 	// params 
 
+	bGui.set("SURFING PRESETS", true);
 	bCycled.set("Cycled", true);
 	bAutoSave.set("Auto Save", true);
 	bAutoSaveTimer.set("Auto Save Timed", false);
@@ -81,12 +82,11 @@ void ofxSurfingPresets::setup()
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 	index.set("INDEX", 0, 0, 0);
-	bShowClicker.set("Clicker Menu", false);
-	bShowControl.set("Control", true);
-	bFloatingClicker.set("Clicker", false);
+	bShowControl.set("Main Panel", true);
+	bShowClicker.set("Inner Clicker", false);
+	bFloatingClicker.set("Float Clicker", false);
 	bShowParameters.set("PARAMETERS", false);
 	MODE_Active.set("Active", true);
-	bGui.set("SURFING PRESETS", true);
 	bDebug.set("Debug", true);
 	bKeys.set("Keys", true);
 	//SHOW_Help.set("HELP", false);	
@@ -466,6 +466,12 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					widgetsManager.Add(bLoad, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
 				}
 
+				//-
+
+				// minimize
+				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
+				//ImGui::Dummy(ImVec2(0, 2));
+
 				ofxImGuiSurfing::AddToggleRoundedButton(bFloatingClicker);
 
 				if (!guiManager.bMinimize)
@@ -552,12 +558,6 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					}
 				}
 
-				//ImGui::Dummy(ImVec2(0, 2));
-
-				//-
-
-				// minimize
-				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
 				//ImGui::Dummy(ImVec2(0, 2));
 
 				//-
