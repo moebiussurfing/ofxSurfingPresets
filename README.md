@@ -45,7 +45,7 @@ void ofApp::setup() {
 * [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams) FORK [Optional]  
 
 <details>
-  <summary>A MORE POWERFUL ALTERNATIVE : ofxPresetsManager</summary>
+  <summary>A MORE POWERFUL ALTERNATIVE -- ofxPresetsManager</summary>
   <p>
       
     - Presets for multiple groups in parallel.
