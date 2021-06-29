@@ -48,7 +48,7 @@ void ofApp::setup() {
   <summary>A MORE POWERFUL ALTERNATIVE</summary>
   <p>
       
-[ofxPresetsManager](https://github.com/moebiussurfing/ofxPresetsManager)  
+  [ofxPresetsManager](https://github.com/moebiussurfing/ofxPresetsManager)  
     - Presets for multiple groups in parallel.
     - Global Combinations of the groups.
     - BPM timed randomizers with probabilities to select presets.
