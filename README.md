@@ -45,8 +45,9 @@ void ofApp::setup() {
 * [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams) FORK [Optional]  
 
 <details>
-  <summary>ofxPresetsManager: A more Powerful and compatible alternative</summary>
+  <summary>ofxPresetsManager: A MORE POWERFUL ALTERNATIVE</summary>
   <p>
+      
     - Presets for multiple groups in parallel.
     - Global Combinations of the groups.
     - BPM timed randomizers with probabilities to select presets.
