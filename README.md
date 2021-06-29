@@ -44,7 +44,10 @@ void ofApp::setup() {
 * [ofxImGui](https://github.com/Daandelange/ofxImGui/) FORK from @**Daandelange**  
 * [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams) FORK [Optional]  
 
-## A more powerful and compatible alternative:
+<details>
+  <summary>A more Powerful and compatible alternative</summary>
+  <p>
+      
 * [ofxPresetsManager](https://github.com/moebiussurfing/ofxPresetsManager):  
     - Presets for multiple groups in parallel.
     - Global Combinations of the groups.
@@ -53,7 +56,9 @@ void ofApp::setup() {
     - Tweening or Smoothing of parameters with plotting.
     - Drag and copy/paste between slots. 
     - Standalone presets
-    
+      </p>
+</details>
+
 ## Tested Systems
 * **Windows 10** / **VS 2017** / **OF ~0.11**
 
