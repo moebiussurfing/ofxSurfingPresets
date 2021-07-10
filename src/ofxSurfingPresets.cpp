@@ -74,6 +74,7 @@ void ofxSurfingPresets::setup()
 	// params 
 
 	bGui.set("SURFING PRESETS", true);
+	bGuiEditor.set("Editor", true);
 	bCycled.set("Cycled", true);
 	bAutoSave.set("Auto Save", true);
 	bAutoSaveTimer.set("Auto Save Timed", false);
@@ -82,10 +83,10 @@ void ofxSurfingPresets::setup()
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 	index.set("INDEX", 0, 0, 0);
-	bShowControl.set("Main Panel", true);
-	bShowClicker.set("Inner Clicker", false);
+	//bShowControl.set("Main Panel", true);
+	bGui_InnerClicker.set("Inner Clicker", false);
 	bFloatingClicker.set("Float Clicker", false);
-	bShowParameters.set("PARAMETERS", false);
+	bShowParameters.set("Parameters", false);
 	MODE_Active.set("Active", true);
 	bDebug.set("Debug", true);
 	bKeys.set("Keys", true);
@@ -102,7 +103,7 @@ void ofxSurfingPresets::setup()
 	params_Control.add(bSetPathPresets);
 	params_Control.add(bRefresh);
 	//params_Control.add(bShowParameters);
-	//params_Control.add(bShowClicker);
+	//params_Control.add(bGui_InnerClicker);
 	//params_Control.add(bShowControl);
 	//params_Control.add(bFloatingClicker);
 	//params_Control.add(bAutoSave);
@@ -113,14 +114,21 @@ void ofxSurfingPresets::setup()
 
 	//-
 
+	params_InnerClicker.setName("Inner Clicker");
+	params_InnerClicker.add(amntBtns);
+	params_InnerClicker.add(respBtns);
+
+	//-
+
 
 	// params AppSettings
 
 	params_AppSettings.setName("AppSettings");
 	params_AppSettings.add(bGui);
+	params_AppSettings.add(bGuiEditor);
 	params_AppSettings.add(bShowParameters);
-	params_AppSettings.add(bShowClicker);
-	params_AppSettings.add(bShowControl);
+	params_AppSettings.add(bGui_InnerClicker);
+	//params_AppSettings.add(bShowControl);
 	params_AppSettings.add(bFloatingClicker);
 	params_AppSettings.add(bAutoSave);
 	params_AppSettings.add(bAutoSaveTimer);
@@ -130,6 +138,7 @@ void ofxSurfingPresets::setup()
 	params_AppSettings.add(guiManager.bMinimize);
 	params_AppSettings.add(bKeys);
 	params_AppSettings.add(MODE_Active);
+	params_AppSettings.add(params_InnerClicker);
 	//params_AppSettings.add(bDebug);
 	//params_AppSettings.add(MODE_App);
 	//params_AppSettings.add(MODE_App_Name);
@@ -139,11 +148,11 @@ void ofxSurfingPresets::setup()
 	//-
 
 	params_FloatClicker.setName("FLOAT CLICKER");
-	params_FloatClicker.add(bShowControl);
-	params_FloatClicker.add(__amntBtns);
-	params_FloatClicker.add(__respBtns);
-	params_FloatClicker.add(__bExtra);
-	params_FloatClicker.add(__bAutoResize);
+	//params_FloatClicker.add(bShowControl);
+	params_FloatClicker.add(amntBtnsFloatClicker);
+	params_FloatClicker.add(respBtnsFloatClicker);
+	params_FloatClicker.add(bExtraFloatClicker);
+	params_FloatClicker.add(bAutoResizeFloatClicker);
 	params_AppSettings.add(params_FloatClicker);
 
 	//ofAddListener(params_AppSettings.parameterChangedE(), this, &ofxSurfingPresets::Changed_AppSettings);
@@ -277,47 +286,46 @@ void ofxSurfingPresets::draw(ofEventArgs & args)
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_Editor()
 {
-	// panels sizes
-	float xx = 10;
-	float yy = 10;
-	float ww = PANEL_WIDGETS_WIDTH;
-	float hh = PANEL_WIDGETS_HEIGHT * 2;
-	int pad = 10;
-
-	// widgets sizes
-	float _w100;
-	float _w50;
-	float _w33;
-	float _w25;
-	float _h = WIDGETS_HEIGHT;
-
-	static int amntBtns = 4;
-	static bool respBtns = true;
-
-	std::string n;
-
-	//-
-
-	ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
-	if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
-
-	ImGuiCond flagsCond = ImGuiCond_None;
-	flagsCond |= ImGuiCond_FirstUseEver;
-
-	//-
-
+	if (bGuiEditor)
 	{
+		// panels sizes
+		float xx = 10;
+		float yy = 10;
+		float ww = PANEL_WIDGETS_WIDTH;
+		float hh = PANEL_WIDGETS_HEIGHT * 2;
+		int pad = 10;
+
+		// widgets sizes
+		float _w100;
+		float _w50;
+		float _w33;
+		float _w25;
+		float _h = WIDGETS_HEIGHT;
+
+		std::string n;
+
+		//-
+
+		ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
+		if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
+
+		ImGuiCond flagsCond = ImGuiCond_None;
+		flagsCond |= ImGuiCond_FirstUseEver;
+
+		//-
+
 		// 1. control
 
-		if (bShowControl)
+		//if (bShowContbShowControlrol)
 		{
 			ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 			ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
-			n = params_Control.getName() + "  |" + params_Preset.getName();
+			n = params_Control.getName() + " |" + params_Preset.getName();
 			//n = params_Control.getName();
 
-			guiManager.beginWindow(n.c_str(), &bOpen0, flagsw);
+			guiManager.beginWindow(n.c_str(), (bool*)&bGuiEditor.get(), flagsw);
+			//guiManager.beginWindow(n.c_str(), &bOpen0, flagsw);
 			{
 				widgetsManager.refreshPanelShape();
 				_w100 = getWidgetsWidth(1);
@@ -374,6 +382,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				if (!fileNames.empty())
 				{
 					int _i = index;
+					//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
 					ImGui::PushItemWidth(_w100 - 20);
 					if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
 					{
@@ -387,15 +396,16 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					ImGui::PopItemWidth();
 				}
 
-				//ImGui::Dummy(ImVec2(0, 5));
+				//ImGui::Dummy(ImVec2(0, 2));
 
 				//// index
 				//if (!guiManager.bMinimize && guiManager.bExtra) ofxImGuiSurfing::AddIntStepped(index);
 
 				// index
 				//ImGui::PushItemWidth(- 100);
+				ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
 				ofxImGuiSurfing::AddParameter(index);
-				//ImGui::PopItemWidth();
+				ImGui::PopItemWidth();
 
 				// next
 				if (guiManager.bMinimize)
@@ -419,25 +429,16 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 				// TODO: copy this code to my ImGui hewlpers..
 
-				if (bShowClicker)
+				if (bGui_InnerClicker)
 				{
-					static bool bOpen = true;
-					ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-					_flagt |= ImGuiTreeNodeFlags_Framed;
-
-					if (ImGui::TreeNodeEx("CLICKER", _flagt))
-					{
-						ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns);
-
-						ImGui::TreePop();
-					}
+					draw_ImGui_MiniClicker();
 				}
 
 				//--
 
-				//widgetsManager.Add(index, SurfingWidgetTypes::IM_DRAG); // crash
-				//widgetsManager.Add(index, SurfingWidgetTypes::IM_DEFAULT);
-				//widgetsManager.Add(index, SurfingWidgetTypes::IM_STEPPER);
+				//widgetsManager.Add(index, SurfingTypes::IM_DRAG); // crash
+				//widgetsManager.Add(index, SurfingTypes::IM_DEFAULT);
+				//widgetsManager.Add(index, SurfingTypes::IM_STEPPER);
 
 				//// spinner
 				//static int v = 1;
@@ -462,8 +463,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					//ImGui::Dummy(ImVec2(0, 1));
 
-					widgetsManager.Add(bSave, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
-					widgetsManager.Add(bLoad, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
+					widgetsManager.Add(bSave, SurfingTypes::IM_BUTTON_SMALL, true, 2);
+					widgetsManager.Add(bLoad, SurfingTypes::IM_BUTTON_SMALL, false, 2);
 				}
 
 				//-
@@ -474,15 +475,17 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 				ofxImGuiSurfing::AddToggleRoundedButton(bFloatingClicker);
 
+				// parameters
+				ofxImGuiSurfing::AddToggleRoundedButton(bShowParameters);
+
 				if (!guiManager.bMinimize)
 				{
-					// parameters
-					ofxImGuiSurfing::AddToggleRoundedButton(bShowParameters);
 					// keys
 					ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
 					// midi
 #ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 					ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui);
+					//ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGuiEditor);
 #endif
 
 					bool bOpen = false;
@@ -498,6 +501,16 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 						_w25 = getWidgetsWidth(4);
 
 						//ImGui::SameLine();
+
+						if (ImGui::Button("NEW", ImVec2(_w50, _h / 2)))
+						{
+							doNewPreset();
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("DELETE", ImVec2(_w50, _h / 2)))
+						{
+							doDeletePreset();
+						}
 
 						if (ImGui::Button("STORE", ImVec2(_w50, _h / 2)))
 						{
@@ -519,18 +532,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 							doRandomizeParams();
 						}
 
-						if (ImGui::Button("NEW", ImVec2(_w50, _h / 2)))
-						{
-							doNewPreset();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("DELETE", ImVec2(_w50, _h / 2)))
-						{
-							doDeletePreset();
-						}
-
-						widgetsManager.Add(bRefresh, SurfingWidgetTypes::IM_BUTTON_SMALL, true, 2);
-						widgetsManager.Add(bSetPathPresets, SurfingWidgetTypes::IM_BUTTON_SMALL, false, 2);
+						widgetsManager.Add(bRefresh, SurfingTypes::IM_BUTTON_SMALL, true, 2);
+						widgetsManager.Add(bSetPathPresets, SurfingTypes::IM_BUTTON_SMALL, false, 2);
 
 						//TODO:
 						//if (ImGui::Button("COPY", ImVec2(_w50, _h / 2)))
@@ -558,29 +561,40 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					}
 				}
 
-				//ImGui::Dummy(ImVec2(0, 2));
 
 				//-
 
 				if (!guiManager.bMinimize)
 				{
+					ImGui::Dummy(ImVec2(0, 4));
 					ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
 
 					ImGui::Indent();
 
 					if (guiManager.bExtra)
 					{
-						ofxImGuiSurfing::AddToggleRoundedButton(bShowClicker);
+						ofxImGuiSurfing::AddToggleRoundedButton(bGui_InnerClicker);
 						//ofxImGuiSurfing::AddToggleRoundedButton(bFloatingClicker);
-						if (bShowClicker)
+						if (bGui_InnerClicker)
 						{
 							ImGui::Indent();
-							ofxImGuiSurfing::ToggleRoundedButton("Responsive", &respBtns);
-							if (respBtns) {
-								ImGui::PushItemWidth(_w50 - 20);
-								ImGui::SliderInt("Max Buttons", &amntBtns, 1, index.getMax() + 1);
+
+							//ofxImGuiSurfing::ToggleRoundedButton("Responsive", &respBtns);
+							//if (respBtns) {
+							//	ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+							//	//ImGui::PushItemWidth(_w50 - 20);
+							//	ImGui::SliderInt("Max Buttons", &amntBtns, 1, index.getMax() + 1);
+							//	ImGui::PopItemWidth();
+							//}
+
+							ofxImGuiSurfing::AddToggleRoundedButton(respBtns);
+							if (respBtns)
+							{
+								ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+								ofxImGuiSurfing::AddIntStepped(amntBtns);
 								ImGui::PopItemWidth();
 							}
+
 							ImGui::Unindent();
 						}
 						ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
@@ -637,9 +651,12 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 						if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
 						{
+							// buttons matrix
+
 							//TODO. index back not working
 							// this is a workaround
 							// could fail on macOS/Linux -> requires fix paths slashes
+
 							for (int i = 0; i < dir.size(); i++)
 							{
 								string si = ofToString(i);
@@ -666,7 +683,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 							//load(nameSelected);
 						}
 
-						//ImGui::Dummy(ImVec2(0, 5));
+						//ImGui::Dummy(ImVec2(0, 2));
 					}
 				}
 
@@ -710,17 +727,20 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 				ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
-				n = "PARAMETERS";
+				//n = "PARAMETERS";
+				n = "PARAMETERS |" + params_Preset.getName();
+
 				//n = params_Preset.getName();
 				guiManager.beginWindow(n.c_str(), (bool*)&bShowParameters.get(), flagsw);
 				//guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
 				{
-					ImGuiTreeNodeFlags flagst;
-					flagst = ImGuiTreeNodeFlags_None;
-					flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-					flagst |= ImGuiTreeNodeFlags_Framed;
+					//ImGuiTreeNodeFlags flagst;
+					//flagst = ImGuiTreeNodeFlags_None;
+					//flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+					//flagst |= ImGuiTreeNodeFlags_Framed;
+					//ofxImGuiSurfing::AddGroup(params_Preset, flagst);
 
-					ofxImGuiSurfing::AddGroup(params_Preset, flagst);
+					ofxImGuiSurfing::AddGroup(params_Preset);
 				}
 				guiManager.endWindow();
 			}
@@ -731,31 +751,31 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_Floating()
 {
-	// panels sizes
-	float xx = 10;
-	float yy = 10;
-	float ww = PANEL_WIDGETS_WIDTH;
-	float hh = PANEL_WIDGETS_HEIGHT * 2;
-	int pad = 10;
-
-	// widgets sizes
-	float _w100;
-	float _w50;
-	float _w33;
-	float _w25;
-	float _h = WIDGETS_HEIGHT;
-
-	std::string n;
-
-	// 3. floating clicker
-
 	if (bFloatingClicker)
 	{
+
+		// panels sizes
+		float xx = 10;
+		float yy = 10;
+		float ww = PANEL_WIDGETS_WIDTH;
+		float hh = PANEL_WIDGETS_HEIGHT * 2;
+		int pad = 10;
+
+		// widgets sizes
+		float _w100;
+		float _w50;
+		float _w33;
+		float _w25;
+		float _h = WIDGETS_HEIGHT;
+
+		std::string n;
+
+		// 3. floating clicker
 		ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
-		if (__bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
+		if (bAutoResizeFloatClicker) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 		//if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 
-		n = "PRESETS CLICKER  |" + params_Preset.getName();
+		n = "PRESETS CLICKER |" + params_Preset.getName();
 		//n = "PRESETS CLICKER";
 
 		guiManager.beginWindow(n.c_str(), (bool*)&bFloatingClicker.get(), flagsw);
@@ -764,21 +784,24 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 			_w100 = getWidgetsWidth(1);
 			_w50 = getWidgetsWidth(2);
 
-			ofxImGuiSurfing::AddMatrixClicker(index, __respBtns, __amntBtns);
+			ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true);
 
-			ofxImGuiSurfing::AddToggleRoundedButton(__bExtra);
-			if (__bExtra)
+			ofxImGuiSurfing::AddToggleRoundedButton(bGuiEditor);
+
+			ofxImGuiSurfing::AddToggleRoundedButton(bExtraFloatClicker);
+			if (bExtraFloatClicker)
 			{
 				ImGui::Indent();
 
-				ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
-				ofxImGuiSurfing::AddToggleRoundedButton(__bAutoResize);
-				ofxImGuiSurfing::AddToggleRoundedButton(__respBtns);
-				if (__respBtns)
+				//ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
+				ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
+				ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
+				if (respBtnsFloatClicker)
 				{
-					ImGui::PushItemWidth(_w50 - 20);
-					ofxImGuiSurfing::AddIntStepped(__amntBtns);
-					//ofxImGuiSurfing::AddParameter(__amntBtns);
+					ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+					//ImGui::PushItemWidth(_w50 - 20);
+					ofxImGuiSurfing::AddIntStepped(amntBtnsFloatClicker);
+					//ofxImGuiSurfing::AddParameter(amntBtnsFloatClicker);
 					ImGui::PopItemWidth();
 				}
 
@@ -786,6 +809,20 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 			}
 		}
 		guiManager.endWindow();
+	}
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::draw_ImGui_MiniClicker() {
+	static bool bOpen = true;
+	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+	_flagt |= ImGuiTreeNodeFlags_Framed;
+
+	if (ImGui::TreeNodeEx("PRESETS", _flagt))
+	{
+		ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns, true);
+
+		ImGui::TreePop();
 	}
 }
 
@@ -802,7 +839,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 		float _w50 = ofxImGuiSurfing::getWidgetsWidth(2);
 		float _h = BUTTON_BIG_HEIGHT;
 
-		//ImGui::Dummy(ImVec2(0, 5));
+		//ImGui::Dummy(ImVec2(0, 2));
 
 		// index
 		ofxImGuiSurfing::AddParameter(index);
@@ -812,6 +849,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 		{
 			int _i = index;
 
+			//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
 			ImGui::PushItemWidth(_w100 - 20);
 			if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
 			{
@@ -857,6 +895,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 		ImGui::TreePop();
 
 		ofxImGuiSurfing::AddToggleRoundedButton(bGui);
+		ofxImGuiSurfing::AddToggleRoundedButton(bGuiEditor);
 	}
 }
 
@@ -1225,6 +1264,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					ofLogError(__FUNCTION__) << "File out of range";
 				}
 			}
+			else { bIsRetrigged = true; }
 		}
 
 		if (name == bSave.getName() && bSave)
@@ -1353,7 +1393,7 @@ void ofxSurfingPresets::setPathGlobal(string s) // must call before setup. disab
 	ofxSurfingHelpers::CheckFolder(path_Global);
 }
 //--------------------------------------------------------------
-void ofxSurfingPresets::setPathPresets(string s) // must call before setup. disabled by default
+void ofxSurfingPresets::setPathPresets(string s)
 {
 	ofLogNotice(__FUNCTION__) << s;
 	path_Presets = s;
@@ -1571,7 +1611,8 @@ void ofxSurfingPresets::doRefreshFiles()
 	else
 	{
 		index.setMax(dir.size() - 1);
-		__amntBtns.setMax(dir.size());
+		amntBtnsFloatClicker.setMax(dir.size());
+		amntBtns.setMax(dir.size());
 	}
 
 	//-

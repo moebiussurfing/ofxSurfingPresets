@@ -6,8 +6,9 @@
 
 /*
 
++ fix populate crash
 + float clicker full responsible height too
-+ add undo engine
++ add undo engine. get from ofxPresetsManager
 + get copy/drag preset sorting from ofxPresetsManager
 
 + add text input to rename preset names/pre
@@ -57,6 +58,21 @@ public:
 		return params_PresetToggles;
 	}
 
+	// easy callbacks
+	// to retrig when preset not changed but is clicked again.
+public:
+	bool isRetrigged()
+	{
+		if (bIsRetrigged) 
+		{
+			bIsRetrigged = false;
+			return true;
+		}
+		else return false;
+	}
+private:
+	bool bIsRetrigged = false;
+
 private:
 	char keyCommands[NUM_KEY_COMMANDS] = {
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -85,6 +101,15 @@ private:
 public:
 	void draw_ImGui_Minimal();
 	void draw_ImGui_Floating();
+	
+	void draw_ImGui_MiniClicker();
+	//float inner clicker layout
+	ofParameter<int> amntBtns{ "Amt Buttons",4 };
+	ofParameter<bool> respBtns{ "Responsive", true };
+	//int amntBtns = 4;
+	//bool respBtns = true;
+	ofParameterGroup params_InnerClicker;
+
 
 private:
 	void draw_ImGui();
@@ -159,8 +184,8 @@ private:
 	ofParameter<bool> bRefresh;
 	ofParameter<bool> bDebug;
 	ofParameter<bool> bShowParameters;
-	ofParameter<bool> bShowClicker;
-	ofParameter<bool> bShowControl;
+	ofParameter<bool> bGui_InnerClicker;
+	//ofParameter<bool> bShowControl;
 	ofParameter<int> index;
 
 	bool bOpen0 = true;
@@ -213,6 +238,9 @@ public:
 	//ofParameter<bool> bShowParameters;
 
 private:
+	ofParameter<bool> bGuiEditor;
+	
+private:
 	ofParameter<bool> MODE_Active;
 	ofParameter<bool> ENABLE_Debug;
 	ofParameter<bool> bKeys;
@@ -222,18 +250,19 @@ private:
 	//ofParameter<int> MODE_App;
 	//ofParameter<string> MODE_App_Name;
 
-	ofParameter<int> __amntBtns{ "Max Buttons", 1, 1, 1 };
-	ofParameter<bool> __respBtns{ "Responsive", true };
-	ofParameter<bool> __bExtra{ "Extra", false };
-	ofParameter<bool> __bAutoResize{ "Auto Resize", true };
+	//float clicker layout
+	ofParameter<int> amntBtnsFloatClicker{ "Max Buttons", 1, 1, 1 };
+	ofParameter<bool> respBtnsFloatClicker{ "Responsive", true };
+	ofParameter<bool> bExtraFloatClicker{ "Extra", false };
+	ofParameter<bool> bAutoResizeFloatClicker{ "Auto Resize", true };
 	ofParameterGroup params_FloatClicker;
 
 	//void Changed_AppSettings(ofAbstractParameter &e);
 	//void Changed_Params(ofAbstractParameter &e);
 
 public:
-	void setPathGlobal(string s);//must cal before setup. disabled by default
-	void setPathPresets(string s);//must cal before setup. disabled by default
+	void setPathGlobal(string s); // must cal before setup.
+	void setPathPresets(string s); // must call before addGroup/setup. Specially usefull when using multiple preset manager instances
 
 private:
 	std::string path_Global; // this is to folder all files to avoid mixing with other addons data
