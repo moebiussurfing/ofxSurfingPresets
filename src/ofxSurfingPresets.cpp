@@ -74,7 +74,7 @@ void ofxSurfingPresets::setup()
 	// params 
 
 	bGui.set("SURFING PRESETS", true);
-	bGuiEditor.set("Editor", true);
+	bGui_Editor.set("Editor", true);
 	bCycled.set("Cycled", true);
 	bAutoSave.set("Auto Save", true);
 	bAutoSaveTimer.set("Auto Save Timed", false);
@@ -83,13 +83,13 @@ void ofxSurfingPresets::setup()
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 	index.set("INDEX", 0, 0, 0);
-	//bShowControl.set("Main Panel", true);
 	bGui_InnerClicker.set("Inner Clicker", false);
-	bFloatingClicker.set("Float Clicker", false);
-	bShowParameters.set("Parameters", false);
+	bGui_FloatingClicker.set("Float Clicker", false);
+	bGui_Parameters.set("Parameters", false);
 	MODE_Active.set("Active", true);
 	bDebug.set("Debug", true);
 	bKeys.set("Keys", true);
+	//bShowControl.set("Main Panel", true);
 	//SHOW_Help.set("HELP", false);	
 	//MODE_App.set("APP MODE", 0, 0, NUM_MODES_APP - 1);
 	//MODE_App_Name.set("", "");
@@ -102,10 +102,10 @@ void ofxSurfingPresets::setup()
 	params_Control.add(bLoad);
 	params_Control.add(bSetPathPresets);
 	params_Control.add(bRefresh);
-	//params_Control.add(bShowParameters);
+	//params_Control.add(bGui_Parameters);
 	//params_Control.add(bGui_InnerClicker);
 	//params_Control.add(bShowControl);
-	//params_Control.add(bFloatingClicker);
+	//params_Control.add(bGui_FloatingClicker);
 	//params_Control.add(bAutoSave);
 	//params_Control.add(bAutoSaveTimer);
 	//params_Control.add(bCycled);
@@ -114,31 +114,24 @@ void ofxSurfingPresets::setup()
 
 	//-
 
-	params_InnerClicker.setName("Inner Clicker");
-	params_InnerClicker.add(amntBtns);
-	params_InnerClicker.add(respBtns);
-
-	//-
-
 
 	// params AppSettings
 
 	params_AppSettings.setName("AppSettings");
 	params_AppSettings.add(bGui);
-	params_AppSettings.add(bGuiEditor);
-	params_AppSettings.add(bShowParameters);
+	params_AppSettings.add(bGui_Editor);
+	params_AppSettings.add(bGui_Parameters);
 	params_AppSettings.add(bGui_InnerClicker);
+	params_AppSettings.add(bGui_FloatingClicker);
 	//params_AppSettings.add(bShowControl);
-	params_AppSettings.add(bFloatingClicker);
 	params_AppSettings.add(bAutoSave);
 	params_AppSettings.add(bAutoSaveTimer);
 	params_AppSettings.add(bCycled);
+	params_AppSettings.add(bKeys);
 	params_AppSettings.add(guiManager.bAutoResize);
 	params_AppSettings.add(guiManager.bExtra);
 	params_AppSettings.add(guiManager.bMinimize);
-	params_AppSettings.add(bKeys);
 	params_AppSettings.add(MODE_Active);
-	params_AppSettings.add(params_InnerClicker);
 	//params_AppSettings.add(bDebug);
 	//params_AppSettings.add(MODE_App);
 	//params_AppSettings.add(MODE_App_Name);
@@ -154,6 +147,13 @@ void ofxSurfingPresets::setup()
 	params_FloatClicker.add(bExtraFloatClicker);
 	params_FloatClicker.add(bAutoResizeFloatClicker);
 	params_AppSettings.add(params_FloatClicker);
+
+	//-
+
+	params_InnerClicker.setName("INNER CLICKER");
+	params_InnerClicker.add(amntBtns);
+	params_InnerClicker.add(respBtns);
+	params_AppSettings.add(params_InnerClicker);
 
 	//ofAddListener(params_AppSettings.parameterChangedE(), this, &ofxSurfingPresets::Changed_AppSettings);
 
@@ -286,7 +286,7 @@ void ofxSurfingPresets::draw(ofEventArgs & args)
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_Editor()
 {
-	if (bGuiEditor)
+	if (bGui_Editor)
 	{
 		// panels sizes
 		float xx = 10;
@@ -324,7 +324,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			n = params_Control.getName() + " |" + params_Preset.getName();
 			//n = params_Control.getName();
 
-			guiManager.beginWindow(n.c_str(), (bool*)&bGuiEditor.get(), flagsw);
+			guiManager.beginWindow(n.c_str(), (bool*)&bGui_Editor.get(), flagsw);
 			//guiManager.beginWindow(n.c_str(), &bOpen0, flagsw);
 			{
 				widgetsManager.refreshPanelShape();
@@ -436,9 +436,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 				//--
 
-				//widgetsManager.Add(index, SurfingTypes::IM_DRAG); // crash
-				//widgetsManager.Add(index, SurfingTypes::IM_DEFAULT);
-				//widgetsManager.Add(index, SurfingTypes::IM_STEPPER);
+				//widgetsManager.Add(index, SurfingTypes::OFX_IM_DRAG); // crash
+				//widgetsManager.Add(index, SurfingTypes::OFX_IM_DEFAULT);
+				//widgetsManager.Add(index, SurfingTypes::OFX_IM_STEPPER);
 
 				//// spinner
 				//static int v = 1;
@@ -463,8 +463,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					//ImGui::Dummy(ImVec2(0, 1));
 
-					widgetsManager.Add(bSave, SurfingTypes::IM_BUTTON_SMALL, true, 2);
-					widgetsManager.Add(bLoad, SurfingTypes::IM_BUTTON_SMALL, false, 2);
+					widgetsManager.Add(bSave, SurfingTypes::OFX_IM_BUTTON_SMALL, true, 2);
+					widgetsManager.Add(bLoad, SurfingTypes::OFX_IM_BUTTON_SMALL, false, 2);
 				}
 
 				//-
@@ -473,10 +473,10 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
 				//ImGui::Dummy(ImVec2(0, 2));
 
-				ofxImGuiSurfing::AddToggleRoundedButton(bFloatingClicker);
+				ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
 
 				// parameters
-				ofxImGuiSurfing::AddToggleRoundedButton(bShowParameters);
+				ofxImGuiSurfing::AddToggleRoundedButton(bGui_Parameters);
 
 				if (!guiManager.bMinimize)
 				{
@@ -485,7 +485,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					// midi
 #ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 					ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui);
-					//ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGuiEditor);
+					//ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui_Editor);
 #endif
 
 					bool bOpen = false;
@@ -532,8 +532,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 							doRandomizeParams();
 						}
 
-						widgetsManager.Add(bRefresh, SurfingTypes::IM_BUTTON_SMALL, true, 2);
-						widgetsManager.Add(bSetPathPresets, SurfingTypes::IM_BUTTON_SMALL, false, 2);
+						widgetsManager.Add(bRefresh, SurfingTypes::OFX_IM_BUTTON_SMALL, true, 2);
+						widgetsManager.Add(bSetPathPresets, SurfingTypes::OFX_IM_BUTTON_SMALL, false, 2);
 
 						//TODO:
 						//if (ImGui::Button("COPY", ImVec2(_w50, _h / 2)))
@@ -573,8 +573,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					if (guiManager.bExtra)
 					{
+						ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
 						ofxImGuiSurfing::AddToggleRoundedButton(bGui_InnerClicker);
-						//ofxImGuiSurfing::AddToggleRoundedButton(bFloatingClicker);
+						//ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
 						if (bGui_InnerClicker)
 						{
 							ImGui::Indent();
@@ -719,7 +720,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 		// 2. preset params
 
-		if (bShowParameters)
+		if (bGui_Parameters)
 		{
 			if (params_Preset.getName() != "-1")
 			{
@@ -731,7 +732,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				n = "PARAMETERS |" + params_Preset.getName();
 
 				//n = params_Preset.getName();
-				guiManager.beginWindow(n.c_str(), (bool*)&bShowParameters.get(), flagsw);
+				guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw);
 				//guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
 				{
 					//ImGuiTreeNodeFlags flagst;
@@ -751,7 +752,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_Floating()
 {
-	if (bFloatingClicker)
+	if (bGui_FloatingClicker)
 	{
 
 		// panels sizes
@@ -778,7 +779,7 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 		n = "PRESETS CLICKER |" + params_Preset.getName();
 		//n = "PRESETS CLICKER";
 
-		guiManager.beginWindow(n.c_str(), (bool*)&bFloatingClicker.get(), flagsw);
+		guiManager.beginWindow(n.c_str(), (bool*)&bGui_FloatingClicker.get(), flagsw);
 		{
 			widgetsManager.refreshPanelShape();
 			_w100 = getWidgetsWidth(1);
@@ -786,7 +787,7 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 
 			ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true);
 
-			ofxImGuiSurfing::AddToggleRoundedButton(bGuiEditor);
+			ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 
 			ofxImGuiSurfing::AddToggleRoundedButton(bExtraFloatClicker);
 			if (bExtraFloatClicker)
@@ -820,7 +821,8 @@ void ofxSurfingPresets::draw_ImGui_MiniClicker() {
 
 	if (ImGui::TreeNodeEx("PRESETS", _flagt))
 	{
-		ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns, true);
+		ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns, true, WIDGETS_HEIGHT / 2);
+		ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 
 		ImGui::TreePop();
 	}
@@ -895,7 +897,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 		ImGui::TreePop();
 
 		ofxImGuiSurfing::AddToggleRoundedButton(bGui);
-		ofxImGuiSurfing::AddToggleRoundedButton(bGuiEditor);
+		ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 	}
 }
 
@@ -1290,6 +1292,20 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		{
 			setActive(MODE_Active);
 		}
+		if (name == bGui_Editor.getName())
+		{
+			if (bGui_Editor) {
+				if (!bGui) bGui = true;
+			}
+		}
+		if (name == bGui.getName()) // workflow
+		{
+			if (!bGui_Editor && !bGui_FloatingClicker)
+			{
+				bGui_Editor = true;
+			}
+		}
+
 	}
 }
 

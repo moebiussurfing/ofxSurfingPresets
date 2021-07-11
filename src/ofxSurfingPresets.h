@@ -104,7 +104,7 @@ public:
 	
 	void draw_ImGui_MiniClicker();
 	//float inner clicker layout
-	ofParameter<int> amntBtns{ "Amt Buttons",4 };
+	ofParameter<int> amntBtns{ "Amt Buttons", 4, 1, 4 };
 	ofParameter<bool> respBtns{ "Responsive", true };
 	//int amntBtns = 4;
 	//bool respBtns = true;
@@ -183,7 +183,7 @@ private:
 	ofParameter<bool> bSetPathPresets;
 	ofParameter<bool> bRefresh;
 	ofParameter<bool> bDebug;
-	ofParameter<bool> bShowParameters;
+	ofParameter<bool> bGui_Parameters;
 	ofParameter<bool> bGui_InnerClicker;
 	//ofParameter<bool> bShowControl;
 	ofParameter<int> index;
@@ -235,16 +235,16 @@ private:
 
 public:
 	ofParameter<bool> bGui; // exposed public to use on external gui's
-	//ofParameter<bool> bShowParameters;
+	//ofParameter<bool> bGui_Parameters;
 
 private:
-	ofParameter<bool> bGuiEditor;
+	ofParameter<bool> bGui_Editor;
 	
 private:
 	ofParameter<bool> MODE_Active;
 	ofParameter<bool> ENABLE_Debug;
 	ofParameter<bool> bKeys;
-	ofParameter<bool> bFloatingClicker;
+	ofParameter<bool> bGui_FloatingClicker;
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> SHOW_Help;
 	//ofParameter<int> MODE_App;
