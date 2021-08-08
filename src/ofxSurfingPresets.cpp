@@ -114,7 +114,6 @@ void ofxSurfingPresets::setup()
 
 	//-
 
-
 	// params AppSettings
 
 	params_AppSettings.setName("AppSettings");
@@ -327,7 +326,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			guiManager.beginWindow(n.c_str(), (bool*)&bGui_Editor.get(), flagsw);
 			//guiManager.beginWindow(n.c_str(), &bOpen0, flagsw);
 			{
-				widgetsManager.refreshPanelShape();
+				guiManager.refresh();
 				_w100 = getWidgetsWidth(1);
 				_w50 = getWidgetsWidth(2);
 				_w33 = getWidgetsWidth(3);
@@ -339,7 +338,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 				{
 					//--
 
-					//widgetsManager.refreshPanelShape();
+					//guiManager.refresh();
 					//_w100 = getWidgetsWidth(1);
 					//_w50 = getWidgetsWidth(2);
 					//_w33 = getWidgetsWidth(3);
@@ -436,9 +435,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 				//--
 
-				//widgetsManager.Add(index, SurfingTypes::OFX_IM_DRAG); // crash
-				//widgetsManager.Add(index, SurfingTypes::OFX_IM_DEFAULT);
-				//widgetsManager.Add(index, SurfingTypes::OFX_IM_STEPPER);
+				//guiManager.Add(index, SurfingImGuiTypes::OFX_IM_DRAG); // crash
+				//guiManager.Add(index, SurfingImGuiTypes::OFX_IM_DEFAULT);
+				//guiManager.Add(index, SurfingImGuiTypes::OFX_IM_STEPPER);
 
 				//// spinner
 				//static int v = 1;
@@ -463,8 +462,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					//ImGui::Dummy(ImVec2(0, 1));
 
-					widgetsManager.Add(bSave, SurfingTypes::OFX_IM_BUTTON_SMALL, true, 2);
-					widgetsManager.Add(bLoad, SurfingTypes::OFX_IM_BUTTON_SMALL, false, 2);
+					guiManager.Add(bSave, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
+					guiManager.Add(bLoad, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
 				}
 
 				//-
@@ -494,7 +493,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					if (ImGui::TreeNodeEx("TOOLS", _flagt))
 					{
-						widgetsManager.refreshPanelShape();
+						guiManager.refresh();
 						_w100 = getWidgetsWidth(1);
 						_w50 = getWidgetsWidth(2);
 						_w33 = getWidgetsWidth(3);
@@ -532,8 +531,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 							doRandomizeParams();
 						}
 
-						widgetsManager.Add(bRefresh, SurfingTypes::OFX_IM_BUTTON_SMALL, true, 2);
-						widgetsManager.Add(bSetPathPresets, SurfingTypes::OFX_IM_BUTTON_SMALL, false, 2);
+						guiManager.Add(bRefresh, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
+						guiManager.Add(bSetPathPresets, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
 
 						//TODO:
 						//if (ImGui::Button("COPY", ImVec2(_w50, _h / 2)))
@@ -781,7 +780,7 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 
 		guiManager.beginWindow(n.c_str(), (bool*)&bGui_FloatingClicker.get(), flagsw);
 		{
-			widgetsManager.refreshPanelShape();
+			guiManager.refresh();
 			_w100 = getWidgetsWidth(1);
 			_w50 = getWidgetsWidth(2);
 

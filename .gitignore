@@ -566,3 +566,7 @@ example-Basic/bin/data/ofxSurfingPresets/Preset.json
 example-Basic/bin/data/ofxSurfingPresets/presets/paramsGroup_00.json
 example-Basic/bin/data/ofxSurfingPresets/presets/paramsGroup_01.json
 example-Basic/bin/data/ofxSurfingPresets/presets/paramsGroup_02.json
+examples/1_Basic/bin/imgui.ini
+examples/1_Basic/bin/data/ofxSurfingPresets/Preset.json
+examples/1_Basic/bin/data/ofxSurfingPresets/ofxSurfingPresets_Settings.xml
+examples/1_Basic/bin/data/imgui_SurfingLayout.xml

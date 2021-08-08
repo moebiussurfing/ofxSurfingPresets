@@ -4,20 +4,23 @@
         "Auto_Save": "1",
         "Auto_Save_Timed": "0",
         "Cycled": "1",
-        "Extra": "1",
+        "Editor": "1",
+        "Extra": "0",
         "FLOAT_CLICKER": {
             "Auto_Resize": "1",
-            "Extra": "1",
-            "Main_Panel": "1",
-            "Max_Buttons": "3",
+            "Extra": "0",
+            "Max_Buttons": "6",
             "Responsive": "1"
         },
         "Float_Clicker": "1",
-        "Inner_Clicker": "0",
+        "INNER_CLICKER": {
+            "Amt_Buttons": "2",
+            "Responsive": "1"
+        },
+        "Inner_Clicker": "1",
         "Keys": "1",
-        "Main_Panel": "1",
         "Minimize": "0",
-        "PARAMETERS": "0",
+        "Parameters": "0",
         "SURFING_PRESETS": "1"
     }
 }
