@@ -262,7 +262,8 @@ private:
 
 public:
 	void setPathGlobal(string s); // must cal before setup.
-	void setPathPresets(string s); // must call before addGroup/setup. Specially usefull when using multiple preset manager instances
+	void setPathPresets(string s); // must call before addGroup/setup. Specially usefull when using multiple preset manager instances or different kits for the same instance.
+	//TODO: add a kit selector
 
 private:
 	std::string path_Global; // this is to folder all files to avoid mixing with other addons data

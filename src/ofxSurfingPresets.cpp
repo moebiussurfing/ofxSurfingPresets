@@ -729,6 +729,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 				//n = "PARAMETERS";
 				n = "PARAMETERS |" + params_Preset.getName();
+				
+				flagsw = ImGuiWindowFlags_None;
+				flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 
 				//n = params_Preset.getName();
 				guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw);
@@ -1658,7 +1661,7 @@ void ofxSurfingPresets::doRefreshFiles()
 //--------------------------------------------------------------
 void ofxSurfingPresets::setPath()
 {
-	ofLogNotice(__FUNCTION__) << " SET PRESETS PATH";
+	ofLogNotice(__FUNCTION__) << "Set presets path";
 
 	// Open the Open File Dialog
 	std::string str = "Select the presets kit path.\n";
