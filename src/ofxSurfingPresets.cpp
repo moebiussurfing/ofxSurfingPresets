@@ -13,7 +13,7 @@ ofxSurfingPresets::ofxSurfingPresets()
 	ofAddListener(ofEvents().draw, this, &ofxSurfingPresets::draw, OF_EVENT_ORDER_AFTER_APP);
 
 	path_Global = "ofxSurfingPresets/"; // this is to folder all files to avoid mixing with other addons data
-	path_Presets = "ofxSurfingPresets/presets";
+	path_Presets = "ofxSurfingPresets/Presets";
 	path_Params_Control = "ofxSurfingPresets_Settings.xml";
 	path_filePreset = "Preset";
 
@@ -247,6 +247,11 @@ void ofxSurfingPresets::startup()
 	// workflow
 	// load first
 	index = 0;
+
+	//-
+
+	// files
+	doRefreshFiles();
 }
 
 //--------------------------------------------------------------
@@ -283,7 +288,7 @@ void ofxSurfingPresets::draw(ofEventArgs & args)
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::draw_ImGui_Editor()
+void ofxSurfingPresets::draw_ImGui_EditorControl()
 {
 	if (bGui_Editor)
 	{
@@ -366,7 +371,11 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					//ImGui::Text(path_Global.data());
 					//ImGui::Text(filePath.data());
 
-					string ss = ofToString(index) + "/" + ofToString(index.getMax());
+					string ss;
+					if (dir.size() == 0) ss = "NO PRESETS";
+					else ss = ofToString(index) + "/" + ofToString(index.getMax());
+					//ss = ofToString(index) + "/" + ofToString(index.getMax());
+
 					ImGui::Text(ss.data());
 					if (guiManager.bMinimize) ImGui::Text(fileName.data()); // -> using text input below
 					//if (guiManager.bExtra) ImGui::Text(path_Presets.data()); // -> show path
@@ -543,14 +552,20 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 						//TODO: show only on last preset
 						//if (index == index.getMax())
 						{
-							if (ImGui::Button("CLEAR", ImVec2(_w50, _h / 2)))
+							if (ImGui::Button("CLEAR KIT!", ImVec2(_w100, _h / 2)))
 							{
 								doClearPresets();
 							}
-							ImGui::SameLine();
-							if (ImGui::Button("POPULATE", ImVec2(_w50, _h / 2)))
+							//ImGui::SameLine();
+
+							if (ImGui::Button("POPULATE KIT", ImVec2(_w50, _h / 2)))
 							{
 								doPopulatePresets();
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("POPULATE RND", ImVec2(_w50, _h / 2)))
+							{
+								doPopulatePresetsRandomized();
 							}
 						}
 
@@ -729,7 +744,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 				//n = "PARAMETERS";
 				n = "PARAMETERS |" + params_Preset.getName();
-				
+
 				flagsw = ImGuiWindowFlags_None;
 				flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 
@@ -756,7 +771,6 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 {
 	if (bGui_FloatingClicker)
 	{
-
 		// panels sizes
 		float xx = 10;
 		float yy = 10;
@@ -778,7 +792,7 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 		if (bAutoResizeFloatClicker) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 		//if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 
-		n = "PRESETS CLICKER |" + params_Preset.getName();
+		n = "PRESETS " + params_Preset.getName();
 		//n = "PRESETS CLICKER";
 
 		guiManager.beginWindow(n.c_str(), (bool*)&bGui_FloatingClicker.get(), flagsw);
@@ -893,7 +907,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 		//static bool bEdit = false;
 		//ofxImGuiSurfing::ToggleRoundedButton("Edit", &bEdit);
 		//if (bEdit) {
-		//	draw_ImGui_Editor();
+		//	draw_ImGui_EditorControl();
 		//}
 
 		ImGui::TreePop();
@@ -908,7 +922,7 @@ void ofxSurfingPresets::draw_ImGui()
 {
 	guiManager.begin();
 	{
-		draw_ImGui_Editor();
+		draw_ImGui_EditorControl();
 
 		//---
 
@@ -1259,7 +1273,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 					//-
 
-//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+					//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
 					refreshToggleNotes();
 					//#endif
 				}
@@ -1307,7 +1321,6 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 				bGui_Editor = true;
 			}
 		}
-
 	}
 }
 
@@ -1514,6 +1527,8 @@ void ofxSurfingPresets::doNewPreset()
 //--------------------------------------------------------------
 void ofxSurfingPresets::doDeletePreset()
 {
+	index = index.getMax();
+
 	//int pre = index;
 
 	ofFile::removeFile(filePath);
@@ -1537,18 +1552,54 @@ void ofxSurfingPresets::doDeletePreset()
 //--------------------------------------------------------------
 void ofxSurfingPresets::doPopulatePresets()
 {
-	//doClearPresets();
+	ofLogNotice(__FUNCTION__);
 
-	for (int i = 0; i < dir.size(); i++)
+	doClearPresets(false);
+
+	const int _max = AMOUNT_KIT_SIZE_DEFAULT;
+	//const int _max = dir.size();
+
+	for (int i = 0; i < _max; i++)
 	{
 		index = i;
-		doRandomizeParams();
-		doSaveCurrent();
+		//doSaveCurrent();
+		doNewPreset();
 	}
+
+	//workflow
+	amntBtnsFloatClicker.setMax(_max);
+	amntBtns.setMax(_max);
+	amntBtnsFloatClicker.set(_max / 3);
+	amntBtns.set(_max / 3);
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::doClearPresets()
+void ofxSurfingPresets::doPopulatePresetsRandomized()
+{
+	ofLogNotice(__FUNCTION__);
+
+	doClearPresets(false);
+
+	const int _max = AMOUNT_KIT_SIZE_DEFAULT;
+	//const int _max = dir.size();
+
+	for (int i = 0; i < _max; i++)
+	{
+		index = i;
+		doNewPreset();
+		doRandomizeParams();
+		doSaveCurrent();
+	}
+
+	//workflow
+	amntBtnsFloatClicker.setMax(_max);
+	amntBtns.setMax(_max);
+	amntBtnsFloatClicker.set(_max / 3);
+	amntBtns.set(_max / 3);
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doClearPresets(bool createOne)
 {
 	ofLogNotice(__FUNCTION__);
 
@@ -1560,10 +1611,9 @@ void ofxSurfingPresets::doClearPresets()
 	}
 	doRefreshFiles();
 
-	doNewPreset();
+	if(createOne) doNewPreset();
 
 	index = 0;
-
 }
 
 //--------------------------------------------------------------
@@ -1629,8 +1679,10 @@ void ofxSurfingPresets::doRefreshFiles()
 	else
 	{
 		index.setMax(dir.size() - 1);
-		amntBtnsFloatClicker.setMax(dir.size());
-		amntBtns.setMax(dir.size());
+
+		////workflow
+		//amntBtnsFloatClicker.setMax(dir.size());
+		//amntBtns.setMax(dir.size());
 	}
 
 	//-

@@ -37,11 +37,17 @@
 
 #define NUM_KEY_COMMANDS 19
 
+
 class ofxSurfingPresets
 {
+private:
+	
+	#define AMOUNT_KIT_SIZE_DEFAULT 9
+
 	//-
 
 public:
+
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
 
@@ -49,7 +55,9 @@ public:
 private:
 	ofxMidiParams mMidiParams;
 #endif
+
 public:
+
 	vector<ofParameter<bool>> notesIndex;
 	ofParameterGroup params_PresetToggles{ "Presets" };
 	void Changed_Params_PresetToggles(ofAbstractParameter &e);
@@ -60,7 +68,9 @@ public:
 
 	// easy callbacks
 	// to retrig when preset not changed but is clicked again.
+
 public:
+
 	bool isRetrigged()
 	{
 		if (bIsRetrigged) 
@@ -79,8 +89,11 @@ private:
 		'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' };
 
 private:
+
 	bool bAutoDraw; // must be false when multiple ImGui instances created!
+
 public:
+
 	// required to set to false when only one ImGui instance is created. By default is setted to ImGui multi instances
 	//--------------------------------------------------------------
 	void setImGuiAutodraw(bool b) {
@@ -90,15 +103,18 @@ public:
 	void setup();
 
 private:
+
 	string nameRoot;
 
 private:
+
 	void update(ofEventArgs & args);
 	void draw(ofEventArgs & args);
 	void exit();
 	void startup();
 
 public:
+
 	void draw_ImGui_Minimal();
 	void draw_ImGui_Floating();
 	
@@ -113,11 +129,12 @@ public:
 
 private:
 	void draw_ImGui();
-	void draw_ImGui_Editor();
+	void draw_ImGui_EditorControl();
 
 	//-
 
 private:
+
 	//bool bDebug = false;
 
 	string nameSelected;
@@ -132,6 +149,7 @@ private:
 	// api
 
 public:
+
 	//--------------------------------------------------------------
 	void addGroup(ofParameterGroup &group) { // main group add
 		setup();
@@ -147,6 +165,7 @@ public:
 	}
 
 public:
+
 	void doSaveCurrent();
 	void doLoadNext();
 	void doLoadPrevious();
@@ -158,8 +177,9 @@ public:
 	void doNewPreset();
 	void doCopyPreset();
 	void doDeletePreset();
-	void doClearPresets();
+	void doClearPresets(bool createOne = true);
 	void doPopulatePresets();
+	void doPopulatePresetsRandomized();
 	void doResetParams();
 	void doRandomizeParams();
 	void doRefreshFiles();
@@ -168,6 +188,7 @@ public:
 	//-
 
 private:
+
 	// gui params
 	ofParameterGroup params;
 	ofParameterGroup params_Control;
@@ -193,6 +214,7 @@ private:
 	bool bOpen2 = true;
 
 public:
+
 	void setActive(bool b);
 	void setGuiVisible(bool b);
 	void setLogLevel(ofLogLevel level);
@@ -203,6 +225,7 @@ public:
 	//void setKey_MODE_App(int k);
 
 private:
+
 	// files browser
 	ofDirectory dir;
 	std::string fileName;
@@ -234,13 +257,16 @@ private:
 	// control params
 
 public:
+
 	ofParameter<bool> bGui; // exposed public to use on external gui's
 	//ofParameter<bool> bGui_Parameters;
 
 private:
+
 	ofParameter<bool> bGui_Editor;
 	
 private:
+
 	ofParameter<bool> MODE_Active;
 	ofParameter<bool> ENABLE_Debug;
 	ofParameter<bool> bKeys;
@@ -261,11 +287,13 @@ private:
 	//void Changed_Params(ofAbstractParameter &e);
 
 public:
+
 	void setPathGlobal(string s); // must cal before setup.
 	void setPathPresets(string s); // must call before addGroup/setup. Specially usefull when using multiple preset manager instances or different kits for the same instance.
 	//TODO: add a kit selector
 
 private:
+
 	std::string path_Global; // this is to folder all files to avoid mixing with other addons data
 	std::string path_Params_Control;
 	std::string path_Presets; // this is to folder all files to avoid mixing with other addons data
@@ -279,9 +307,11 @@ private:
 //	void keyPressed(int key);
 
 private:
+
 	// keys
 	void keyPressed(ofKeyEventArgs &eventArgs);
-	void keyReleased(ofKeyEventArgs &eventArgs);
+	//void keyReleased(ofKeyEventArgs &eventArgs);
+
 	void addKeysListeners();
 	void removeKeysListeners();
 
