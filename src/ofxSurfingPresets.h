@@ -62,7 +62,31 @@ public:
 	ofParameterGroup params_PresetToggles{ "Presets" };
 	void Changed_Params_PresetToggles(ofAbstractParameter &e);
 	void refreshToggleNotes();
-	ofParameterGroup & getParametersSelectorToggles() { // to select index preset using bool toggle parameters
+
+	//--------------------------------------------------------------
+	ofParameterGroup & getParametersSelectorToggles() { // to select index preset using bool toggle parameters triggers!
+
+//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+	//notesIndex.clear();
+	//params_PresetToggles.clear();
+	//for (int i = 0; i <= index.getMax(); i++)
+	//{
+	//	string n = "Preset ";
+	//	//n += ofToString(i < 10 ? "0" : "");
+	//	n += ofToString(i);
+
+	//	ofParameter<bool> b{ n, false };
+	//	notesIndex.push_back(b);
+	//	params_PresetToggles.add(b);
+	//}
+	//ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+//
+//	mMidiParams.clear();
+//	mMidiParams.add(params_Preset); // -> to control preset params
+//	mMidiParams.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
+//#endif
+
 		return params_PresetToggles;
 	}
 

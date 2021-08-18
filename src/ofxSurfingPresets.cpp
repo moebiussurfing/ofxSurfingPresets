@@ -74,7 +74,7 @@ void ofxSurfingPresets::setup()
 	// params 
 
 	bGui.set("SURFING PRESETS", true);
-	bGui_Editor.set("Editor", true);
+	bGui_Editor.set("Presets Editor", true);
 	bCycled.set("Cycled", true);
 	bAutoSave.set("Auto Save", true);
 	bAutoSaveTimer.set("Auto Save Timed", false);
@@ -325,7 +325,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 			ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 			ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
-			n = params_Control.getName() + " |" + params_Preset.getName();
+			n = "Presets Editor |" + params_Preset.getName();
+			//n = params_Control.getName() + " |" + params_Preset.getName();
 			//n = params_Control.getName();
 
 			guiManager.beginWindow(n.c_str(), (bool*)&bGui_Editor.get(), flagsw);
@@ -410,10 +411,11 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				//if (!guiManager.bMinimize && guiManager.bExtra) ofxImGuiSurfing::AddIntStepped(index);
 
 				// index
-				//ImGui::PushItemWidth(- 100);
-				ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+				//ImGui::PushItemWidth(_w100 - 20);
+				//ImGui::PushItemWidth(100);
+				//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
 				ofxImGuiSurfing::AddParameter(index);
-				ImGui::PopItemWidth();
+				//ImGui::PopItemWidth();
 
 				// next
 				if (guiManager.bMinimize)
@@ -515,7 +517,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 							doNewPreset();
 						}
 						ImGui::SameLine();
-						if (ImGui::Button("DELETE", ImVec2(_w50, _h / 2)))
+						if (ImGui::Button("DELETE LAST", ImVec2(_w50, _h / 2)))
 						{
 							doDeletePreset();
 						}
@@ -801,7 +803,8 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 			_w100 = getWidgetsWidth(1);
 			_w50 = getWidgetsWidth(2);
 
-			ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true);
+			float sizey = ofxImGuiSurfing::getWidgetsHeightRelative() * 2;
+			ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
 
 			ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 
@@ -815,9 +818,10 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 				ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
 				if (respBtnsFloatClicker)
 				{
-					ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-					//ImGui::PushItemWidth(_w50 - 20);
-					ofxImGuiSurfing::AddIntStepped(amntBtnsFloatClicker);
+					//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+					ImGui::PushItemWidth(_w50);
+					guiManager.Add(amntBtnsFloatClicker, SurfingImGuiTypes::OFX_IM_STEPPER);
+					//ofxImGuiSurfing::AddIntStepped(amntBtnsFloatClicker);
 					//ofxImGuiSurfing::AddParameter(amntBtnsFloatClicker);
 					ImGui::PopItemWidth();
 				}
@@ -860,7 +864,9 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 		//ImGui::Dummy(ImVec2(0, 2));
 
 		// index
+		//ImGui::PushItemWidth(_w100 - 20);
 		ofxImGuiSurfing::AddParameter(index);
+		//ImGui::PopItemWidth();
 
 		// scrollable list
 		if (!fileNames.empty())
@@ -912,7 +918,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 
 		ImGui::TreePop();
 
-		ofxImGuiSurfing::AddToggleRoundedButton(bGui);
+		//ofxImGuiSurfing::AddToggleRoundedButton(bGui);//main
 		ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 	}
 }
@@ -1554,7 +1560,7 @@ void ofxSurfingPresets::doPopulatePresets()
 {
 	ofLogNotice(__FUNCTION__);
 
-	doClearPresets(false);
+	doClearPresets(1);
 
 	const int _max = AMOUNT_KIT_SIZE_DEFAULT;
 	//const int _max = dir.size();
@@ -1578,7 +1584,7 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 {
 	ofLogNotice(__FUNCTION__);
 
-	doClearPresets(false);
+	doClearPresets(1);
 
 	const int _max = AMOUNT_KIT_SIZE_DEFAULT;
 	//const int _max = dir.size();
@@ -1611,7 +1617,7 @@ void ofxSurfingPresets::doClearPresets(bool createOne)
 	}
 	doRefreshFiles();
 
-	if(createOne) doNewPreset();
+	if (createOne) doNewPreset();
 
 	index = 0;
 }
@@ -1680,9 +1686,9 @@ void ofxSurfingPresets::doRefreshFiles()
 	{
 		index.setMax(dir.size() - 1);
 
-		////workflow
-		//amntBtnsFloatClicker.setMax(dir.size());
-		//amntBtns.setMax(dir.size());
+		//workflow
+		amntBtnsFloatClicker.setMax(dir.size());
+		amntBtns.setMax(dir.size());
 	}
 
 	//-
