@@ -41,8 +41,8 @@
 class ofxSurfingPresets
 {
 private:
-	
-	#define AMOUNT_KIT_SIZE_DEFAULT 9
+
+#define AMOUNT_KIT_SIZE_DEFAULT 9
 
 	//-
 
@@ -92,12 +92,10 @@ public:
 
 	// easy callbacks
 	// to retrig when preset not changed but is clicked again.
-
 public:
-
 	bool isRetrigged()
 	{
-		if (bIsRetrigged) 
+		if (bIsRetrigged)
 		{
 			bIsRetrigged = false;
 			return true;
@@ -106,6 +104,79 @@ public:
 	}
 private:
 	bool bIsRetrigged = false;
+
+	//----
+
+	// A. easy callbacks
+	// loaded / saved
+	// to faster ofApp integration 
+	// to check in update() as callback
+public:
+	//--------------------------------------------------------------
+	bool isDoneLoad()
+	{
+		if (bIsDoneLoad)
+		{
+			bIsDoneLoad = false;
+			return true;
+		}
+		return false;
+	}
+private:
+	bool bIsDoneLoad = false;
+
+	//--
+
+public:
+	//--------------------------------------------------------------
+	bool isDoneSave()
+	{
+		if (bIsDoneSave)
+		{
+			bIsDoneSave = false;
+			return true;
+		}
+		return false;
+	}
+private:
+	bool bIsDoneSave = false;
+
+	//--
+
+	// B. better callbacks
+	// loaded / saved
+	// to get (from ofApp) when it happens
+public:
+	ofParameter<bool> DONE_load;// easy callback to know (in ofApp) that preset LOAD is done 
+	ofParameter<bool> DONE_save;// easy callback to know (in ofApp) that preset SAVE is done
+
+	//--
+
+	// C. easy trig-callback
+	// used to get alerted when preset has not changed but we like to retrig something
+	// in some situation we would like this feature:
+	// 1. user clicked a preset box
+	// 2. but to the same current loaded preset
+	// 3. no need to reload the file settings
+	// 4. but we want to use the user box click to trig something
+private:
+	bool bMustTrig = false;
+public:
+	//--------------------------------------------------------------
+	bool isMustTrig()// trig on select preset or not. this is useful when preset selected not changed, but we want to retrig current preset settings
+	{
+		if (bMustTrig)
+		{
+			bMustTrig = false;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	//----
 
 private:
 	char keyCommands[NUM_KEY_COMMANDS] = {
@@ -141,7 +212,8 @@ public:
 
 	void draw_ImGui_Minimal();
 	void draw_ImGui_Floating();
-	
+	void draw_ImGui_Parameters();
+
 	void draw_ImGui_MiniClicker();
 	//float inner clicker layout
 	ofParameter<int> amntBtns{ "Amt Buttons", 4, 1, 4 };
@@ -175,6 +247,11 @@ private:
 public:
 
 	//--------------------------------------------------------------
+	void setup(ofParameterGroup &group) { // main group add
+		addGroup(group);
+	}
+
+	//--------------------------------------------------------------
 	void addGroup(ofParameterGroup &group) { // main group add
 		setup();
 
@@ -191,6 +268,10 @@ public:
 public:
 
 	void doSaveCurrent();
+	void saveCurrentPreset(int i = -1) {//legacy api
+		doSaveCurrent();
+	};
+
 	void doLoadNext();
 	void doLoadPrevious();
 	void load(int _index);
@@ -208,6 +289,10 @@ public:
 	void doRandomizeParams();
 	void doRefreshFiles();
 	void setPath();
+
+	void setRandomizerBpm(float bpm) {
+
+	}
 
 	//-
 
@@ -242,6 +327,8 @@ public:
 	void setActive(bool b);
 	void setGuiVisible(bool b);
 	void setLogLevel(ofLogLevel level);
+
+	void setModeAutoSave(bool b) { setAutoSave(b); };//legacy api
 	void setAutoSave(bool b)
 	{
 		bAutoSave = b;
@@ -288,7 +375,7 @@ public:
 private:
 
 	ofParameter<bool> bGui_Editor;
-	
+
 private:
 
 	ofParameter<bool> MODE_Active;

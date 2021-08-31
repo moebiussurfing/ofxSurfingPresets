@@ -325,7 +325,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 			ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 			ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
-			n = "Presets Editor |" + params_Preset.getName();
+			n = "PRESETS EDITOR " + params_Preset.getName();
 			//n = params_Control.getName() + " |" + params_Preset.getName();
 			//n = params_Control.getName();
 
@@ -339,6 +339,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				_w25 = getWidgetsWidth(4);
 
 				//-
+
+				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
 
 				if (!guiManager.bMinimize)
 				{
@@ -475,18 +477,28 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 					guiManager.Add(bSave, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
 					guiManager.Add(bLoad, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
+
+					guiManager.Add(bAutoSave, SurfingImGuiTypes::OFX_IM_TOGGLE_SMALL);
+				}
+
+
+				//if (guiManager.bMinimize)
+				if (ImGui::Button("NEW", ImVec2(_w100, _h / 2)))
+				{
+					doNewPreset();
 				}
 
 				//-
 
 				// minimize
-				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
+				//ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
 				//ImGui::Dummy(ImVec2(0, 2));
-
-				ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
 
 				// parameters
 				ofxImGuiSurfing::AddToggleRoundedButton(bGui_Parameters);
+
+				// clicker
+				ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
 
 				if (!guiManager.bMinimize)
 				{
@@ -576,7 +588,6 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						ImGui::TreePop();
 					}
 				}
-
 
 				//-
 
@@ -730,40 +741,6 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				}
 			}
 			guiManager.endWindow();
-		}
-
-		//----
-
-		// 2. preset params
-
-		if (bGui_Parameters)
-		{
-			if (params_Preset.getName() != "-1")
-			{
-				xx += ww + pad;
-				ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
-				ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
-
-				//n = "PARAMETERS";
-				n = "PARAMETERS |" + params_Preset.getName();
-
-				flagsw = ImGuiWindowFlags_None;
-				flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
-
-				//n = params_Preset.getName();
-				guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw);
-				//guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
-				{
-					//ImGuiTreeNodeFlags flagst;
-					//flagst = ImGuiTreeNodeFlags_None;
-					//flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-					//flagst |= ImGuiTreeNodeFlags_Framed;
-					//ofxImGuiSurfing::AddGroup(params_Preset, flagst);
-
-					ofxImGuiSurfing::AddGroup(params_Preset);
-				}
-				guiManager.endWindow();
-			}
 		}
 	}
 }
@@ -924,6 +901,56 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 }
 
 //--------------------------------------------------------------
+void ofxSurfingPresets::draw_ImGui_Parameters()
+{
+	// 2. preset params
+
+	if (bGui_Parameters)
+	{
+		if (params_Preset.getName() != "-1")
+		{
+			//xx += ww + pad;
+			//ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
+			//ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
+
+			string n;
+			//n = "PARAMETERS";
+			n = "PARAMETERS " + params_Preset.getName();
+			//n = params_Preset.getName();
+
+			ImGuiWindowFlags flagsw;
+			flagsw = ImGuiWindowFlags_None;
+			flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
+
+			//guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw);
+			//guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
+			if (guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw))
+			{
+				ImGuiTreeNodeFlags flagst;
+				if (!guiManager.bMinimize) flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+				//flagst = ImGuiTreeNodeFlags_None;
+				//flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+				//flagst |= ImGuiTreeNodeFlags_Framed;
+				//ofxImGuiSurfing::AddGroup(params_Preset, flagst);
+
+				//TODO:
+				ofxImGuiSurfing::AddGroup(params_Preset, flagst);
+				//ofxImGuiSurfing::AddGroup(params_Preset);
+			//}
+
+				ofxImGuiSurfing::AddSpacingSeparated();
+
+				ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
+				ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
+
+				//guiManager.endWindow();
+			}
+			guiManager.endWindow();
+		}
+	}
+}
+
+//--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui()
 {
 	guiManager.begin();
@@ -933,6 +960,10 @@ void ofxSurfingPresets::draw_ImGui()
 		//---
 
 		draw_ImGui_Floating();
+
+		//----
+
+		draw_ImGui_Parameters();
 	}
 	guiManager.end();
 
@@ -1438,12 +1469,17 @@ void ofxSurfingPresets::setPathPresets(string s)
 	ofxSurfingHelpers::CheckFolder(path_Presets);
 }
 
+//--
+
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRecallState()
 {
 	ofLogNotice(__FUNCTION__) << path_Global + path_filePreset + _ext;
 	ofxSurfingHelpers::loadGroup(params_Preset, path_Global + path_filePreset + _ext);
 
+	DONE_load = true;
+	//simple callback
+	bIsDoneLoad = true;
 }
 
 //--------------------------------------------------------------
@@ -1452,6 +1488,9 @@ void ofxSurfingPresets::doStoreState()
 	ofLogNotice(__FUNCTION__) << path_Global + path_filePreset + _ext;
 	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
+	DONE_save = true;
+	//simple callback
+	bIsDoneSave = true;
 }
 
 //--------------------------------------------------------------
@@ -1474,6 +1513,16 @@ void ofxSurfingPresets::load(string path)
 {
 	ofLogNotice(__FUNCTION__) << path;
 	ofxSurfingHelpers::loadGroup(params_Preset, path);
+
+	//-
+
+	// callback
+	// MODE A. it's important if this line is before or after ofSerialize
+	ofLogVerbose(__FUNCTION__) << "DONE_load";
+	DONE_load = true;
+
+	//simple callback
+	bIsDoneLoad = true;
 }
 
 //--------------------------------------------------------------
@@ -1481,6 +1530,16 @@ void ofxSurfingPresets::save(string path)
 {
 	ofLogNotice(__FUNCTION__) << path;
 	ofxSurfingHelpers::saveGroup(params_Preset, path);
+
+	//-
+
+	// callback
+	// MODE A. it's important if this line is before or after ofSerialize
+	ofLogVerbose(__FUNCTION__) << "DONE_save";
+	DONE_save = true;
+
+	//simple callback
+	bIsDoneSave = true;
 }
 
 //--------------------------------------------------------------
@@ -1808,6 +1867,8 @@ void ofxSurfingPresets::doRandomizeParams() {
 			pr = ofRandom(pr.getMin(), pr.getMax());
 		}
 	}
+
+	bMustTrig = true;
 }
 
 //--------------------------------------------------------------
@@ -1831,4 +1892,6 @@ void ofxSurfingPresets::doResetParams() {
 			pr = pr.getMin();
 		}
 	}
+
+	bMustTrig = true;
 }
