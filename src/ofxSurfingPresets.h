@@ -287,6 +287,7 @@ public:
 	void doPopulatePresetsRandomized();
 	void doResetParams();
 	void doRandomizeParams();
+	void doRandomizeIndex();
 	void doRefreshFiles();
 	void setPath();
 

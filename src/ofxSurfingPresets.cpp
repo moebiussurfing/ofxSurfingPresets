@@ -1478,6 +1478,7 @@ void ofxSurfingPresets::doRecallState()
 	ofxSurfingHelpers::loadGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	DONE_load = true;
+
 	//simple callback
 	bIsDoneLoad = true;
 }
@@ -1489,6 +1490,7 @@ void ofxSurfingPresets::doStoreState()
 	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	DONE_save = true;
+
 	//simple callback
 	bIsDoneSave = true;
 }
@@ -1833,6 +1835,18 @@ void ofxSurfingPresets::doLoadNext()
 		else index++;
 	}
 	else index++;
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doRandomizeIndex() {
+	int icur = index.get();
+	int i = ofRandom(index.getMin(), index.getMax() + 1);
+	if (i == icur) {
+		i++;
+		i = i % index.getMax();
+	}
+	ofLogNotice(__FUNCTION__) << i;
+	load(i);
 }
 
 //--------------------------------------------------------------
