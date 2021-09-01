@@ -96,6 +96,7 @@ void ofxSurfingPresets::setup()
 	//MODE_App_Name.setSerializable(false);
 	//ENABLE_Debug.set("DEBUG", true);
 
+	params_Control.clear();
 	params_Control.setName("PRESETS CONTROL");
 	params_Control.add(index);
 	params_Control.add(bSave);
@@ -116,6 +117,7 @@ void ofxSurfingPresets::setup()
 
 	// params AppSettings
 
+	params_AppSettings.clear();
 	params_AppSettings.setName("AppSettings");
 	params_AppSettings.add(bGui);
 	params_AppSettings.add(bGui_Editor);
@@ -139,6 +141,7 @@ void ofxSurfingPresets::setup()
 
 	//-
 
+	params_FloatClicker.clear();
 	params_FloatClicker.setName("FLOAT CLICKER");
 	//params_FloatClicker.add(bShowControl);
 	params_FloatClicker.add(amntBtnsFloatClicker);
@@ -149,6 +152,7 @@ void ofxSurfingPresets::setup()
 
 	//-
 
+	params_InnerClicker.clear();
 	params_InnerClicker.setName("INNER CLICKER");
 	params_InnerClicker.add(amntBtns);
 	params_InnerClicker.add(respBtns);
@@ -166,6 +170,7 @@ void ofxSurfingPresets::setup()
 	//-
 
 	// all
+	params.clear();
 	params.setName("ALL PARAMS");
 	params.add(params_Control);
 	params.add(params_AppSettings);
@@ -927,23 +932,31 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 			if (guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw))
 			{
 				ImGuiTreeNodeFlags flagst;
-				if (!guiManager.bMinimize) flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-				//flagst = ImGuiTreeNodeFlags_None;
-				//flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+				flagst = ImGuiTreeNodeFlags_None;
+
+				//if (!guiManager.bMinimize) flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+				
+				flagst |= ImGuiTreeNodeFlags_DefaultOpen;
 				//flagst |= ImGuiTreeNodeFlags_Framed;
-				//ofxImGuiSurfing::AddGroup(params_Preset, flagst);
 
 				//TODO:
 				ofxImGuiSurfing::AddGroup(params_Preset, flagst);
 				//ofxImGuiSurfing::AddGroup(params_Preset);
-			//}
 
 				ofxImGuiSurfing::AddSpacingSeparated();
 
+				//guiManager.endWindow();
+				if (bReset.getName() != "-1")
+				{
+					guiManager.Add(bReset, OFX_IM_BUTTON_SMALL);
+				}
+
 				ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 				ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
-
-				//guiManager.endWindow();
+				//if (bReset != nullptr) {
+				//	if (ImGui::Button("Reset", (bool*)&bReset)) {
+				//	}
+				//}
 			}
 			guiManager.endWindow();
 		}

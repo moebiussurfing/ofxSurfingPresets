@@ -6,14 +6,18 @@
 
 /*
 
-+ fix populate crash
-+ float clicker full responsible height too
-+ add undo engine. get from ofxPresetsManager
-+ get copy/drag preset sorting from ofxPresetsManager
+TODO:
 
-+ add text input to rename preset names/pre
-+ batch rename all files
-+ delete a file should push sorting the gap?
++	sorting: ctrl + click = copy, drag
+		get copy/drag preset sorting from ofxPresetsManager
++	fix populate crashes
++	float clicker full responsible height too
++	add undo engine.
++	add random engine.
+
++	add text input to rename preset names/pre
++	batch rename all files
++	delete a file should + rearrenge sorting 
 
 */
 
@@ -293,6 +297,20 @@ public:
 
 	void setRandomizerBpm(float bpm) {
 
+	}
+
+	//bool * bReset = NULL;
+	//void setResetPtr(bool &b) {
+	//	bReset = (bool*)b;
+	//}
+
+	//remote reset
+	// bc each group could have different appropiated reset values
+private:
+	ofParameter <bool> bReset{ "-1", false };
+public:
+	void setResetPtr(ofParameter<bool> &b) {
+		bReset.makeReferenceTo(b);
 	}
 
 	//-
