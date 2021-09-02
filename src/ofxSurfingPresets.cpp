@@ -78,13 +78,14 @@ void ofxSurfingPresets::setup()
 	bCycled.set("Cycled", true);
 	bAutoSave.set("Auto Save", true);
 	bAutoSaveTimer.set("Auto Save Timed", false);
+	bNewPreset.set("New", false);
 	bSave.set("SAVE", false);
 	bLoad.set("LOAD", false);
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 	index.set("INDEX", 0, 0, 0);
 	bGui_InnerClicker.set("Inner Clicker", false);
-	bGui_FloatingClicker.set("Float Clicker", false);
+	bGui_FloatingClicker.set("Float Clicker", true);
 	bGui_Parameters.set("Parameters", false);
 	MODE_Active.set("Active", true);
 	bDebug.set("Debug", true);
@@ -100,6 +101,7 @@ void ofxSurfingPresets::setup()
 	params_Control.setName("PRESETS CONTROL");
 	params_Control.add(index);
 	params_Control.add(bSave);
+	params_Control.add(bNewPreset);
 	params_Control.add(bLoad);
 	params_Control.add(bSetPathPresets);
 	params_Control.add(bRefresh);
@@ -162,6 +164,7 @@ void ofxSurfingPresets::setup()
 
 	// exclude
 	bSave.setSerializable(false);
+	bNewPreset.setSerializable(false);
 	bLoad.setSerializable(false);
 	bSetPathPresets.setSerializable(false);
 	bRefresh.setSerializable(false);
@@ -490,6 +493,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				//if (guiManager.bMinimize)
 				if (ImGui::Button("NEW", ImVec2(_w100, _h / 2)))
 				{
+					//bNewPreset = true;
 					doNewPreset();
 				}
 
@@ -785,15 +789,22 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 			_w100 = getWidgetsWidth(1);
 			_w50 = getWidgetsWidth(2);
 
+			// clicker
 			float sizey = ofxImGuiSurfing::getWidgetsHeightRelative() * 2;
 			ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
 
+			// parameters
+			ofxImGuiSurfing::AddToggleRoundedButton(bGui_Parameters);
+
+			// editor
 			ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 
+			// floating
 			ofxImGuiSurfing::AddToggleRoundedButton(bExtraFloatClicker);
 			if (bExtraFloatClicker)
 			{
 				ImGui::Indent();
+
 
 				//ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
 				ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
@@ -1340,10 +1351,15 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 			bSave = false;
 			save(filePath);
 		}
-		if (name == bLoad.getName() && bSave)
+		if (name == bLoad.getName() && bLoad)
 		{
 			bLoad = false;
 			load(filePath);
+		}
+		if (name == bNewPreset.getName() && bNewPreset)
+		{
+			bNewPreset = false;
+			doNewPreset();
 		}
 		if (name == bRefresh.getName() && bRefresh)
 		{

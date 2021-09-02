@@ -17,7 +17,7 @@ TODO:
 
 +	add text input to rename preset names/pre
 +	batch rename all files
-+	delete a file should + rearrenge sorting 
++	delete a file should + rearrenge sorting
 
 */
 
@@ -315,6 +315,10 @@ public:
 
 	//-
 
+public:
+	ofParameter<bool> bAutoSave;
+	ofParameter<bool> bNewPreset;
+
 private:
 
 	// gui params
@@ -324,7 +328,6 @@ private:
 
 	ofParameter<bool> bCycled;
 
-	ofParameter<bool> bAutoSave;
 	int index_PRE = -1;
 
 	ofParameter<bool> bSave;
@@ -332,7 +335,6 @@ private:
 	ofParameter<bool> bSetPathPresets;
 	ofParameter<bool> bRefresh;
 	ofParameter<bool> bDebug;
-	ofParameter<bool> bGui_Parameters;
 	ofParameter<bool> bGui_InnerClicker;
 	//ofParameter<bool> bShowControl;
 	ofParameter<int> index;
@@ -388,19 +390,20 @@ private:
 
 public:
 
-	ofParameter<bool> bGui; // exposed public to use on external gui's
-	//ofParameter<bool> bGui_Parameters;
+	// exposed public to use on external gui's
+	ofParameter<bool> bGui;
+	ofParameter<bool> bGui_Editor;
+	ofParameter<bool> bGui_FloatingClicker;
+	ofParameter<bool> bGui_Parameters;
 
 private:
 
-	ofParameter<bool> bGui_Editor;
 
 private:
 
 	ofParameter<bool> MODE_Active;
 	ofParameter<bool> ENABLE_Debug;
 	ofParameter<bool> bKeys;
-	ofParameter<bool> bGui_FloatingClicker;
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> SHOW_Help;
 	//ofParameter<int> MODE_App;
