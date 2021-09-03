@@ -74,10 +74,11 @@ void ofxSurfingPresets::setup()
 	// params 
 
 	bGui.set("SURFING PRESETS", true);
-	bGui_Editor.set("Presets Editor", true);
+	bGui_Editor.set("Editor", true);
+	//bGui_Editor.set("Presets Editor", true);
 	bCycled.set("Cycled", true);
-	bAutoSave.set("Auto Save", true);
-	bAutoSaveTimer.set("Auto Save Timed", false);
+	bAutoSave.set("AutoSave", true);
+	bAutoSaveTimer.set("AutoSave Timed", false);
 	bNewPreset.set("New", false);
 	bSave.set("SAVE", false);
 	bLoad.set("LOAD", false);
@@ -85,7 +86,8 @@ void ofxSurfingPresets::setup()
 	bRefresh.set("REFRESH", false);
 	index.set("INDEX", 0, 0, 0);
 	bGui_InnerClicker.set("Inner Clicker", false);
-	bGui_FloatingClicker.set("Float Clicker", true);
+	bGui_FloatingClicker.set("Clicker", true);
+	//bGui_FloatingClicker.set("Float Clicker", true);
 	bGui_Parameters.set("Parameters", false);
 	MODE_Active.set("Active", true);
 	bDebug.set("Debug", true);
@@ -184,9 +186,13 @@ void ofxSurfingPresets::setup()
 	//--
 
 	// gui
-	guiManager.setImGuiAutodraw(bAutoDraw);
-	guiManager.setup(); // this instantiates and configurates ofxImGui inside the class object.
-	//guiManager.bAutoResize = false;
+	//guiManager.setImGuiAutodraw(bAutoDraw);
+	//guiManager.setup(); // this instantiates and configurates ofxImGui inside the class object.
+	////guiManager.bAutoResize = false;
+
+	guiManager.setSettingsPathLabel("ofxSurfingPresets");
+	guiManager.setAutoSaveSettings(true);
+	guiManager.setup(IM_GUI_MODE_INSTANTIATED);
 
 	//-
 
