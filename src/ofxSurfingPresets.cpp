@@ -37,7 +37,7 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	//ofRemoveListener(params_AppSettings.parameterChangedE(), this, &ofxSurfingPresets::Changed_AppSettings);
 	ofRemoveListener(params_Control.parameterChangedE(), this, &ofxSurfingPresets::Changed_Control);
 
-	//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+	//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 	//#endif
 
@@ -48,7 +48,7 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	exit();
 }
 
-//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 //--------------------------------------------------------------
 void ofxSurfingPresets::refreshToggleNotes()
 {
@@ -191,7 +191,7 @@ void ofxSurfingPresets::setup()
 	////guiManager.bAutoResize = false;
 
 	guiManager.setSettingsPathLabel("ofxSurfingPresets");
-	guiManager.setAutoSaveSettings(true);
+	//guiManager.setAutoSaveSettings(true);
 	guiManager.setup(IM_GUI_MODE_INSTANTIATED);
 
 	//-
@@ -228,7 +228,7 @@ void ofxSurfingPresets::startup()
 	}
 	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 	mMidiParams.connect();
 	mMidiParams.add(params_Preset); // -> to control preset params
 	mMidiParams.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
@@ -295,7 +295,7 @@ void ofxSurfingPresets::draw(ofEventArgs & args)
 
 		//-
 
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		mMidiParams.draw();
 #endif
 	}
@@ -520,7 +520,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 					// keys
 					ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
 					// midi
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui);
 					//ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui_Editor);
 #endif
@@ -615,7 +615,6 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 					if (guiManager.bExtra)
 					{
-						ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
 						ofxImGuiSurfing::AddToggleRoundedButton(bGui_InnerClicker);
 						//ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
 						if (bGui_InnerClicker)
@@ -642,10 +641,11 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						}
 						ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
 						//ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
-						ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
 						ofxImGuiSurfing::AddToggleRoundedButton(bAutoSaveTimer);
+						ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
 						//ofxImGuiSurfing::AddToggleRoundedButton(MODE_Active);
 						//ofxImGuiSurfing::AddToggleRoundedButton(bDebug);
+						ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
 
 						bool bOpen = false;
 						ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
@@ -841,7 +841,7 @@ void ofxSurfingPresets::draw_ImGui_MiniClicker() {
 	if (ImGui::TreeNodeEx("PRESETS", _flagt))
 	{
 		ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns, true, WIDGETS_HEIGHT / 2);
-		ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
+		//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 
 		ImGui::TreePop();
 	}
@@ -1340,7 +1340,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 					//-
 
-					//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+					//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					refreshToggleNotes();
 					//#endif
 				}
@@ -1453,7 +1453,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 //	}
 //}
 
-//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 //--------------------------------------------------------------
 void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 {
@@ -1619,7 +1619,7 @@ void ofxSurfingPresets::doNewPreset()
 		notesIndex.push_back(b);
 		params_PresetToggles.add(b);
 
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		mMidiParams.add(b);
 #endif
 	}
@@ -1789,7 +1789,7 @@ void ofxSurfingPresets::doRefreshFiles()
 
 	//-
 
-//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 //	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 //	notesIndex.clear();
 //	params_PresetToggles.clear();

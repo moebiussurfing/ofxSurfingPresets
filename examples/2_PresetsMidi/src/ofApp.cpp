@@ -2,8 +2,6 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	ofSetWindowPosition(-1920, 26);
-
 	ofSetCircleResolution(200);
 
 	// group
@@ -13,22 +11,14 @@ void ofApp::setup() {
 	params.add(rotation1.set("rotation1", 1, 0, 2));
 	params.add(rotation2.set("rotation2", 180, 0, 360));
 
-	presets.setImGuiAutodraw(true); // -> required true when using only one ImGui instance inside the add-ons of your ofApp
+	//presets.setImGuiAutodraw(true); // -> required true when using only one ImGui instance inside the add-ons of your ofApp
 	presets.addGroup(params);
-}
-
-//--------------------------------------------------------------
-void ofApp::update() {
 }
 
 //--------------------------------------------------------------
 void ofApp::draw()
 {
 	drawScene();
-}
-
-//--------------------------------------------------------------
-void ofApp::exit() {
 }
 
 //--------------------------------------------------------------

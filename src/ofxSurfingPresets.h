@@ -10,14 +10,15 @@ TODO:
 
 +	sorting: ctrl + click = copy, drag
 		get copy/drag preset sorting from ofxPresetsManager
++	add multi groups
 +	fix populate crashes
 +	float clicker full responsible height too
-+	add undo engine.
++	add undo engine here.
 +	add random engine.
 
 +	add text input to rename preset names/pre
 +	batch rename all files
-+	delete a file should + rearrenge sorting
++	delete a file should + re-arrenge sorting
 
 */
 
@@ -26,12 +27,12 @@ TODO:
 
 // OPTIONAL
 
-//#define USE_MIDI_PARAMS__SURFING_PRESETS
+#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 
 //--------------------------------------
 
 
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 #include "ofxMidiParams.h"
 #endif
 
@@ -45,23 +46,20 @@ TODO:
 class ofxSurfingPresets
 {
 private:
-
 #define AMOUNT_KIT_SIZE_DEFAULT 9
 
 	//-
 
 public:
-
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
 
-#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 private:
 	ofxMidiParams mMidiParams;
 #endif
 
 public:
-
 	vector<ofParameter<bool>> notesIndex;
 	ofParameterGroup params_PresetToggles{ "Presets" };
 	void Changed_Params_PresetToggles(ofAbstractParameter &e);
@@ -70,7 +68,7 @@ public:
 	//--------------------------------------------------------------
 	ofParameterGroup & getParametersSelectorToggles() { // to select index preset using bool toggle parameters triggers!
 
-//#ifdef USE_MIDI_PARAMS__SURFING_PRESETS
+//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 //	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 	//notesIndex.clear();
 	//params_PresetToggles.clear();
@@ -276,6 +274,9 @@ public:
 		doSaveCurrent();
 	};
 
+	void doLoad(int _index) {
+		load(_index);
+	};
 	void doLoadNext();
 	void doLoadPrevious();
 	void load(int _index);
