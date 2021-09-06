@@ -27,10 +27,16 @@ TODO:
 
 // OPTIONAL
 
-#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+// midi
+//#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
+//#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 
 //--------------------------------------
 
+
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
+#include "ofxSurfingMidi.h"
+#endif
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 #include "ofxMidiParams.h"
@@ -58,6 +64,12 @@ public:
 private:
 	ofxMidiParams mMidiParams;
 #endif
+
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
+private:
+	ofxSurfingMidi mMidiParams;
+#endif
+
 
 public:
 	vector<ofParameter<bool>> notesIndex;

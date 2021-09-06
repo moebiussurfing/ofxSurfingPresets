@@ -235,6 +235,10 @@ void ofxSurfingPresets::startup()
 	//mMidiParams.add(index);
 #endif
 
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
+	mMidiParams.setup(params_Preset);
+#endif
+
 	//-
 
 	DISABLE_Callbacks = false;
@@ -298,6 +302,11 @@ void ofxSurfingPresets::draw(ofEventArgs & args)
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		mMidiParams.draw();
 #endif
+
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
+		mMidiParams.drawImGui();
+#endif
+
 	}
 }
 
@@ -519,6 +528,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				{
 					// keys
 					ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
+
 					// midi
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui);
@@ -952,7 +962,7 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 				flagst = ImGuiTreeNodeFlags_None;
 
 				//if (!guiManager.bMinimize) flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-				
+
 				flagst |= ImGuiTreeNodeFlags_DefaultOpen;
 				//flagst |= ImGuiTreeNodeFlags_Framed;
 
