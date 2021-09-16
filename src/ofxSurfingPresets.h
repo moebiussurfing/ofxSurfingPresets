@@ -48,6 +48,7 @@ TODO:
 
 #define NUM_KEY_COMMANDS 19
 
+//-
 
 class ofxSurfingPresets
 {
@@ -418,7 +419,7 @@ private:
 	ofParameter<bool> ENABLE_Debug;
 	ofParameter<bool> bKeys;
 	//ofParameter<glm::vec2> Gui_Position;
-	//ofParameter<bool> SHOW_Help;
+	//ofParameter<bool> bHelp;
 	//ofParameter<int> MODE_App;
 	//ofParameter<string> MODE_App_Name;
 

@@ -93,7 +93,7 @@ void ofxSurfingPresets::setup()
 	bDebug.set("Debug", true);
 	bKeys.set("Keys", true);
 	//bShowControl.set("Main Panel", true);
-	//SHOW_Help.set("HELP", false);	
+	//bHelp.set("HELP", false);	
 	//MODE_App.set("APP MODE", 0, 0, NUM_MODES_APP - 1);
 	//MODE_App_Name.set("", "");
 	//MODE_App_Name.setSerializable(false);
@@ -140,7 +140,7 @@ void ofxSurfingPresets::setup()
 	//params_AppSettings.add(bDebug);
 	//params_AppSettings.add(MODE_App);
 	//params_AppSettings.add(MODE_App_Name);
-	//params_AppSettings.add(SHOW_Help);
+	//params_AppSettings.add(bHelp);
 	//params_AppSettings.add(ENABLE_Debug);
 
 	//-
@@ -1147,7 +1147,7 @@ void ofxSurfingPresets::setLogLevel(ofLogLevel level)
 //		//}
 //		//else if (key == 'h')
 //		//{
-//		//	SHOW_Help = !SHOW_Help;
+//		//	bHelp = !bHelp;
 //		//}
 //		//else if (key == 'd')
 //		//{
