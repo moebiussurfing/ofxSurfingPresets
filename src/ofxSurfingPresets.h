@@ -10,8 +10,9 @@ TODO:
 
 +	sorting: ctrl + click = copy, drag
 		get copy/drag preset sorting from ofxPresetsManager
++	fix startup populate crashes
 +	add multi groups
-+	fix populate crashes
+
 +	float clicker full responsible height too
 +	add undo engine here.
 +	add random engine.
@@ -424,7 +425,7 @@ private:
 	//ofParameter<string> MODE_App_Name;
 
 	//float clicker layout
-	ofParameter<int> amntBtnsFloatClicker{ "Max Buttons", 1, 1, 1 };
+	ofParameter<int> amntBtnsFloatClicker{ "MaxBut", 1, 1, 1 };
 	ofParameter<bool> respBtnsFloatClicker{ "Responsive", true };
 	ofParameter<bool> bExtraFloatClicker{ "Extra", false };
 	ofParameter<bool> bAutoResizeFloatClicker{ "Auto Resize", true };

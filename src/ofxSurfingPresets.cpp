@@ -355,7 +355,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 			guiManager.beginWindow(n.c_str(), (bool*)&bGui_Editor.get(), flagsw);
 			//guiManager.beginWindow(n.c_str(), &bOpen0, flagsw);
 			{
-				guiManager.refresh();
+				guiManager.refreshLayout();
 				_w100 = getWidgetsWidth(1);
 				_w50 = getWidgetsWidth(2);
 				_w33 = getWidgetsWidth(3);
@@ -369,7 +369,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				{
 					//--
 
-					//guiManager.refresh();
+					//guiManager.refreshLayout();
 					//_w100 = getWidgetsWidth(1);
 					//_w50 = getWidgetsWidth(2);
 					//_w33 = getWidgetsWidth(3);
@@ -541,7 +541,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 					if (ImGui::TreeNodeEx("TOOLS", _flagt))
 					{
-						guiManager.refresh();
+						guiManager.refreshLayout();
 						_w100 = getWidgetsWidth(1);
 						_w50 = getWidgetsWidth(2);
 						_w33 = getWidgetsWidth(3);
@@ -801,9 +801,10 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 
 		guiManager.beginWindow(n.c_str(), (bool*)&bGui_FloatingClicker.get(), flagsw);
 		{
-			guiManager.refresh();
+			guiManager.refreshLayout();
 			_w100 = getWidgetsWidth(1);
 			_w50 = getWidgetsWidth(2);
+			_w33 = getWidgetsWidth(3);
 
 			// clicker
 			float sizey = ofxImGuiSurfing::getWidgetsHeightRelative() * 2;
@@ -821,18 +822,17 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 			{
 				ImGui::Indent();
 
-
 				//ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
 				ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
 				ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
 				if (respBtnsFloatClicker)
 				{
 					//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-					ImGui::PushItemWidth(_w50);
+					//ImGui::PushItemWidth(_w33);
 					guiManager.Add(amntBtnsFloatClicker, SurfingImGuiTypes::OFX_IM_STEPPER);
 					//ofxImGuiSurfing::AddIntStepped(amntBtnsFloatClicker);
 					//ofxImGuiSurfing::AddParameter(amntBtnsFloatClicker);
-					ImGui::PopItemWidth();
+					//ImGui::PopItemWidth();
 				}
 
 				ImGui::Unindent();
