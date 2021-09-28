@@ -3,17 +3,17 @@
         "AutoSave": "1",
         "AutoSave_Timed": "0",
         "Auto_Resize": "1",
-        "Clicker": "1",
+        "Clicker": "0",
         "Cycled": "1",
         "Editor": "1",
         "FLOAT_CLICKER": {
             "Auto_Resize": "1",
             "Extra": "0",
-            "Max_Buttons": "1",
+            "MaxBut": "3",
             "Responsive": "1"
         },
         "INNER_CLICKER": {
-            "Amt_Buttons": "2",
+            "Amt_Buttons": "3",
             "Responsive": "1"
         },
         "Inner_Clicker": "0",

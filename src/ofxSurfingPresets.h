@@ -300,14 +300,15 @@ public:
 	void doRecallState();
 	void doNewPreset();
 	void doCopyPreset();
-	void doDeletePreset();
+	void doDeletePreset(int pos = -1);
 	void doClearPresets(bool createOne = true);
 	void doPopulatePresets();
 	void doPopulatePresetsRandomized();
 	void doResetParams();
 	void doRandomizeParams();
 	void doRandomizeIndex();
-	void doRefreshFiles();
+	bool doRefreshFiles();
+	void doRefreshFilesAndRename();
 	void setPath();
 
 	void setRandomizerBpm(float bpm) {
@@ -448,6 +449,18 @@ private:
 	std::string path_filePreset;
 
 	std::string _ext = ".json";
+
+	//--------------------------------------------------------------
+	string getFilepathForIndexPreset(int _index) {
+		string _si = ofToString(_index);
+		if (_index < 10) _si = "0" + _si;
+		string _ss = nameRoot + "_" + _si;
+		string _fileName = _ss;
+		string _filePath = path_Presets + "/" + _ss + _ext;
+		ofLogNotice(__FUNCTION__) << _filePath;
+
+		return _filePath;
+	}
 
 	//ofxPanel gui_Control;
 

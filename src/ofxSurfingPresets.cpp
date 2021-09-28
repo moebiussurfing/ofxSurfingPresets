@@ -213,7 +213,8 @@ void ofxSurfingPresets::startup()
 
 	//-
 
-	// midi
+	// Midi
+
 	notesIndex.clear();
 	params_PresetToggles.clear();
 	for (int i = 0; i <= index.getMax(); i++)
@@ -245,30 +246,39 @@ void ofxSurfingPresets::startup()
 
 	//-
 
-	// settings
+	// Settings
 	ofxSurfingHelpers::loadGroup(params_AppSettings, path_Global + path_Params_Control);
 
 	MODE_Active = true;
 
-	// path for settings
+	// Path for settings
 	ofxSurfingHelpers::CheckFolder(path_Global);
 	ofxSurfingHelpers::CheckFolder(path_Presets);
 
-	// create first prest if folder it's empty
-	if (dir.size() == 0)
-	{
-		doNewPreset();
-	}
+	//-
 
-	ofxSurfingHelpers::loadGroup(params_Preset, path_Global + path_filePreset + _ext);
+	// Files
+	bool b = doRefreshFiles();
+
+	// Initiate
+	if (!b) doPopulatePresetsRandomized();
+
+	//-
+
+	//// Create first preset if folder it's empty
+	//if (dir.size() == 0)
+	//{
+	//	doNewPreset();
+	//}
+
+	//ofxSurfingHelpers::loadGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	// workflow
-	// load first
+	// Load first
 	index = 0;
 
 	//-
 
-	// files
 	doRefreshFiles();
 }
 
@@ -541,71 +551,94 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 					if (ImGui::TreeNodeEx("TOOLS", _flagt))
 					{
-						guiManager.refreshLayout();
-						_w100 = getWidgetsWidth(1);
-						_w50 = getWidgetsWidth(2);
-						_w33 = getWidgetsWidth(3);
-						_w25 = getWidgetsWidth(4);
-
 						//ImGui::SameLine();
 
-						if (ImGui::Button("NEW", ImVec2(_w50, _h / 2)))
+						if (ImGui::TreeNodeEx("PRESET", _flagt))
 						{
-							doNewPreset();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("DELETE LAST", ImVec2(_w50, _h / 2)))
-						{
-							doDeletePreset();
-						}
+							guiManager.refreshLayout();
+							_w100 = getWidgetsWidth(1);
+							_w50 = getWidgetsWidth(2);
+							_w33 = getWidgetsWidth(3);
+							_w25 = getWidgetsWidth(4);
 
-						if (ImGui::Button("STORE", ImVec2(_w50, _h / 2)))
-						{
-							doStoreState();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("RECALL", ImVec2(_w50, _h / 2)))
-						{
-							doRecallState();
-						}
-
-						if (ImGui::Button("RESET", ImVec2(_w50, _h / 2)))
-						{
-							doResetParams();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("RANDOMiZE", ImVec2(_w50, _h / 2)))
-						{
-							doRandomizeParams();
-						}
-
-						guiManager.Add(bRefresh, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
-						guiManager.Add(bSetPathPresets, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
-
-						//TODO:
-						//if (ImGui::Button("COPY", ImVec2(_w50, _h / 2)))
-						//{
-						//	doCopyPreset();
-						//}
-
-						//TODO: show only on last preset
-						//if (index == index.getMax())
-						{
-							if (ImGui::Button("CLEAR KIT!", ImVec2(_w100, _h / 2)))
+							if (ImGui::Button("NEW", ImVec2(_w50, _h / 2)))
 							{
-								doClearPresets();
-							}
-							//ImGui::SameLine();
-
-							if (ImGui::Button("POPULATE KIT", ImVec2(_w50, _h / 2)))
-							{
-								doPopulatePresets();
+								doNewPreset();
 							}
 							ImGui::SameLine();
-							if (ImGui::Button("POPULATE RND", ImVec2(_w50, _h / 2)))
+							if (ImGui::Button("DELETE", ImVec2(_w50, _h / 2)))
 							{
-								doPopulatePresetsRandomized();
+								doDeletePreset(index);
+								//doDeletePreset();
 							}
+
+							if (ImGui::Button("STORE", ImVec2(_w50, _h / 2)))
+							{
+								doStoreState();
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("RECALL", ImVec2(_w50, _h / 2)))
+							{
+								doRecallState();
+							}
+
+							if (ImGui::Button("RESET", ImVec2(_w50, _h / 2)))
+							{
+								doResetParams();
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("RANDOM", ImVec2(_w50, _h / 2)))
+							{
+								doRandomizeParams();
+							}
+
+							ImGui::TreePop();
+						}
+
+						//--
+
+						if (ImGui::TreeNodeEx("KIT", _flagt))
+						{
+							guiManager.refreshLayout();
+							_w100 = getWidgetsWidth(1);
+							_w50 = getWidgetsWidth(2);
+							_w33 = getWidgetsWidth(3);
+							_w25 = getWidgetsWidth(4);
+
+							guiManager.Add(bRefresh, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
+							guiManager.Add(bSetPathPresets, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
+
+							//TODO:
+							//if (ImGui::Button("COPY", ImVec2(_w50, _h / 2)))
+							//{
+							//	doCopyPreset();
+							//}
+
+							//TODO: show only on last preset
+							//if (index == index.getMax())
+							{
+								if (ImGui::Button("CLEAR", ImVec2(_w100, _h / 2)))
+								{
+									doClearPresets();
+								}
+
+								if (ImGui::Button("RECREATE", ImVec2(_w100, _h / 2)))
+								{
+									doRefreshFilesAndRename();
+								}
+
+								if (ImGui::Button("POPULATE", ImVec2(_w100, _h / 2)))
+								{
+									doPopulatePresets();
+								}
+
+								if (ImGui::Button("POPULATE RND", ImVec2(_w100, _h / 2)))
+								{
+									doPopulatePresetsRandomized();
+								}
+							}
+
+							ImGui::TreePop();
 						}
 
 						//ImGui::Dummy(ImVec2(0, 2));
@@ -747,10 +780,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				{
 					if (!guiManager.bMinimize)
 					{
-						ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAdvanced);
-						//guiManager.bAdvanced = guiManager.bExtra; // link extra width advanced
-
-						guiManager.drawAdvancedSubPanel();
+						guiManager.drawAdvanced();
 
 						//if (bDebug) guiManager.drawAdvancedSubPanel();
 						//if (bDebug) {
@@ -761,7 +791,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						//	ofxImGuiSurfing::AddGroup(params, flagst);
 						//}
 
-						ImGui::Unindent();
+						//ImGui::Unindent();
 					}
 				}
 			}
@@ -1309,13 +1339,16 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 						//string _fileName = dir.getName(index_PRE);
 						//string _filePath = dir.getPath(index_PRE);
 
+						//int i = index_PRE;
+						//string si = ofToString(i);
+						//if (i < 10) si = "0" + si;
+						//string ss = nameRoot + "_" + si;
+						//fileName = ss;
+						//filePath = path_Presets + "/" + ss + _ext;
+						//ofLogNotice(__FUNCTION__) << filePath;
+
 						int i = index_PRE;
-						string si = ofToString(i);
-						if (i < 10) si = "0" + si;
-						string ss = nameRoot + "_" + si;
-						fileName = ss;
-						filePath = path_Presets + "/" + ss + _ext;
-						ofLogNotice(__FUNCTION__) << filePath;
+						filePath = getFilepathForIndexPreset(i);
 
 						save(filePath);
 					}
@@ -1338,14 +1371,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					//fileName = dir.getName(index);
 					//filePath = dir.getPath(index);
 
-					int i = index;
-					string si = ofToString(i);
-					if (i < 10) si = "0" + si;
-					string ss = nameRoot + "_" + si;
-					fileName = ss;
-					filePath = path_Presets + "/" + ss + _ext;
-					ofLogNotice(__FUNCTION__) << filePath;
-
+					filePath = getFilepathForIndexPreset(index);
 					load(filePath);
 
 					//-
@@ -1632,33 +1658,56 @@ void ofxSurfingPresets::doNewPreset()
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		mMidiParams.add(b);
 #endif
-	}
+}
 
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::doDeletePreset()
+void ofxSurfingPresets::doDeletePreset(int pos)
 {
-	index = index.getMax();
+	int indexPre = index;
 
-	//int pre = index;
+	// Last
+	if (pos == -1)
+	{
+		index = index.getMax();//go to last. name will be updated
+		ofFile::removeFile(filePath);//remove last
+		ofLogNotice(__FUNCTION__) << "Remove last: " << filePath;
 
-	ofFile::removeFile(filePath);
-	ofLogNotice(__FUNCTION__) << filePath;
-	doRefreshFiles();
+		doRefreshFiles();
+
+		// Load last
+		if (dir.size() > 0) index = index.getMax();
+	}
+	// Current
+	else
+	{
+		int i = index;
+		string si = ofToString(i);
+		if (i < 10) si = "0" + si;
+		string ss = nameRoot + "_" + si;
+		fileName = ss;
+		filePath = path_Presets + "/" + ss + _ext;
+		ofLogNotice(__FUNCTION__) << "Remove: " << filePath;
+		ofFile::removeFile(filePath);
+
+		//-
+
+		// Recreate
+		doRefreshFilesAndRename();
+	}
+
 
 	//TODO: set index to new one
 	// should re sort and rename all the presets 
 	// workflow
 
-	//if (dir.size() > 0) index = pre;
+	//if (dir.size() > 0) index = indexPre;
 
 	// load first file in dir
 	//if (dir.size() > 0) index = 0;
 	//else index = -1;
 
-	// load last
-	if (dir.size() > 0) index = index.getMax();
 }
 
 //--------------------------------------------------------------
@@ -1671,7 +1720,7 @@ void ofxSurfingPresets::doPopulatePresets()
 	const int _max = AMOUNT_KIT_SIZE_DEFAULT;
 	//const int _max = dir.size();
 
-	for (int i = 0; i < _max; i++)
+	for (int i = 0; i < _max - 1; i++)
 	{
 		index = i;
 		//doSaveCurrent();
@@ -1695,7 +1744,7 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 	const int _max = AMOUNT_KIT_SIZE_DEFAULT;
 	//const int _max = dir.size();
 
-	for (int i = 0; i < _max; i++)
+	for (int i = 0; i < _max - 1; i++)
 	{
 		index = i;
 		doNewPreset();
@@ -1703,7 +1752,7 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 		doSaveCurrent();
 	}
 
-	//workflow
+	// workflow
 	amntBtnsFloatClicker.setMax(_max);
 	amntBtns.setMax(_max);
 	amntBtnsFloatClicker.set(_max / 3);
@@ -1762,17 +1811,19 @@ void ofxSurfingPresets::doCopyPreset()
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::doRefreshFiles()
+bool ofxSurfingPresets::doRefreshFiles()
 {
-	// load dragged images folder
+	// Load dragged images folder
 	ofLogNotice(__FUNCTION__) << "list files " << path_Presets;
+
+	bool b = false;
 
 	dir.listDir(path_Presets);
 	dir.allowExt("JSON");
 	dir.allowExt("json");
 	dir.sort();
 
-	// log files on folder
+	// Log files on folder
 	fileNames.clear();
 	for (int i = 0; i < dir.size(); i++)
 	{
@@ -1792,10 +1843,19 @@ void ofxSurfingPresets::doRefreshFiles()
 	{
 		index.setMax(dir.size() - 1);
 
-		//workflow
+		// workflow
 		amntBtnsFloatClicker.setMax(dir.size());
 		amntBtns.setMax(dir.size());
 	}
+
+	index = index;
+
+	//-
+
+	b = (dir.size() > 0);
+	//true if there's some file
+
+	return b;
 
 	//-
 
@@ -1819,7 +1879,51 @@ void ofxSurfingPresets::doRefreshFiles()
 //	mMidiParams.add(params_Preset); // -> to control preset params
 //	mMidiParams.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
 //#endif
+}
 
+//--------------------------------------------------------------
+void ofxSurfingPresets::doRefreshFilesAndRename()
+{
+	// Load dragged images folder
+	ofLogNotice(__FUNCTION__) << "list files " << path_Presets;
+
+	// Dir
+	dir.listDir(path_Presets);
+	dir.allowExt("JSON");
+	dir.allowExt("json");
+	dir.sort();
+
+	// Rename all the files on the folder
+	fileNames.clear();
+	for (int i = 0; i < dir.size(); i++)
+	{
+		ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
+
+		string si = ofToString(i);
+		if (i < 10) si = "0" + si;
+		string ss = nameRoot + "_" + si;
+		fileName = ss;
+		filePath = path_Presets + "/" + ss + _ext;
+		ofLogNotice(__FUNCTION__) << "Remove: " << filePath;
+
+		ofFile f;
+		f.open(dir[i].getAbsolutePath());
+		f.renameTo(filePath);
+		//f.renameTo(filePath, true, true);
+
+		fileNames.push_back(fileName);
+	}
+
+	index.setMin(0);
+	if (dir.size() == 0) index.setMax(0);
+	else
+	{
+		index.setMax(dir.size() - 1);
+
+		////workflow
+		//amntBtnsFloatClicker.setMax(dir.size());
+		//amntBtns.setMax(dir.size());
+	}
 }
 
 //--------------------------------------------------------------

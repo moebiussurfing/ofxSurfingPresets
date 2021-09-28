@@ -14,10 +14,11 @@ public:
 
 		ofxSurfingPresets presets;
 
-		// scene parameters 
+		// Scene Parameters 
 		ofParameterGroup params;
 		ofParameter<float> size1;
 		ofParameter<float> rotation1;
 		ofParameter<float> rotation2;
 		ofParameter<int> size2;
+		ofParameter<int> indexColor;
 };
