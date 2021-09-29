@@ -10,16 +10,11 @@ TODO:
 
 +	sorting: ctrl + click = copy, drag
 		get copy/drag preset sorting from ofxPresetsManager
-+	fix startup populate crashes
 +	add multi groups
 
 +	float clicker full responsible height too
 +	add undo engine here.
 +	add random engine.
-
-+	add text input to rename preset names/pre
-+	batch rename all files
-+	delete a file should + re-arrenge sorting
 
 */
 
@@ -28,9 +23,9 @@ TODO:
 
 // OPTIONAL
 
-// midi
+// Midi
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
-//#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 
 //--------------------------------------
 

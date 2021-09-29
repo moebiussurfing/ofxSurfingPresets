@@ -1658,7 +1658,7 @@ void ofxSurfingPresets::doNewPreset()
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		mMidiParams.add(b);
 #endif
-}
+	}
 
 }
 
@@ -2027,7 +2027,7 @@ void ofxSurfingPresets::doRandomizeParams() {
 		else if (p.type() == typeid(ofParameter<int>).name())
 		{
 			ofParameter<int> pr = p.cast<int>();
-			pr = ofRandom(pr.getMin(), pr.getMax());
+			pr = ofRandom(pr.getMin(), pr.getMax() + 1);
 		}
 	}
 
