@@ -6,12 +6,12 @@
 	<param paramName="rotation2" group="paramsGroup" midiid="27" displayName="Control27" />
 	<param paramName="indexColor" group="paramsGroup" midiid="-1" displayName="" />
 	<param paramName="Preset_0" group="Presets" midiid="572" displayName="Note 60" />
-	<param paramName="Preset_1" group="Presets" midiid="573" displayName="Note 61" />
-	<param paramName="Preset_2" group="Presets" midiid="574" displayName="Note 62" />
-	<param paramName="Preset_3" group="Presets" midiid="575" displayName="Note 63" />
-	<param paramName="Preset_4" group="Presets" midiid="568" displayName="Note 56" />
-	<param paramName="Preset_5" group="Presets" midiid="569" displayName="Note 57" />
-	<param paramName="Preset_6" group="Presets" midiid="570" displayName="Note 58" />
-	<param paramName="Preset_7" group="Presets" midiid="571" displayName="Note 59" />
+	<param paramName="Preset_1" group="Presets" midiid="-1" displayName="" />
+	<param paramName="Preset_2" group="Presets" midiid="-1" displayName="" />
+	<param paramName="Preset_3" group="Presets" midiid="-1" displayName="" />
+	<param paramName="Preset_4" group="Presets" midiid="-1" displayName="" />
+	<param paramName="Preset_5" group="Presets" midiid="-1" displayName="" />
+	<param paramName="Preset_6" group="Presets" midiid="-1" displayName="" />
+	<param paramName="Preset_7" group="Presets" midiid="-1" displayName="" />
 	<param paramName="Preset_8" group="Presets" midiid="-1" displayName="" />
 </midiparams>

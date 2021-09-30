@@ -573,3 +573,4 @@ examples/1_Basic/bin/data/imgui_SurfingLayout.xml
 *.json
 *.json
 *.xml
+*.json

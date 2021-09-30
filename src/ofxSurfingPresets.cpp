@@ -370,6 +370,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				_w50 = getWidgetsWidth(2);
 				_w33 = getWidgetsWidth(3);
 				_w25 = getWidgetsWidth(4);
+				_h = getWidgetsHeightUnit();
 
 				//-
 
@@ -427,7 +428,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				{
 					int _i = index;
 					//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-					ImGui::PushItemWidth(_w100 - 20);
+					//ImGui::PushItemWidth(_w100);
 					if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
 					{
 						ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
@@ -437,7 +438,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 							index = _i;
 						}
 					}
-					ImGui::PopItemWidth();
+					//ImGui::PopItemWidth();
 				}
 
 				//ImGui::Dummy(ImVec2(0, 2));
@@ -457,12 +458,12 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 				{
 					ImGui::PushButtonRepeat(true);
 					{
-						if (ImGui::Button("<", ImVec2(_w50, _h / 2)))
+						if (ImGui::Button("<", ImVec2(_w50, _h)))
 						{
 							doLoadPrevious();
 						}
 						ImGui::SameLine();
-						if (ImGui::Button(">", ImVec2(_w50, _h / 2)))
+						if (ImGui::Button(">", ImVec2(_w50, _h)))
 						{
 							doLoadNext();
 						}
@@ -516,7 +517,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 
 				//if (guiManager.bMinimize)
-				if (ImGui::Button("NEW", ImVec2(_w100, _h / 2)))
+				if (ImGui::Button("NEW", ImVec2(_w100, _h)))
 				{
 					//bNewPreset = true;
 					doNewPreset();
@@ -560,34 +561,65 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 							_w50 = getWidgetsWidth(2);
 							_w33 = getWidgetsWidth(3);
 							_w25 = getWidgetsWidth(4);
+							_h = getWidgetsHeightUnit();
 
-							if (ImGui::Button("NEW", ImVec2(_w50, _h / 2)))
+							if (ImGui::Button("NEW", ImVec2(_w50, _h)))
 							{
 								doNewPreset();
 							}
 							ImGui::SameLine();
-							if (ImGui::Button("DELETE", ImVec2(_w50, _h / 2)))
+
+							//if (ImGui::Button("DELETE", ImVec2(_w50, _h)))
+							//{
+							//	doDeletePreset(index);
+							//}
+
+							if (ImGui::Button("DELETE", ImVec2(_w50, _h))) ImGui::OpenPopup("DELETE?");
+							if (ImGui::BeginPopupModal("DELETE?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 							{
-								doDeletePreset(index);
-								//doDeletePreset();
+								ImGui::Text("Current Preset will be deleted.\nThis operation cannot be undone!\n\n");
+								ImGui::Separator();
+
+								static bool dont_ask_me_next_time = false;
+								ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+								ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+								ImGui::PopStyleVar();
+
+								if (!dont_ask_me_next_time) {
+									if (ImGui::Button("OK", ImVec2(120, 0))) {
+										ofLogNotice(__FUNCTION__) << "DELETE";
+										doDeletePreset(index);
+										ImGui::CloseCurrentPopup();
+									}
+									ImGui::SetItemDefaultFocus();
+									ImGui::SameLine();
+									if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+								}
+								else {
+									ofLogNotice(__FUNCTION__) << "DELETE";
+									doDeletePreset(index);
+									ImGui::CloseCurrentPopup();
+								}
+
+								ImGui::EndPopup();
 							}
 
-							if (ImGui::Button("STORE", ImVec2(_w50, _h / 2)))
+							if (ImGui::Button("STORE", ImVec2(_w50, _h)))
 							{
 								doStoreState();
 							}
 							ImGui::SameLine();
-							if (ImGui::Button("RECALL", ImVec2(_w50, _h / 2)))
+							if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
 							{
 								doRecallState();
 							}
 
-							if (ImGui::Button("RESET", ImVec2(_w50, _h / 2)))
+							if (ImGui::Button("RESET", ImVec2(_w50, _h)))
 							{
 								doResetParams();
 							}
 							ImGui::SameLine();
-							if (ImGui::Button("RANDOM", ImVec2(_w50, _h / 2)))
+							if (ImGui::Button("RANDOM", ImVec2(_w50, _h)))
 							{
 								doRandomizeParams();
 							}
@@ -604,12 +636,13 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 							_w50 = getWidgetsWidth(2);
 							_w33 = getWidgetsWidth(3);
 							_w25 = getWidgetsWidth(4);
+							_h = getWidgetsHeightUnit();
 
 							guiManager.Add(bRefresh, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
 							guiManager.Add(bSetPathPresets, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
 
 							//TODO:
-							//if (ImGui::Button("COPY", ImVec2(_w50, _h / 2)))
+							//if (ImGui::Button("COPY", ImVec2(_w50, _h)))
 							//{
 							//	doCopyPreset();
 							//}
@@ -617,22 +650,53 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 							//TODO: show only on last preset
 							//if (index == index.getMax())
 							{
-								if (ImGui::Button("CLEAR", ImVec2(_w100, _h / 2)))
+								//if (ImGui::Button("CLEAR", ImVec2(_w100, _h)))
+								//{
+								//	doClearPresets();
+								//}
+
+								if (ImGui::Button("CLEAR KIT", ImVec2(_w100, _h))) ImGui::OpenPopup("CLEAR KIT?");
+								if (ImGui::BeginPopupModal("CLEAR KIT?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 								{
-									doClearPresets();
+									ImGui::Text("User Kit will be erased.\nThis operation cannot be undone!\n\n");
+									ImGui::Separator();
+
+									static bool dont_ask_me_next_time = false;
+									ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+									ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+									ImGui::PopStyleVar();
+
+									if (!dont_ask_me_next_time) {
+										if (ImGui::Button("OK", ImVec2(120, 0))) {
+											ofLogNotice(__FUNCTION__) << "CLEAR";
+											doClearPresets();
+											ImGui::CloseCurrentPopup();
+										}
+										ImGui::SetItemDefaultFocus();
+										ImGui::SameLine();
+										if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+									}
+									else {
+										ofLogNotice(__FUNCTION__) << "CLEAR";
+										doClearPresets();
+										ImGui::CloseCurrentPopup();
+									}
+
+									ImGui::EndPopup();
 								}
 
-								if (ImGui::Button("RECREATE", ImVec2(_w100, _h / 2)))
+
+								if (ImGui::Button("RECREATE", ImVec2(_w100, _h)))
 								{
 									doRefreshFilesAndRename();
 								}
 
-								if (ImGui::Button("POPULATE", ImVec2(_w100, _h / 2)))
+								if (ImGui::Button("POPULATE", ImVec2(_w100, _h)))
 								{
 									doPopulatePresets();
 								}
 
-								if (ImGui::Button("POPULATE RND", ImVec2(_w100, _h / 2)))
+								if (ImGui::Button("POPULATE RND", ImVec2(_w100, _h)))
 								{
 									doPopulatePresetsRandomized();
 								}
@@ -835,6 +899,7 @@ void ofxSurfingPresets::draw_ImGui_Floating()
 			_w100 = getWidgetsWidth(1);
 			_w50 = getWidgetsWidth(2);
 			_w33 = getWidgetsWidth(3);
+			_h = getWidgetsHeightUnit();
 
 			// clicker
 			float sizey = ofxImGuiSurfing::getWidgetsHeightRelative() * 2;
@@ -898,7 +963,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 	{
 		float _w100 = ofxImGuiSurfing::getWidgetsWidth(1);
 		float _w50 = ofxImGuiSurfing::getWidgetsWidth(2);
-		float _h = BUTTON_BIG_HEIGHT;
+		float _h = getWidgetsHeightRelative();
 
 		//ImGui::Dummy(ImVec2(0, 2));
 
@@ -913,7 +978,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 			int _i = index;
 
 			//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-			ImGui::PushItemWidth(_w100 - 20);
+			//ImGui::PushItemWidth(_w100);
 			if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
 			{
 				ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
@@ -932,17 +997,17 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 					//}
 				}
 			}
-			ImGui::PopItemWidth();
+			//ImGui::PopItemWidth();
 		}
 
 		ImGui::PushButtonRepeat(true);
 		{
-			if (ImGui::Button("<", ImVec2(_w50, _h / 2)))
+			if (ImGui::Button("<", ImVec2(_w50, _h)))
 			{
 				doLoadPrevious();
 			}
 			ImGui::SameLine();
-			if (ImGui::Button(">", ImVec2(_w50, _h / 2)))
+			if (ImGui::Button(">", ImVec2(_w50, _h)))
 			{
 				doLoadNext();
 			}
