@@ -25,7 +25,7 @@ TODO:
 
 // Midi
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
-#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+//#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 
 //--------------------------------------
 
