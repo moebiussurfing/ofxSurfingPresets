@@ -4,21 +4,27 @@
 
 #include "ofxSurfingPresets.h"
 
-class ofApp : public ofBaseApp{
+class ofApp : public ofBaseApp {
 
 public:
-		void setup();
-		void draw();
-		void drawScene();
-		void keyPressed(int key);
+	void setup();
+	void draw();
+	void drawScene();
+	void keyPressed(int key);
 
-		ofxSurfingPresets presets;
+	ofxSurfingPresets presets;
 
-		// Scene Parameters 
-		ofParameterGroup params;
-		ofParameter<float> size1;
-		ofParameter<float> rotation1;
-		ofParameter<float> rotation2;
-		ofParameter<int> size2;
-		ofParameter<int> indexColor;
+	// Scene Parameters 
+	ofParameterGroup params;
+	ofParameter<float> size1;
+	ofParameter<float> rotation1;
+	ofParameter<float> rotation2;
+	ofParameter<int> size2;
+	ofParameter<int> indexColor;
+
+	//TODO:
+	// Smooth
+	ofParameter<bool> bSmooth{ "Smooth", false };
+	ofParameter<float> smoothSpeed{ "Speed", 0.f, 0.f, 1.f };
+	ofParameterGroup params_Smooth{ "_Smoother", bSmooth, smoothSpeed };
 };

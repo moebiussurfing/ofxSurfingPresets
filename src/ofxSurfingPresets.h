@@ -8,10 +8,10 @@
 
 TODO:
 
-+	sorting: ctrl + click = copy, drag
++	sorting: ctrl + click = copy, drag ?
 		get copy/drag preset sorting from ofxPresetsManager
 +	add multi groups
-
++	add easy tween
 +	float clicker full responsible height too
 +	add undo engine here.
 +	add random engine.
@@ -26,6 +26,8 @@ TODO:
 // Midi
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+
+#define USE__BASIC_TWEENER
 
 //--------------------------------------
 
@@ -49,13 +51,15 @@ TODO:
 class ofxSurfingPresets
 {
 private:
-#define AMOUNT_KIT_SIZE_DEFAULT 9
+#define AMOUNT_KIT_SIZE_DEFAULT 9 // Default common amount presets but can be resized
 
-	//-
+	//----
 
 public:
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
+
+	//-
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 private:
@@ -67,6 +71,7 @@ private:
 	ofxSurfingMidi mMidiParams;
 #endif
 
+	//-
 
 public:
 	vector<ofParameter<bool>> notesIndex;
@@ -75,23 +80,23 @@ public:
 	void refreshToggleNotes();
 
 	//--------------------------------------------------------------
-	ofParameterGroup & getParametersSelectorToggles() { // to select index preset using bool toggle parameters triggers!
+	ofParameterGroup & getParametersSelectorToggles() { // To select index preset using bool toggle parameters triggers!
 
 //#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 //	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-	//notesIndex.clear();
-	//params_PresetToggles.clear();
-	//for (int i = 0; i <= index.getMax(); i++)
-	//{
-	//	string n = "Preset ";
-	//	//n += ofToString(i < 10 ? "0" : "");
-	//	n += ofToString(i);
-
-	//	ofParameter<bool> b{ n, false };
-	//	notesIndex.push_back(b);
-	//	params_PresetToggles.add(b);
-	//}
-	//ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+//notesIndex.clear();
+//params_PresetToggles.clear();
+//for (int i = 0; i <= index.getMax(); i++)
+//{
+//	std::string n = "Preset ";
+//	//n += ofToString(i < 10 ? "0" : "");
+//	n += ofToString(i);
+//
+//	ofParameter<bool> b{ n, false };
+//	notesIndex.push_back(b);
+//	params_PresetToggles.add(b);
+//}
+//ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 //
 //	mMidiParams.clear();
 //	mMidiParams.add(params_Preset); // -> to control preset params
@@ -101,9 +106,11 @@ public:
 		return params_PresetToggles;
 	}
 
-	// easy callbacks
-	// to retrig when preset not changed but is clicked again.
+	// Easy callbacks
+	// To retrig when preset not changed but is clicked again.
+
 public:
+	//--------------------------------------------------------------
 	bool isRetrigged()
 	{
 		if (bIsRetrigged)
@@ -118,10 +125,11 @@ private:
 
 	//----
 
-	// A. easy callbacks
-	// loaded / saved
-	// to faster ofApp integration 
-	// to check in update() as callback
+	// A. Easy callbacks
+	// Loaded / saved
+	// To faster ofApp integration 
+	// To check in update() as callback
+
 public:
 	//--------------------------------------------------------------
 	bool isDoneLoad()
@@ -154,27 +162,28 @@ private:
 
 	//--
 
-	// B. better callbacks
-	// loaded / saved
-	// to get (from ofApp) when it happens
+	// B. Better Callbacks
+	// Loaded / saved
+	// To get (from ofApp) when it happens
 public:
 	ofParameter<bool> DONE_load;// easy callback to know (in ofApp) that preset LOAD is done 
 	ofParameter<bool> DONE_save;// easy callback to know (in ofApp) that preset SAVE is done
 
 	//--
 
-	// C. easy trig-callback
-	// used to get alerted when preset has not changed but we like to retrig something
-	// in some situation we would like this feature:
-	// 1. user clicked a preset box
-	// 2. but to the same current loaded preset
-	// 3. no need to reload the file settings
-	// 4. but we want to use the user box click to trig something
+	// C. Easy trig-callback
+	// Used to get alerted when preset has not changed but we like to retrig something
+	// In some situation we would like this feature:
+	// 1. User clicked a preset box
+	// 2. But to the same current loaded preset
+	// 3. No need to reload the file settings
+	// 4. But we want to use the user box click to trig something
+
 private:
 	bool bMustTrig = false;
 public:
 	//--------------------------------------------------------------
-	bool isMustTrig()// trig on select preset or not. this is useful when preset selected not changed, but we want to retrig current preset settings
+	bool isMustTrig() // Trig on select preset or not. this is useful when preset selected not changed, but we want to retrig current preset settings
 	{
 		if (bMustTrig)
 		{
@@ -196,11 +205,12 @@ private:
 
 private:
 
-	bool bAutoDraw; // must be false when multiple ImGui instances created!
+	bool bAutoDraw; // Must be false when multiple ImGui instances created!
 
 public:
 
-	// required to set to false when only one ImGui instance is created. By default is setted to ImGui multi instances
+	// Required to set to false when only one ImGui instance is created. 
+	// By default is setted to ImGui multi instances
 	//--------------------------------------------------------------
 	void setImGuiAutodraw(bool b) {
 		bAutoDraw = b;
@@ -210,7 +220,7 @@ public:
 
 private:
 
-	string nameRoot;
+	std::string nameRoot;
 
 private:
 
@@ -222,7 +232,7 @@ private:
 public:
 
 	void draw_ImGui_Minimal();
-	void draw_ImGui_Floating();
+	void draw_ImGui_FloatingClicker();
 	void draw_ImGui_Parameters();
 
 	void draw_ImGui_MiniClicker();
@@ -244,26 +254,26 @@ private:
 
 	//bool bDebug = false;
 
-	string nameSelected;
+	std::string nameSelected;
 
 	ofxSurfing_ImGui_Manager guiManager;
 
-	// preset params
-	ofParameterGroup params_Preset{ "-1" };
+	// Preset Params
+	ofParameterGroup params_Preset{ "-1" }; //-> The params that we are storing into each preset file.
 
-	//-
+	//----
 
-	// api
+	// Api
 
 public:
 
 	//--------------------------------------------------------------
-	void setup(ofParameterGroup &group) { // main group add
+	void setup(ofParameterGroup &group) { // Main group add
 		addGroup(group);
 	}
 
 	//--------------------------------------------------------------
-	void addGroup(ofParameterGroup &group) { // main group add
+	void addGroup(ofParameterGroup &group) { // Main group add
 		setup();
 
 		params_Preset = group;
@@ -271,26 +281,50 @@ public:
 		nameRoot = params_Preset.getName();
 
 		//-
+		
+		// Basic Tweener
+		add(group);
 
-		// refresh
+		//-
+
+		// Refresh
 		startup();
 	}
+
+	//----
+
+private:
+
+	// Extra params to insert to the addon gui but from the parent scope (ofApp)
+	ofParameterGroup params_AppExtra{ "-1" };
+
+public:
+
+	//--------------------------------------------------------------
+	void addParamsAppExtra(ofParameterGroup &groupExtra) {
+		params_AppExtra = groupExtra;
+	}
+
+	//----
 
 public:
 
 	void doSaveCurrent();
-	void saveCurrentPreset(int i = -1) {//legacy api
+	//--------------------------------------------------------------
+	void saveCurrentPreset(int i = -1) { // Legacy api
 		doSaveCurrent();
 	};
 
+	//--------------------------------------------------------------
 	void doLoad(int _index) {
 		load(_index);
 	};
+
 	void doLoadNext();
 	void doLoadPrevious();
 	void load(int _index);
-	void load(string path);
-	void save(string path);
+	void load(std::string path);
+	void save(std::string path);
 	void doStoreState();
 	void doRecallState();
 	void doNewPreset();
@@ -306,6 +340,7 @@ public:
 	void doRefreshFilesAndRename();
 	void setPath();
 
+	//--------------------------------------------------------------
 	void setRandomizerBpm(float bpm) {
 
 	}
@@ -315,11 +350,13 @@ public:
 	//	bReset = (bool*)b;
 	//}
 
-	//remote reset
-	// bc each group could have different appropiated reset values
+	// Remote reset
+	// Bc each group could have different appropiated reset values
+
 private:
 	ofParameter <bool> bReset{ "-1", false };
 public:
+	//--------------------------------------------------------------
 	void setResetPtr(ofParameter<bool> &b) {
 		bReset.makeReferenceTo(b);
 	}
@@ -332,7 +369,7 @@ public:
 
 private:
 
-	// gui params
+	// Gui Params
 	ofParameterGroup params;
 	ofParameterGroup params_Control;
 	ofParameterGroup params_AppSettings;
@@ -360,7 +397,9 @@ public:
 	void setGuiVisible(bool b);
 	void setLogLevel(ofLogLevel level);
 
-	void setModeAutoSave(bool b) { setAutoSave(b); };//legacy api
+	//--------------------------------------------------------------
+	void setModeAutoSave(bool b) { setAutoSave(b); }; // Legacy Api
+	//--------------------------------------------------------------
 	void setAutoSave(bool b)
 	{
 		bAutoSave = b;
@@ -369,7 +408,7 @@ public:
 
 private:
 
-	// files browser
+	// Files Browser
 	ofDirectory dir;
 	std::string fileName;
 	std::string filePath;
@@ -381,14 +420,14 @@ private:
 
 	//int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
 
-	// autosave
+	// Autosave
 	ofParameter<bool> bAutoSaveTimer;
 	uint64_t timerLast_Autosave = 0;
 	int timeToAutosave = 5000;
 
-	// updating some params before save will trigs also the group callbacks
-	//so we disable this callbacks just in case params updatings are required
-	//in this case we will need to update gui position param
+	// Updating some params before save will trigs also the group callbacks
+	// So we disable this callbacks just in case params updatings are required
+	// In this case we will need to update gui position param
 	bool DISABLE_Callbacks = false;
 
 	//-
@@ -397,18 +436,15 @@ private:
 
 	//-
 
-	// control params
+	// Control Params
 
 public:
 
-	// exposed public to use on external gui's
+	// Exposed public to use on external gui's
 	ofParameter<bool> bGui;
 	ofParameter<bool> bGui_Editor;
 	ofParameter<bool> bGui_FloatingClicker;
 	ofParameter<bool> bGui_Parameters;
-
-private:
-
 
 private:
 
@@ -418,9 +454,9 @@ private:
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> bHelp;
 	//ofParameter<int> MODE_App;
-	//ofParameter<string> MODE_App_Name;
+	//ofParameter<std::string> MODE_App_Name;
 
-	//float clicker layout
+	// Floating Clicker Layout
 	ofParameter<int> amntBtnsFloatClicker{ "MaxBut", 1, 1, 1 };
 	ofParameter<bool> respBtnsFloatClicker{ "Responsive", true };
 	ofParameter<bool> bExtraFloatClicker{ "Extra", false };
@@ -432,49 +468,211 @@ private:
 
 public:
 
-	void setPathGlobal(string s); // must cal before setup.
-	void setPathPresets(string s); // must call before addGroup/setup. Specially usefull when using multiple preset manager instances or different kits for the same instance.
-	//TODO: add a kit selector
+	void setPathGlobal(std::string s); // Must cal before setup.
+	void setPathPresets(std::string s); // Must call before addGroup/setup. Specially usefull when using multiple preset manager instances or different kits for the same instance.
+	//TODO: Add a kit selector
 
 private:
 
-	std::string path_Global; // this is to folder all files to avoid mixing with other addons data
+	std::string path_Global; // This is to folder all files to avoid mixing with other addons data
 	std::string path_Params_Control;
-	std::string path_Presets; // this is to folder all files to avoid mixing with other addons data
+	std::string path_Presets; // This is to folder all files to avoid mixing with other addons data
 	std::string path_filePreset;
 
 	std::string _ext = ".json";
 
 	//--------------------------------------------------------------
-	string getFilepathForIndexPreset(int _index) {
-		string _si = ofToString(_index);
+	std::string getFilepathForIndexPreset(int _index) {
+		std::string _si = ofToString(_index);
 		if (_index < 10) _si = "0" + _si;
-		string _ss = nameRoot + "_" + _si;
-		string _fileName = _ss;
-		string _filePath = path_Presets + "/" + _ss + _ext;
+		std::string _ss = nameRoot + "_" + _si;
+		std::string _fileName = _ss;
+		std::string _filePath = path_Presets + "/" + _ss + _ext;
 		ofLogNotice(__FUNCTION__) << _filePath;
 
 		return _filePath;
 	}
 
-	//ofxPanel gui_Control;
-
-//public:
-//	void keyPressed(int key);
-
 private:
 
-	// keys
+	// Keys
 	void keyPressed(ofKeyEventArgs &eventArgs);
-	//void keyReleased(ofKeyEventArgs &eventArgs);
-
 	void addKeysListeners();
 	void removeKeysListeners();
 
-	//// mouse
-	 //void mouseDragged(ofMouseEventArgs &eventArgs);
-	 //void mousePressed(ofMouseEventArgs &eventArgs);
-	 //void mouseReleased(ofMouseEventArgs &eventArgs);
-	 //void addMouseListeners();
-	 //void removeMouseListeners();
+	
+
+
+	//--------------------------------------------------------------
+
+#ifdef USE__BASIC_TWEENER
+	
+	//TODO:
+	// Simple Tweener
+
+//public:
+	//// Simple Getters
+	//float get(ofParameter<float> &e);
+	//int get(ofParameter<int> &e);
+
+private:
+	ofParameterGroup mParamsGroup_COPY{ "paramsTweened" };
+	
+	//----
+	
+private:
+
+	//--------------------------------------------------------------
+	void addParam(ofAbstractParameter& aparam) {
+
+		static string suffix = "_Tween_";
+
+		string _name = aparam.getName();
+		ofLogNotice() << __FUNCTION__ << " [ ofAbstractParameter ] \t " << _name;
+
+		//--
+
+		// https://forum.openframeworks.cc/t/ofxparametercollection-manage-multiple-ofparameters/34888/3
+		auto type = aparam.type();
+
+		bool isGroup = type == typeid(ofParameterGroup).name();
+
+		bool isFloat = type == typeid(ofParameter<float>).name();
+		bool isInt = type == typeid(ofParameter<int>).name();
+		bool isBool = type == typeid(ofParameter<bool>).name();
+
+		// vec
+		bool isVec2 = type == typeid(ofParameter<glm::vec2>).name();
+		bool isVec3 = type == typeid(ofParameter<glm::vec3>).name();
+		bool isVec4 = type == typeid(ofParameter<glm::vec4>).name();
+
+		ofLogNotice() << __FUNCTION__ << " " << _name << " \t [ " << type << " ]";
+
+		if (isGroup)
+		{
+			auto &g = aparam.castGroup();
+
+			for (int i = 0; i < g.size(); i++) {
+				addParam(g.get(i));
+			}
+		}
+
+		// add/queue each param
+		// exclude groups to remove from plots
+		if (!isGroup) mParamsGroup_COPY.add(aparam);
+
+		//--
+
+		// create a copy group
+		// will be the output or target to be use params
+
+		if (isFloat) {
+			ofParameter<float> p = aparam.cast<float>();
+			ofParameter<float> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
+			mParamsGroup_COPY.add(_p);
+		}
+		else if (isInt) {
+			ofParameter<int> p = aparam.cast<int>();
+			ofParameter<int> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
+			mParamsGroup_COPY.add(_p);
+		}
+		else if (isBool) {
+			ofParameter<bool> p = aparam.cast<bool>();
+			ofParameter<bool> _p{ _name + suffix, p.get() };
+			mParamsGroup_COPY.add(_p);
+		}
+
+		//TODO:
+		//vec
+		else if (isVec2) {
+			ofParameter<glm::vec2> p = aparam.cast<glm::vec2>();
+			ofParameter<glm::vec2> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
+			mParamsGroup_COPY.add(_p);
+		}
+		else if (isVec3) {
+			ofParameter<glm::vec3> p = aparam.cast<glm::vec3>();
+			ofParameter<glm::vec3> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
+			mParamsGroup_COPY.add(_p);
+		}
+		else if (isVec4) {
+			ofParameter<glm::vec4> p = aparam.cast<glm::vec4>();
+			ofParameter<glm::vec4> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
+			mParamsGroup_COPY.add(_p);
+		}
+
+		else {
+		}
+	}
+
+	//--------------------------------------------------------------
+	void add(ofParameterGroup aparams) {
+		for (int i = 0; i < aparams.size(); i++) {
+			addParam(aparams.get(i));
+		}
+	}
+
+	//--------------------------------------------------------------
+	void add(ofParameter<float>& aparam) {
+		addParam(aparam);
+	}
+	//--------------------------------------------------------------
+	void add(ofParameter<bool>& aparam) {
+		addParam(aparam);
+	}
+	//--------------------------------------------------------------
+	void add(ofParameter<int>& aparam) {
+		addParam(aparam);
+	}
+	//--------------------------------------------------------------
+	void add(ofParameter<glm::vec2>& aparam) {
+		addParam(aparam);
+	}
+	//--------------------------------------------------------------
+	void add(ofParameter<glm::vec3>& aparam) {
+		addParam(aparam);
+	}
+	//--------------------------------------------------------------
+	void add(ofParameter<glm::vec4>& aparam) {
+		addParam(aparam);
+	}
+
+	//------------
+
+	// API getters
+public:
+	// to get the smoothed parameters indiviauly and externaly
+
+	//simplified getters
+	//--------------------------------------------------------------
+	float get(ofParameter<float> &e) {
+		string name = e.getName();
+		auto &p = mParamsGroup_COPY.get(name);
+		if (p.type() == typeid(ofParameter<float>).name())
+		{
+			return p.cast<float>().get();
+		}
+		else
+		{
+			ofLogError(__FUNCTION__) << "Not expected type: " << name;
+			return -1;
+		}
+	}
+	//--------------------------------------------------------------
+	int get(ofParameter<int> &e) {
+		string name = e.getName();
+		auto &p = mParamsGroup_COPY.get(name);
+		if (p.type() == typeid(ofParameter<int>).name())
+		{
+			return p.cast<int>().get();
+		}
+		else
+		{
+			ofLogError(__FUNCTION__) << "Not expected type: " << name;
+			return -1;
+		}
+	}
+
+	void updateTweeners();
+#endif
+
 };
