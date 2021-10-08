@@ -29,12 +29,14 @@ ofParameterGroup params;
 
 ofApp.cpp
 ```c++
-void ofApp::setup() {
+void ofApp::setup() 
+{
     // Params Group
     params.setName("paramsGroup");
     params.add(fill.set("fill", true));
     params.add(lineWidth.set("lineWidth", 1, 0.1, 10));
     params.add(size.set("size", 100, 5, 200));
+
     presets.addGroup(params);
 }
 ```
@@ -43,7 +45,7 @@ void ofApp::setup() {
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)  
 * [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui)
 * [ofxImGui](https://github.com/Daandelange/ofxImGui/) [ _FORK from_ @**Daandelange** ]  
-* [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams) [ _FORK Optional _ ]  
+* [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams) [ _FORK Optional_ ]  
 
 <details>
   <summary>A MORE POWERFUL ALTERNATIVE</summary>
