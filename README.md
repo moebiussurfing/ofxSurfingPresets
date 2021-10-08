@@ -2,18 +2,20 @@
 
 ## Overview
 
-Simple presets system for **openFrameworks** with an **ImGui** based GUI.
+Presets System for **openFrameworks** with an **ImGui** based GUI.
 
 ## Screenshot
 ![gif](docs/ofxSurfingPresets.gif?raw=true "gif")
 
 ## Features
-- De/Serialize JSON files to an ofParameterGroup.  
-- ImGui based GUI: minimizable.
-- Reset and randomize parameters.
+- De/Serializes JSON files from/to an **ofParameterGroup**.  
+- **ImGui** based Gui.
 - Minimizable. Easy to integrate to your projects/add-ons.
-- One memory slot to Store/Recall and copy presets.
-- Key commands.
+- Reset and basic Randomize parameters.
+- One Memory slot to Store/Recall compare and copy presets.
+- Key Commands.
+- Clear and auto populate (randomized or not) kit of Presets.
+- Compatible with some Midi add-ons.
 
 ## Usage
 
@@ -28,12 +30,11 @@ ofParameterGroup params;
 ofApp.cpp
 ```c++
 void ofApp::setup() {
-    // param group
+    // Params Group
     params.setName("paramsGroup");
     params.add(fill.set("fill", true));
     params.add(lineWidth.set("lineWidth", 1, 0.1, 10));
     params.add(size.set("size", 100, 5, 200));
-    ..
     presets.addGroup(params);
 }
 ```
@@ -41,8 +42,8 @@ void ofApp::setup() {
 ## Dependencies
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)  
 * [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui)
-* [ofxImGui](https://github.com/Daandelange/ofxImGui/) FORK from @**Daandelange**  
-* [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams) FORK [Optional]  
+* [ofxImGui](https://github.com/Daandelange/ofxImGui/) [ _FORK from_ @**Daandelange** ]  
+* [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams) [ _FORK Optional _ ]  
 
 <details>
   <summary>A MORE POWERFUL ALTERNATIVE</summary>
@@ -64,12 +65,8 @@ void ofApp::setup() {
 * **Windows 10** / **VS 2017** / **OF ~0.11**
 
 ## Author
-An addon by **@moebiusSurfing**  
+An add-on by **@moebiusSurfing**  
 *( ManuMolina ) 2021*  
-
-[Twitter](https://twitter.com/moebiussurfing/)  
-[Instagram](https://www.instagram.com/moebiussurfing/)  
-[YouTube](https://www.youtube.com/channel/UCzUw96_wjmNxyIoFXf84hQg)  
 
 ## License
 [**MIT License**](https://github.com/LICENSE)
