@@ -376,307 +376,232 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 			ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 			ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
-			n = "PRESETS EDITOR " + params_Preset.getName();
+			n = "PRESETS EDITOR";
+			//n = "PRESETS EDITOR " + params_Preset.getName();
 			//n = params_Control.getName() + " |" + params_Preset.getName();
 			//n = params_Control.getName();
 
-			guiManager.beginWindow(n.c_str(), (bool*)&bGui_Editor.get(), flagsw);
-			//guiManager.beginWindow(n.c_str(), &bOpen0, flagsw);
+			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
-				guiManager.refreshLayout();
-				_w100 = getWidgetsWidth(1);
-				_w50 = getWidgetsWidth(2);
-				_w33 = getWidgetsWidth(3);
-				_w25 = getWidgetsWidth(4);
-				_h = getWidgetsHeightUnit();
+				IMGUI_SUGAR__WINDOWS_CONSTRAINTS;
 
-				//-
-
-				ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
-
-				if (!guiManager.bMinimize)
+				guiManager.beginWindow(n.c_str(), (bool*)&bGui_Editor.get(), flagsw);
 				{
-					//--
+					ImGui::Text(params_Preset.getName().c_str());
 
-					//guiManager.refreshLayout();
-					//_w1 = getWidgetsWidth(1);
-					//_w2 = getWidgetsWidth(2);
-					//_w3 = getWidgetsWidth(3);
-					//_w4 = getWidgetsWidth(4);
+					guiManager.refreshLayout();
+					_w100 = getWidgetsWidth(1);
+					_w50 = getWidgetsWidth(2);
+					_w33 = getWidgetsWidth(3);
+					_w25 = getWidgetsWidth(4);
+					_h = getWidgetsHeightUnit();
 
-					//--
+					//-
 
-					//// Textinput
-					//{
-					//	// input text
-					//	static int keyboardFocus;
-					//	//static char str0[128] = fileName.c_str();
-					//	//std::string fileName = "Name";
-					//	char *cstr = new char[fileName.length() + 1];
-					//	strcpy(cstr, fileName.c_str());
-					//	ImGui::InputText("Name", cstr, IM_ARRAYSIZE(cstr));
-					//	//if (ImGui::IsItemClicked()) {
-					//	//	keyboardFocus = 0;
-					//	//}
-					//	//if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive()) {
-					//	//	ImGui::SetKeyboardFocusHere(keyboardFocus);
-					//	//}
-					//}
+					ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
 
-					//ImGui::Text(path_Global.data());
-					//ImGui::Text(filePath.data());
-
-					string ss;
-					if (dir.size() == 0) ss = "NO PRESETS";
-					else ss = ofToString(index) + "/" + ofToString(index.getMax());
-					//ss = ofToString(index) + "/" + ofToString(index.getMax());
-
-					ImGui::Text(ss.data());
-					if (guiManager.bMinimize) ImGui::Text(fileName.data()); // -> using text input below
-					//if (guiManager.bExtra) ImGui::Text(path_Presets.data()); // -> show path
-
-					//ImGui::Dummy(ImVec2(0, 1));
-				}
-
-				//--
-
-				// 1. Scrollable list
-
-				if (!fileNames.empty())
-				{
-					int _i = index;
-					//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-					//ImGui::PushItemWidth(_w1);
-					if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
+					if (!guiManager.bMinimize)
 					{
-						ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
+						//--
 
-						if (_i < fileNames.size())
-						{
-							index = _i;
-						}
-					}
-					//ImGui::PopItemWidth();
-				}
-
-				//ImGui::Dummy(ImVec2(0, 2));
-
-				//// index
-				//if (!guiManager.bMinimize && guiManager.bExtra) ofxImGuiSurfing::AddIntStepped(index);
-
-				// index
-				//ImGui::PushItemWidth(_w1 - 20);
-				//ImGui::PushItemWidth(100);
-				//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-				ofxImGuiSurfing::AddParameter(index);
-				//ImGui::PopItemWidth();
-
-				// next
-				if (guiManager.bMinimize)
-				{
-					ImGui::PushButtonRepeat(true);
-					{
-						if (ImGui::Button("<", ImVec2(_w50, _h)))
-						{
-							doLoadPrevious();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button(">", ImVec2(_w50, _h)))
-						{
-							doLoadNext();
-						}
-					}
-					ImGui::PopButtonRepeat();
-				}
-
-				//--
-
-				// TODO: copy this code to my ImGui hewlpers..
-
-				if (bGui_InnerClicker)
-				{
-					draw_ImGui_MiniClicker();
-				}
-
-				//--
-
-				//guiManager.Add(index, SurfingImGuiTypes::OFX_IM_DRAG); // crash
-				//guiManager.Add(index, SurfingImGuiTypes::OFX_IM_DEFAULT);
-				//guiManager.Add(index, SurfingImGuiTypes::OFX_IM_STEPPER);
-
-				//// spinner
-				//static int v = 1;
-				//ImGuiInputTextFlags flags = 0;
-				//Surfing::SpinInt("Index", &v, 1, 100, flags);
-
-				if (!guiManager.bMinimize)
-				{
-					ImGui::PushButtonRepeat(true);
-					{
-						if (ImGui::Button("<", ImVec2(_w50, _h)))
-						{
-							doLoadPrevious();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button(">", ImVec2(_w50, _h)))
-						{
-							doLoadNext();
-						}
-					}
-					ImGui::PopButtonRepeat();
-
-					//ImGui::Dummy(ImVec2(0, 1));
-
-					guiManager.Add(bSave, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
-					guiManager.Add(bLoad, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
-
-					guiManager.Add(bAutoSave, SurfingImGuiTypes::OFX_IM_TOGGLE_SMALL);
-				}
-
-
-				//if (guiManager.bMinimize)
-				if (ImGui::Button("NEW", ImVec2(_w100, _h)))
-				{
-					//bNewPreset = true;
-					doNewPreset();
-				}
-
-				//-
-
-				// Minimize
-				//ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
-				//ImGui::Dummy(ImVec2(0, 2));
-
-				// Parameters
-				ofxImGuiSurfing::AddToggleRoundedButton(bGui_Parameters);
-
-				// Clicker
-				ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
-
-				if (!guiManager.bMinimize)
-				{
-					// Keys
-					ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
-
-					// Midi
-#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-					ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui);
-					//ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui_Editor);
-#endif
-
-					bool bOpen = false;
-					ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-					_flagt |= ImGuiTreeNodeFlags_Framed;
-
-					if (ImGui::TreeNodeEx("TOOLS", _flagt))
-					{
-						//ImGui::SameLine();
-
-						if (ImGui::TreeNodeEx("PRESET", _flagt))
-						{
-							guiManager.refreshLayout();
-							_w100 = getWidgetsWidth(1);
-							_w50 = getWidgetsWidth(2);
-							_w33 = getWidgetsWidth(3);
-							_w25 = getWidgetsWidth(4);
-							_h = getWidgetsHeightUnit();
-
-							if (ImGui::Button("NEW", ImVec2(_w50, _h)))
-							{
-								doNewPreset();
-							}
-							ImGui::SameLine();
-
-							//if (ImGui::Button("DELETE", ImVec2(_w2, _h)))
-							//{
-							//	doDeletePreset(index);
-							//}
-
-							if (ImGui::Button("DELETE", ImVec2(_w50, _h))) ImGui::OpenPopup("DELETE?");
-							if (ImGui::BeginPopupModal("DELETE?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-							{
-								ImGui::Text("Current Preset will be deleted.\nThis operation cannot be undone!\n\n");
-								ImGui::Separator();
-
-								static bool dont_ask_me_next_time = false;
-								ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-								ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
-								ImGui::PopStyleVar();
-
-								if (!dont_ask_me_next_time) {
-									if (ImGui::Button("OK", ImVec2(120, 0))) {
-										ofLogNotice(__FUNCTION__) << "DELETE";
-										doDeletePreset(index);
-										ImGui::CloseCurrentPopup();
-									}
-									ImGui::SetItemDefaultFocus();
-									ImGui::SameLine();
-									if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-								}
-								else {
-									ofLogNotice(__FUNCTION__) << "DELETE";
-									doDeletePreset(index);
-									ImGui::CloseCurrentPopup();
-								}
-
-								ImGui::EndPopup();
-							}
-
-							if (ImGui::Button("STORE", ImVec2(_w50, _h)))
-							{
-								doStoreState();
-							}
-							ImGui::SameLine();
-							if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
-							{
-								doRecallState();
-							}
-
-							if (ImGui::Button("RESET", ImVec2(_w50, _h)))
-							{
-								doResetParams();
-							}
-							ImGui::SameLine();
-							if (ImGui::Button("RANDOM", ImVec2(_w50, _h)))
-							{
-								doRandomizeParams();
-							}
-
-							ImGui::TreePop();
-						}
+						//guiManager.refreshLayout();
+						//_w1 = getWidgetsWidth(1);
+						//_w2 = getWidgetsWidth(2);
+						//_w3 = getWidgetsWidth(3);
+						//_w4 = getWidgetsWidth(4);
 
 						//--
 
-						if (ImGui::TreeNodeEx("KIT", _flagt))
+						//// Textinput
+						//{
+						//	// input text
+						//	static int keyboardFocus;
+						//	//static char str0[128] = fileName.c_str();
+						//	//std::string fileName = "Name";
+						//	char *cstr = new char[fileName.length() + 1];
+						//	strcpy(cstr, fileName.c_str());
+						//	ImGui::InputText("Name", cstr, IM_ARRAYSIZE(cstr));
+						//	//if (ImGui::IsItemClicked()) {
+						//	//	keyboardFocus = 0;
+						//	//}
+						//	//if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive()) {
+						//	//	ImGui::SetKeyboardFocusHere(keyboardFocus);
+						//	//}
+						//}
+
+						//ImGui::Text(path_Global.data());
+						//ImGui::Text(filePath.data());
+
+						string ss;
+						if (dir.size() == 0) ss = "NO PRESETS";
+						else ss = ofToString(index) + "/" + ofToString(index.getMax());
+						//ss = ofToString(index) + "/" + ofToString(index.getMax());
+
+						ImGui::Text(ss.data());
+						if (guiManager.bMinimize) ImGui::Text(fileName.data()); // -> using text input below
+						//if (guiManager.bExtra) ImGui::Text(path_Presets.data()); // -> show path
+
+						//ImGui::Dummy(ImVec2(0, 1));
+					}
+
+					//--
+
+					// 1. Scrollable list
+
+					if (!fileNames.empty())
+					{
+						int _i = index;
+						//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+						//ImGui::PushItemWidth(_w1);
+						if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
 						{
-							guiManager.refreshLayout();
-							_w100 = getWidgetsWidth(1);
-							_w50 = getWidgetsWidth(2);
-							_w33 = getWidgetsWidth(3);
-							_w25 = getWidgetsWidth(4);
-							_h = getWidgetsHeightUnit();
+							ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
 
-							guiManager.Add(bRefresh, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
-							guiManager.Add(bSetPathPresets, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
-
-							//TODO:
-							//if (ImGui::Button("COPY", ImVec2(_w2, _h)))
-							//{
-							//	doCopyPreset();
-							//}
-
-							//TODO: show only on last preset
-							//if (index == index.getMax())
+							if (_i < fileNames.size())
 							{
-								//if (ImGui::Button("CLEAR", ImVec2(_w1, _h)))
+								index = _i;
+							}
+						}
+						//ImGui::PopItemWidth();
+					}
+
+					//ImGui::Dummy(ImVec2(0, 2));
+
+					//// index
+					//if (!guiManager.bMinimize && guiManager.bExtra) ofxImGuiSurfing::AddIntStepped(index);
+
+					// index
+					//ImGui::PushItemWidth(_w1 - 20);
+					//ImGui::PushItemWidth(100);
+					//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+					ofxImGuiSurfing::AddParameter(index);
+					//ImGui::PopItemWidth();
+
+					// next
+					if (guiManager.bMinimize)
+					{
+						ImGui::PushButtonRepeat(true);
+						{
+							if (ImGui::Button("<", ImVec2(_w50, _h)))
+							{
+								doLoadPrevious();
+							}
+							ImGui::SameLine();
+							if (ImGui::Button(">", ImVec2(_w50, _h)))
+							{
+								doLoadNext();
+							}
+						}
+						ImGui::PopButtonRepeat();
+					}
+
+					//--
+
+					// TODO: copy this code to my ImGui hewlpers..
+
+					if (bGui_InnerClicker)
+					{
+						draw_ImGui_MiniClicker();
+					}
+
+					//--
+
+					//guiManager.Add(index, SurfingImGuiTypes::OFX_IM_DRAG); // crash
+					//guiManager.Add(index, SurfingImGuiTypes::OFX_IM_DEFAULT);
+					//guiManager.Add(index, SurfingImGuiTypes::OFX_IM_STEPPER);
+
+					//// spinner
+					//static int v = 1;
+					//ImGuiInputTextFlags flags = 0;
+					//Surfing::SpinInt("Index", &v, 1, 100, flags);
+
+					if (!guiManager.bMinimize)
+					{
+						ImGui::PushButtonRepeat(true);
+						{
+							if (ImGui::Button("<", ImVec2(_w50, _h)))
+							{
+								doLoadPrevious();
+							}
+							ImGui::SameLine();
+							if (ImGui::Button(">", ImVec2(_w50, _h)))
+							{
+								doLoadNext();
+							}
+						}
+						ImGui::PopButtonRepeat();
+
+						//ImGui::Dummy(ImVec2(0, 1));
+
+						guiManager.Add(bSave, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
+						guiManager.Add(bLoad, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
+
+						guiManager.Add(bAutoSave, SurfingImGuiTypes::OFX_IM_TOGGLE_SMALL);
+					}
+
+
+					//if (guiManager.bMinimize)
+					if (ImGui::Button("NEW", ImVec2(_w100, _h)))
+					{
+						//bNewPreset = true;
+						doNewPreset();
+					}
+
+					//-
+
+					// Minimize
+					//ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
+					//ImGui::Dummy(ImVec2(0, 2));
+
+					// Parameters
+					ofxImGuiSurfing::AddToggleRoundedButton(bGui_Parameters);
+
+					// Clicker
+					ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
+
+					if (!guiManager.bMinimize)
+					{
+						// Keys
+						ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
+
+						// Midi
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+						ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui);
+						//ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui_Editor);
+#endif
+
+						bool bOpen = false;
+						ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+						_flagt |= ImGuiTreeNodeFlags_Framed;
+
+						if (ImGui::TreeNodeEx("TOOLS", _flagt))
+						{
+							//ImGui::SameLine();
+
+							if (ImGui::TreeNodeEx("PRESET", _flagt))
+							{
+								guiManager.refreshLayout();
+								_w100 = getWidgetsWidth(1);
+								_w50 = getWidgetsWidth(2);
+								_w33 = getWidgetsWidth(3);
+								_w25 = getWidgetsWidth(4);
+								_h = getWidgetsHeightUnit();
+
+								if (ImGui::Button("NEW", ImVec2(_w50, _h)))
+								{
+									doNewPreset();
+								}
+								ImGui::SameLine();
+
+								//if (ImGui::Button("DELETE", ImVec2(_w2, _h)))
 								//{
-								//	doClearPresets();
+								//	doDeletePreset(index);
 								//}
 
-								if (ImGui::Button("CLEAR KIT", ImVec2(_w100, _h))) ImGui::OpenPopup("CLEAR KIT?");
-								if (ImGui::BeginPopupModal("CLEAR KIT?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+								if (ImGui::Button("DELETE", ImVec2(_w50, _h))) ImGui::OpenPopup("DELETE?");
+								if (ImGui::BeginPopupModal("DELETE?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 								{
-									ImGui::Text("User Kit will be erased.\nThis operation cannot be undone!\n\n");
+									ImGui::Text("Current Preset will be deleted.\nThis operation cannot be undone!\n\n");
 									ImGui::Separator();
 
 									static bool dont_ask_me_next_time = false;
@@ -686,8 +611,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 									if (!dont_ask_me_next_time) {
 										if (ImGui::Button("OK", ImVec2(120, 0))) {
-											ofLogNotice(__FUNCTION__) << "CLEAR";
-											doClearPresets();
+											ofLogNotice(__FUNCTION__) << "DELETE";
+											doDeletePreset(index);
 											ImGui::CloseCurrentPopup();
 										}
 										ImGui::SetItemDefaultFocus();
@@ -695,189 +620,272 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 										if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
 									}
 									else {
-										ofLogNotice(__FUNCTION__) << "CLEAR";
-										doClearPresets();
+										ofLogNotice(__FUNCTION__) << "DELETE";
+										doDeletePreset(index);
 										ImGui::CloseCurrentPopup();
 									}
 
 									ImGui::EndPopup();
 								}
 
-
-								if (ImGui::Button("RECREATE", ImVec2(_w100, _h)))
+								if (ImGui::Button("STORE", ImVec2(_w50, _h)))
 								{
-									doRefreshFilesAndRename();
+									doStoreState();
+								}
+								ImGui::SameLine();
+								if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
+								{
+									doRecallState();
 								}
 
-								if (ImGui::Button("POPULATE", ImVec2(_w100, _h)))
+								if (ImGui::Button("RESET", ImVec2(_w50, _h)))
 								{
-									doPopulatePresets();
+									doResetParams();
+								}
+								ImGui::SameLine();
+								if (ImGui::Button("RANDOM", ImVec2(_w50, _h)))
+								{
+									doRandomizeParams();
 								}
 
-								if (ImGui::Button("POPULATE RND", ImVec2(_w100, _h)))
-								{
-									doPopulatePresetsRandomized();
-								}
+								ImGui::TreePop();
 							}
+
+							//--
+
+							if (ImGui::TreeNodeEx("KIT", _flagt))
+							{
+								guiManager.refreshLayout();
+								_w100 = getWidgetsWidth(1);
+								_w50 = getWidgetsWidth(2);
+								_w33 = getWidgetsWidth(3);
+								_w25 = getWidgetsWidth(4);
+								_h = getWidgetsHeightUnit();
+
+								guiManager.Add(bRefresh, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
+								guiManager.Add(bSetPathPresets, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
+
+								//TODO:
+								//if (ImGui::Button("COPY", ImVec2(_w2, _h)))
+								//{
+								//	doCopyPreset();
+								//}
+
+								//TODO: show only on last preset
+								//if (index == index.getMax())
+								{
+									//if (ImGui::Button("CLEAR", ImVec2(_w1, _h)))
+									//{
+									//	doClearPresets();
+									//}
+
+									if (ImGui::Button("CLEAR KIT", ImVec2(_w100, _h))) ImGui::OpenPopup("CLEAR KIT?");
+									if (ImGui::BeginPopupModal("CLEAR KIT?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+									{
+										ImGui::Text("User Kit will be erased.\nThis operation cannot be undone!\n\n");
+										ImGui::Separator();
+
+										static bool dont_ask_me_next_time = false;
+										ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+										ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+										ImGui::PopStyleVar();
+
+										if (!dont_ask_me_next_time) {
+											if (ImGui::Button("OK", ImVec2(120, 0))) {
+												ofLogNotice(__FUNCTION__) << "CLEAR";
+												doClearPresets();
+												ImGui::CloseCurrentPopup();
+											}
+											ImGui::SetItemDefaultFocus();
+											ImGui::SameLine();
+											if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+										}
+										else {
+											ofLogNotice(__FUNCTION__) << "CLEAR";
+											doClearPresets();
+											ImGui::CloseCurrentPopup();
+										}
+
+										ImGui::EndPopup();
+									}
+
+
+									if (ImGui::Button("RECREATE", ImVec2(_w100, _h)))
+									{
+										doRefreshFilesAndRename();
+									}
+
+									if (ImGui::Button("POPULATE", ImVec2(_w100, _h)))
+									{
+										doPopulatePresets();
+									}
+
+									if (ImGui::Button("POPULATE RND", ImVec2(_w100, _h)))
+									{
+										doPopulatePresetsRandomized();
+									}
+								}
+
+								ImGui::TreePop();
+							}
+
+							//ImGui::Dummy(ImVec2(0, 2));
 
 							ImGui::TreePop();
 						}
-
-						//ImGui::Dummy(ImVec2(0, 2));
-
-						ImGui::TreePop();
 					}
-				}
 
-				//-
+					//-
 
-				if (!guiManager.bMinimize)
-				{
-					ImGui::Dummy(ImVec2(0, 4));
-					ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
-
-					ImGui::Indent();
-
-					if (guiManager.bExtra)
-					{
-						ofxImGuiSurfing::AddToggleRoundedButton(bGui_InnerClicker);
-						//ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
-						if (bGui_InnerClicker)
-						{
-							ImGui::Indent();
-
-							//ofxImGuiSurfing::ToggleRoundedButton("Responsive", &respBtns);
-							//if (respBtns) {
-							//	ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-							//	//ImGui::PushItemWidth(_w2 - 20);
-							//	ImGui::SliderInt("Max Buttons", &amntBtns, 1, index.getMax() + 1);
-							//	ImGui::PopItemWidth();
-							//}
-
-							ofxImGuiSurfing::AddToggleRoundedButton(respBtns);
-							if (respBtns)
-							{
-								ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-								ofxImGuiSurfing::AddIntStepped(amntBtns);
-								ImGui::PopItemWidth();
-							}
-
-							ImGui::Unindent();
-						}
-						ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
-						//ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
-						ofxImGuiSurfing::AddToggleRoundedButton(bAutoSaveTimer);
-						ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
-						//ofxImGuiSurfing::AddToggleRoundedButton(MODE_Active);
-						//ofxImGuiSurfing::AddToggleRoundedButton(bDebug);
-						ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
-
-						bool bOpen = false;
-						ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-						_flagt |= ImGuiTreeNodeFlags_Framed;
-						if (ImGui::TreeNodeEx("PATHS", _flagt))
-						{
-							ImGui::Text(path_Presets.data()); // -> show path
-							ImGui::TreePop();
-						}
-					}
-					//ofxImGuiSurfing::ToggleRoundedButton("Debug", &bDebug);
-				}
-
-				//-
-
-				// all
-
-				//if (bDebug) {
-				//	xx += ww + pad;
-				//	ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
-				//	ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
-				//	n = "ofxSurfingPresets";
-				//	guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
-				//	{
-				//		ImGuiTreeNodeFlags flagst;
-				//		flagst = ImGuiTreeNodeFlags_None;
-				//		flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-				//		flagst |= ImGuiTreeNodeFlags_Framed;
-				//		ofxImGuiSurfing::AddGroup(params_AppSettings, flagst);
-				//		ofxImGuiSurfing::AddGroup(params_Control, flagst);
-				//	}
-				//	guiManager.endWindow();
-				//}
-
-				//-
-
-				// Extra
-
-				if (!guiManager.bMinimize)
-				{
-					if (guiManager.bExtra)
-					{
-						//-
-
-						// buttons selector
-
-						if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
-						{
-							// buttons matrix
-
-							//TODO. index back not working
-							// this is a workaround
-							// could fail on macOS/Linux -> requires fix paths slashes
-
-							for (int i = 0; i < dir.size(); i++)
-							{
-								string si = ofToString(i);
-								if (i < 10) si = "0" + si;
-								string ss = nameRoot + "_" + si;
-								fileName = ss;
-
-								auto s0 = ofSplitString(nameSelected, "\\", true);
-								string s1 = s0[s0.size() - 1]; // filename
-								auto s = ofSplitString(s1, ".json");
-
-								string _nameSelected = s[0];
-
-								if (_nameSelected == fileName)
-								{
-									index = i;
-								}
-							}
-
-							ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
-
-							//-
-
-							//load(nameSelected);
-						}
-
-						//ImGui::Dummy(ImVec2(0, 2));
-					}
-				}
-
-				//-
-
-				// Extra panel
-				if (guiManager.bExtra)
-				{
 					if (!guiManager.bMinimize)
 					{
-						guiManager.drawAdvanced();
+						ImGui::Dummy(ImVec2(0, 4));
+						ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
 
-						//if (bDebug) guiManager.drawAdvancedSubPanel();
-						//if (bDebug) {
-						//	ImGuiTreeNodeFlags flagst;
-						//	flagst = ImGuiTreeNodeFlags_None;
-						//	flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-						//	flagst |= ImGuiTreeNodeFlags_Framed;
-						//	ofxImGuiSurfing::AddGroup(params, flagst);
-						//}
+						ImGui::Indent();
 
-						//ImGui::Unindent();
+						if (guiManager.bExtra)
+						{
+							ofxImGuiSurfing::AddToggleRoundedButton(bGui_InnerClicker);
+							//ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
+							if (bGui_InnerClicker)
+							{
+								ImGui::Indent();
+
+								//ofxImGuiSurfing::ToggleRoundedButton("Responsive", &respBtns);
+								//if (respBtns) {
+								//	ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+								//	//ImGui::PushItemWidth(_w2 - 20);
+								//	ImGui::SliderInt("Max Buttons", &amntBtns, 1, index.getMax() + 1);
+								//	ImGui::PopItemWidth();
+								//}
+
+								ofxImGuiSurfing::AddToggleRoundedButton(respBtns);
+								if (respBtns)
+								{
+									ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+									ofxImGuiSurfing::AddIntStepped(amntBtns);
+									ImGui::PopItemWidth();
+								}
+
+								ImGui::Unindent();
+							}
+							ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
+							//ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
+							ofxImGuiSurfing::AddToggleRoundedButton(bAutoSaveTimer);
+							ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
+							//ofxImGuiSurfing::AddToggleRoundedButton(MODE_Active);
+							//ofxImGuiSurfing::AddToggleRoundedButton(bDebug);
+							ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
+
+							bool bOpen = false;
+							ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+							_flagt |= ImGuiTreeNodeFlags_Framed;
+							if (ImGui::TreeNodeEx("PATHS", _flagt))
+							{
+								ImGui::Text(path_Presets.data()); // -> show path
+								ImGui::TreePop();
+							}
+						}
+						//ofxImGuiSurfing::ToggleRoundedButton("Debug", &bDebug);
+					}
+
+					//-
+
+					// all
+
+					//if (bDebug) {
+					//	xx += ww + pad;
+					//	ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
+					//	ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
+					//	n = "ofxSurfingPresets";
+					//	guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
+					//	{
+					//		ImGuiTreeNodeFlags flagst;
+					//		flagst = ImGuiTreeNodeFlags_None;
+					//		flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+					//		flagst |= ImGuiTreeNodeFlags_Framed;
+					//		ofxImGuiSurfing::AddGroup(params_AppSettings, flagst);
+					//		ofxImGuiSurfing::AddGroup(params_Control, flagst);
+					//	}
+					//	guiManager.endWindow();
+					//}
+
+					//-
+
+					// Extra
+
+					if (!guiManager.bMinimize)
+					{
+						if (guiManager.bExtra)
+						{
+							//-
+
+							// buttons selector
+
+							if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
+							{
+								// buttons matrix
+
+								//TODO. index back not working
+								// this is a workaround
+								// could fail on macOS/Linux -> requires fix paths slashes
+
+								for (int i = 0; i < dir.size(); i++)
+								{
+									string si = ofToString(i);
+									if (i < 10) si = "0" + si;
+									string ss = nameRoot + "_" + si;
+									fileName = ss;
+
+									auto s0 = ofSplitString(nameSelected, "\\", true);
+									string s1 = s0[s0.size() - 1]; // filename
+									auto s = ofSplitString(s1, ".json");
+
+									string _nameSelected = s[0];
+
+									if (_nameSelected == fileName)
+									{
+										index = i;
+									}
+								}
+
+								ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
+
+								//-
+
+								//load(nameSelected);
+							}
+
+							//ImGui::Dummy(ImVec2(0, 2));
+						}
+					}
+
+					//-
+
+					// Extra panel
+					if (guiManager.bExtra)
+					{
+						if (!guiManager.bMinimize)
+						{
+							guiManager.drawAdvanced();
+
+							//if (bDebug) guiManager.drawAdvancedSubPanel();
+							//if (bDebug) {
+							//	ImGuiTreeNodeFlags flagst;
+							//	flagst = ImGuiTreeNodeFlags_None;
+							//	flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+							//	flagst |= ImGuiTreeNodeFlags_Framed;
+							//	ofxImGuiSurfing::AddGroup(params, flagst);
+							//}
+
+							//ImGui::Unindent();
+						}
 					}
 				}
+				guiManager.endWindow();
 			}
-			guiManager.endWindow();
+			ImGui::PopID();
 		}
 	}
 }
@@ -908,10 +916,13 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 		if (bAutoResizeFloatClicker) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 		//if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 
-		ImGui::PushID(("##"+ params_Preset.getName()).c_str());
+		n = "PRESETS";
+		//n = "PRESETS " + params_Preset.getName();
+
+		ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 		{
-			n = "PRESETS";
-			//n = "PRESETS " + params_Preset.getName();
+			IMGUI_SUGAR__WINDOWS_CONSTRAINTS;
+
 			guiManager.beginWindow(n.c_str(), (bool*)&bGui_FloatingClicker.get(), flagsw);
 			{
 				ImGui::Text(params_Preset.getName().c_str());
@@ -1093,46 +1104,52 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 			//ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
 			string n;
-			//n = "PARAMETERS";
-			n = "PARAMETERS " + params_Preset.getName();
+			n = "PARAMETERS";
+			//n = "PARAMETERS " + params_Preset.getName();
 			//n = params_Preset.getName();
 
 			ImGuiWindowFlags flagsw;
 			flagsw = ImGuiWindowFlags_None;
 			flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 
-			//guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw);
-			//guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
-			if (guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw))
+			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
-				ImGuiTreeNodeFlags flagst;
-				flagst = ImGuiTreeNodeFlags_None;
+				//IMGUI_SUGAR__WINDOWS_CONSTRAINTS;
 
-				//if (!guiManager.bMinimize) flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-
-				flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-				//flagst |= ImGuiTreeNodeFlags_Framed;
-
-				//TODO:
-				ofxImGuiSurfing::AddGroup(params_Preset, flagst);
-				//ofxImGuiSurfing::AddGroup(params_Preset);
-
-				ofxImGuiSurfing::AddSpacingSeparated();
-
-				//guiManager.endWindow();
-				if (bReset.getName() != "-1")
+				if (guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw))
 				{
-					guiManager.Add(bReset, OFX_IM_BUTTON_SMALL);
-				}
+					ImGui::Text(params_Preset.getName().c_str());
 
-				ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
-				ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
-				//if (bReset != nullptr) {
-				//	if (ImGui::Button("Reset", (bool*)&bReset)) {
-				//	}
-				//}
+					ImGuiTreeNodeFlags flagst;
+					flagst = ImGuiTreeNodeFlags_None;
+
+					//if (!guiManager.bMinimize) flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+
+					flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+					//flagst |= ImGuiTreeNodeFlags_Framed;
+
+					//TODO:
+					ofxImGuiSurfing::AddGroup(params_Preset, flagst);
+					//ofxImGuiSurfing::AddGroup(params_Preset);
+
+					ofxImGuiSurfing::AddSpacingSeparated();
+
+					//guiManager.endWindow();
+					if (bReset.getName() != "-1")
+					{
+						guiManager.Add(bReset, OFX_IM_BUTTON_SMALL);
+					}
+
+					ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
+					ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
+					//if (bReset != nullptr) {
+					//	if (ImGui::Button("Reset", (bool*)&bReset)) {
+					//	}
+					//}
+				}
+				guiManager.endWindow();
 			}
-			guiManager.endWindow();
+			ImGui::PopID();
 		}
 	}
 }
