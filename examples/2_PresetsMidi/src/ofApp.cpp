@@ -60,7 +60,7 @@ void ofApp::drawScene()
 	else
 	{
 		static const float MAX_CLAMP_SMOOTH = 0.85f;
-		float sp = ofMap(smoothSpeed, 1, 0, 0.1f, MAX_CLAMP_SMOOTH);
+		float sp = ofMap(smoothSpeed, 1, 0, 0.45f, MAX_CLAMP_SMOOTH);
 		ofxSurfingHelpers::ofxKuValueSmooth(_size1, size1.get(), sp);
 		ofxSurfingHelpers::ofxKuValueSmooth(_size2, size2.get(), sp);
 		ofxSurfingHelpers::ofxKuValueSmooth(_rotation1, rotation1.get(), sp);
