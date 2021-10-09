@@ -15,8 +15,8 @@ void ofApp::setup() {
 
 	presets.addGroup(params);
 
-	// Extra Controls for this app
-	presets.addParamsAppExtra(params_Smooth);
+	//// Extra Controls for this app
+	//presets.addParamsAppExtra(params_SmoothControl);
 }
 
 //--------------------------------------------------------------
@@ -39,37 +39,31 @@ void ofApp::keyPressed(int key)
 //--------------------------------------------------------------
 void ofApp::drawScene()
 {
-	// Final variables to apply to the Scene below.
-	// Notice that: If declared here, they must be static to mantain the previous frame values.
+	// The final variables to apply to draw the below Scene.
+	// Notice that: 
+	// If declared here, they must be static to mantain the previous frame setted values!
 	static float _size1;
 	static int _size2;
 	static float _rotation1;
 	static float _rotation2;
 
-	//--
+	//-
 
-	// No smooth. Raw values.
-	if (!bSmooth.get())
-	{
-		_size1 = size1;
-		_size2 = size2;
-		_rotation1 = rotation1;
-		_rotation2 = rotation2;
-	}
-	// Smoothed
-	else
-	{
-		static const float MAX_CLAMP_SMOOTH = 0.85f;
-		float sp = ofMap(smoothSpeed, 1, 0, 0.45f, MAX_CLAMP_SMOOTH);
-		ofxSurfingHelpers::ofxKuValueSmooth(_size1, size1.get(), sp);
-		ofxSurfingHelpers::ofxKuValueSmooth(_size2, size2.get(), sp);
-		ofxSurfingHelpers::ofxKuValueSmooth(_rotation1, rotation1.get(), sp);
-		ofxSurfingHelpers::ofxKuValueSmooth(_rotation2, rotation2.get(), sp);
-	}
+	//// A. No smooth. Raw values.
+	//_size1 = size1;
+	//_size2 = size2;
+	//_rotation1 = rotation1;
+	//_rotation2 = rotation2;
+
+	// B. Addon Smoother
+	_size1 = presets.get(size1);
+	_size2 = presets.get(size2);
+	_rotation1 = presets.get(rotation1);
+	_rotation2 = presets.get(rotation2);
 
 	//-
 
-	// Pre process
+	// Preprocess
 	_size1 += 0.2;
 	float _scale2 = _size1 / 5.f;
 	int _rSz = _size2 + (ofGetHeight() * _scale2);
@@ -91,7 +85,9 @@ void ofApp::drawScene()
 	case 2: _color = ofColor::green; break;
 	default: _color = ofColor::red; break;
 	}
+
 	int _alpha = ofMap(_size2, 0, size2.getMax(), 200, 245);
+	ofColor c(_color.r, _color.g, _color.b, _alpha);
 
 	//--
 
@@ -110,7 +106,7 @@ void ofApp::drawScene()
 		ofScale(1.3f);
 		ofRotateDeg(_rot);
 
-		ofSetColor(_color.r * 255, _color.g * 255, _color.b * 255, _color.a * _alpha);
+		ofSetColor(c);
 		ofDrawRectangle(-_rSz * .5f, -_rSz * .5f, _rSz, _rSz);
 
 		_rSz *= _rat;
@@ -118,7 +114,7 @@ void ofApp::drawScene()
 		ofTranslate(0, 0);
 		_rot += _rag;
 
-		ofSetColor(_color.r * 255, _color.g * 255, _color.b * 255, _color.a * _alpha);
+		ofSetColor(c);
 		ofDrawRectangle(-_rSz * .5f, -_rSz * .5f, _rSz, _rSz);
 
 		_rSz *= _rat;
@@ -126,7 +122,7 @@ void ofApp::drawScene()
 		ofTranslate(0, 0);
 		_rot += _rag;
 
-		ofSetColor(_color.r * 255, _color.g * 255, _color.b * 255, _color.a * _alpha);
+		ofSetColor(c);
 		ofDrawRectangle(-_rSz * .5f, -_rSz * .5f, _rSz, _rSz);
 
 		_rSz *= _rat;
@@ -134,7 +130,7 @@ void ofApp::drawScene()
 		ofTranslate(0, 0);
 		_rot += _rag;
 
-		ofSetColor(_color.r * 255, _color.g * 255, _color.b * 255, _color.a * _alpha);
+		ofSetColor(c);
 		ofDrawRectangle(-_rSz * .5f, -_rSz * .5f, _rSz, _rSz);
 	}
 	ofPopMatrix();

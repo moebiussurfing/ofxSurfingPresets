@@ -21,10 +21,4 @@ public:
 	ofParameter<float> rotation2;
 	ofParameter<int> size2;
 	ofParameter<int> indexColor;
-
-	//TODO:
-	// Smooth
-	ofParameter<bool> bSmooth{ "Smooth", false };
-	ofParameter<float> smoothSpeed{ "Speed", 0.f, 0.f, 1.f };
-	ofParameterGroup params_Smooth{ "_Smoother", bSmooth, smoothSpeed };
 };

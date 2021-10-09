@@ -27,7 +27,7 @@ TODO:
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 
-#define USE__BASIC_TWEENER
+#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
 
 //--------------------------------------
 
@@ -281,9 +281,13 @@ public:
 		nameRoot = params_Preset.getName();
 
 		//-
-		
+
 		// Basic Tweener
-		add(group);
+#ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
+		addSmooth(group);
+
+		addParamsAppExtra(params_SmoothControl);
+#endif
 
 		//-
 
@@ -500,179 +504,229 @@ private:
 	void addKeysListeners();
 	void removeKeysListeners();
 
-	
-
-
 	//--------------------------------------------------------------
 
-#ifdef USE__BASIC_TWEENER
-	
 	//TODO:
-	// Simple Tweener
+	
+	// Simple Smoother
 
-//public:
-	//// Simple Getters
-	//float get(ofParameter<float> &e);
-	//int get(ofParameter<int> &e);
+#ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
+	ofParameter<bool> bSmooth{ "Smooth", false };
+	ofParameter<float> smoothSpeed{ "Speed", 0.f, 0.f, 1.f };
+	ofParameterGroup params_SmoothControl{ "_Smoother", bSmooth, smoothSpeed };
+
+	float MAX_CLAMP_SMOOTH = 0.85f;
+	float sp;
 
 private:
-	ofParameterGroup mParamsGroup_COPY{ "paramsTweened" };
-	
+	ofParameterGroup params_Preset_Smoothed{ "params_Tweened" };
+
+	string suffix = "";//to append to the soomthed copied params
+	//string suffix = "_Tween_";
+
 	//----
 	
 private:
 
 	//--------------------------------------------------------------
-	void addParam(ofAbstractParameter& aparam) {
-
-		static string suffix = "_Tween_";
-
-		string _name = aparam.getName();
-		ofLogNotice() << __FUNCTION__ << " [ ofAbstractParameter ] \t " << _name;
-
-		//--
+	void addSmoothParam(ofAbstractParameter& aparam) {
 
 		// https://forum.openframeworks.cc/t/ofxparametercollection-manage-multiple-ofparameters/34888/3
+
+		string _name = aparam.getName();
 		auto type = aparam.type();
 
 		bool isGroup = type == typeid(ofParameterGroup).name();
-
 		bool isFloat = type == typeid(ofParameter<float>).name();
 		bool isInt = type == typeid(ofParameter<int>).name();
-		bool isBool = type == typeid(ofParameter<bool>).name();
-
-		// vec
-		bool isVec2 = type == typeid(ofParameter<glm::vec2>).name();
+		//bool isBool = type == typeid(ofParameter<bool>).name();
+		bool isVec2 = type == typeid(ofParameter<glm::vec2>).name();// vec
 		bool isVec3 = type == typeid(ofParameter<glm::vec3>).name();
 		bool isVec4 = type == typeid(ofParameter<glm::vec4>).name();
 
-		ofLogNotice() << __FUNCTION__ << " " << _name << " \t [ " << type << " ]";
+		ofLogNotice() << __FUNCTION__ << " [ ofAbstractParameter ] \t " << _name << " \t [ " << type << " ]";
 
+		//--
+
+		// Group
+		// Do it recursively..
 		if (isGroup)
 		{
 			auto &g = aparam.castGroup();
 
-			for (int i = 0; i < g.size(); i++) {
-				addParam(g.get(i));
+			for (int i = 0; i < g.size(); i++) { // ofAbstractParameters
+				addSmoothParam(g.get(i));
 			}
 		}
 
-		// add/queue each param
-		// exclude groups to remove from plots
-		if (!isGroup) mParamsGroup_COPY.add(aparam);
+		// Add/queue each param
+		// But exclude groups structure
+		if (!isGroup) params_Preset_Smoothed.add(aparam);
 
 		//--
 
-		// create a copy group
-		// will be the output or target to be use params
+		// Create a copied group of params to apply a copied and smoothed "version" of the params.
+		// Will be the output or target to be use params.
+		// But we will must to read them manually using a method:
+		/*
+			// Example:
+			// Draw()
+			static float _size1;
+			static int _size2;
+			_size1 = presets.get(size1);
+			_size2 = presets.get(size2);
+		*/
 
 		if (isFloat) {
 			ofParameter<float> p = aparam.cast<float>();
 			ofParameter<float> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
-			mParamsGroup_COPY.add(_p);
+			params_Preset_Smoothed.add(_p);
 		}
 		else if (isInt) {
 			ofParameter<int> p = aparam.cast<int>();
 			ofParameter<int> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
-			mParamsGroup_COPY.add(_p);
+			params_Preset_Smoothed.add(_p);
 		}
-		else if (isBool) {
-			ofParameter<bool> p = aparam.cast<bool>();
-			ofParameter<bool> _p{ _name + suffix, p.get() };
-			mParamsGroup_COPY.add(_p);
-		}
+		//else if (isBool) {
+		//	ofParameter<bool> p = aparam.cast<bool>();
+		//	ofParameter<bool> _p{ _name + suffix, p.get() };
+		//	params_Preset_Smoothed.add(_p);
+		//}
 
 		//TODO:
-		//vec
+
+		// vec
 		else if (isVec2) {
 			ofParameter<glm::vec2> p = aparam.cast<glm::vec2>();
 			ofParameter<glm::vec2> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
-			mParamsGroup_COPY.add(_p);
+			params_Preset_Smoothed.add(_p);
 		}
 		else if (isVec3) {
 			ofParameter<glm::vec3> p = aparam.cast<glm::vec3>();
 			ofParameter<glm::vec3> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
-			mParamsGroup_COPY.add(_p);
+			params_Preset_Smoothed.add(_p);
 		}
 		else if (isVec4) {
 			ofParameter<glm::vec4> p = aparam.cast<glm::vec4>();
 			ofParameter<glm::vec4> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
-			mParamsGroup_COPY.add(_p);
+			params_Preset_Smoothed.add(_p);
 		}
 
+		// Unknown
 		else {
+			ofLogError(__FUNCTION__) << "Not the expected type for ofParam: " << _name;
 		}
 	}
 
 	//--------------------------------------------------------------
-	void add(ofParameterGroup aparams) {
+	void addSmooth(ofParameterGroup aparams) {
 		for (int i = 0; i < aparams.size(); i++) {
-			addParam(aparams.get(i));
+			addSmoothParam(aparams.get(i));
 		}
 	}
-
 	//--------------------------------------------------------------
-	void add(ofParameter<float>& aparam) {
-		addParam(aparam);
+	void addSmooth(ofParameter<float>& aparam) {
+		addSmoothParam(aparam);
 	}
 	//--------------------------------------------------------------
-	void add(ofParameter<bool>& aparam) {
-		addParam(aparam);
+	void addSmooth(ofParameter<bool>& aparam) {
+		addSmoothParam(aparam);
 	}
 	//--------------------------------------------------------------
-	void add(ofParameter<int>& aparam) {
-		addParam(aparam);
+	void addSmooth(ofParameter<int>& aparam) {
+		addSmoothParam(aparam);
 	}
 	//--------------------------------------------------------------
-	void add(ofParameter<glm::vec2>& aparam) {
-		addParam(aparam);
+	void addSmooth(ofParameter<glm::vec2>& aparam) {
+		addSmoothParam(aparam);
 	}
 	//--------------------------------------------------------------
-	void add(ofParameter<glm::vec3>& aparam) {
-		addParam(aparam);
+	void addSmooth(ofParameter<glm::vec3>& aparam) {
+		addSmoothParam(aparam);
 	}
 	//--------------------------------------------------------------
-	void add(ofParameter<glm::vec4>& aparam) {
-		addParam(aparam);
+	void addSmooth(ofParameter<glm::vec4>& aparam) {
+		addSmoothParam(aparam);
 	}
 
 	//------------
 
 	// API getters
+
 public:
-	// to get the smoothed parameters indiviauly and externaly
+	// Simplified getters
+	// To get the smoothed single parameters.
+	// Notice that when smooth is disabled, we will get the raw values without smoothing.
+	// (Then, should be the same than use the original ofParams.)
 
-	//simplified getters
+	//TODO: remake templated
+	//template<typename ParameterType>
+	//inline bool AddVSlider(ofParameter<ParameterType>& parameter, ImVec2 sz = ImVec2(-1.f, -1.f), bool bNoName = false, bool bNoNumber = false)
+
 	//--------------------------------------------------------------
-	float get(ofParameter<float> &e) {
+	float get(ofParameter<float> &e) { // Gets smoothed value for passed param. Will use his name and search into param group.
 		string name = e.getName();
-		auto &p = mParamsGroup_COPY.get(name);
-		if (p.type() == typeid(ofParameter<float>).name())
-		{
-			return p.cast<float>().get();
+		
+		if (bSmooth) {
+			auto &p = params_Preset_Smoothed.get(name); // Smoothed
+			if (p.type() == typeid(ofParameter<float>).name())
+			{
+				return p.cast<float>().get();
+			}
+			else
+			{
+				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
+				return -1;
+			}
 		}
-		else
-		{
-			ofLogError(__FUNCTION__) << "Not expected type: " << name;
-			return -1;
-		}
-	}
-	//--------------------------------------------------------------
-	int get(ofParameter<int> &e) {
-		string name = e.getName();
-		auto &p = mParamsGroup_COPY.get(name);
-		if (p.type() == typeid(ofParameter<int>).name())
-		{
-			return p.cast<int>().get();
-		}
-		else
-		{
-			ofLogError(__FUNCTION__) << "Not expected type: " << name;
-			return -1;
-		}
+		else {
+			auto &p = params_Preset.get(name); // Raw
+			if (p.type() == typeid(ofParameter<float>).name())
+			{
+				return p.cast<float>().get();
+			}
+			else
+			{
+				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
+				return -1;
+			}
+		}		
 	}
 
-	void updateTweeners();
+	//--------------------------------------------------------------
+	int get(ofParameter<int> &e) { // Gets smoothed value for passed param. Will use his name and search into param group.
+		string name = e.getName();
+		
+		if (bSmooth) {
+			auto &p = params_Preset_Smoothed.get(name); // Smoothed
+			if (p.type() == typeid(ofParameter<int>).name())
+			{
+				return p.cast<int>().get();
+			}
+			else
+			{
+				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
+				return -1;
+			}
+		}
+		else {
+			auto &p = params_Preset.get(name); // Raw
+			if (p.type() == typeid(ofParameter<int>).name())
+			{
+				return p.cast<int>().get();
+			}
+			else
+			{
+				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
+				return -1;
+			}
+		}	
+	}
+
+	void updateSmoother();
+	void updateSmoothParam(ofAbstractParameter& aparam);
+	// To allow recursive group levels using a funtion to each param
+
 #endif
 
 };

@@ -65,13 +65,13 @@ void ofxSurfingPresets::refreshToggleNotes()
 //--------------------------------------------------------------
 void ofxSurfingPresets::setup()
 {
-	// log mode
+	// Log mode
 	ofSetLogLevel("ofxSurfingPresets", OF_LOG_NOTICE);
 	//ofSetLogLevel("ofxSurfingPresets", OF_LOG_SILENT);
 
 	//--
 
-	// params 
+	// Params 
 
 	bGui.set("SURFING PRESETS", true);
 	bGui_Editor.set("Editor", true);
@@ -119,7 +119,7 @@ void ofxSurfingPresets::setup()
 
 	//-
 
-	// params AppSettings
+	// Params AppSettings
 
 	params_AppSettings.clear();
 	params_AppSettings.setName("AppSettings");
@@ -162,9 +162,12 @@ void ofxSurfingPresets::setup()
 	params_InnerClicker.add(respBtns);
 	params_AppSettings.add(params_InnerClicker);
 
+	// External extra or smooth params
+	if (params_AppExtra.getName() != "-1") params_AppSettings.add(params_AppExtra);
+
 	//ofAddListener(params_AppSettings.parameterChangedE(), this, &ofxSurfingPresets::Changed_AppSettings);
 
-	// exclude
+	// Exclude
 	bSave.setSerializable(false);
 	bNewPreset.setSerializable(false);
 	bLoad.setSerializable(false);
@@ -174,18 +177,18 @@ void ofxSurfingPresets::setup()
 
 	//-
 
-	// all
+	// All
 	params.clear();
 	params.setName("ALL PARAMS");
 	params.add(params_Control);
 	params.add(params_AppSettings);
 
-	// all back
+	// All back
 	//ofAddListener(params.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params);
 
 	//--
 
-	// gui
+	// Gui
 	//guiManager.setImGuiAutodraw(bAutoDraw);
 	//guiManager.setup(); // this instantiates and configurates ofxImGui inside the class object.
 	////guiManager.bAutoResize = false;
@@ -196,7 +199,7 @@ void ofxSurfingPresets::setup()
 
 	//-
 
-	// files
+	// Files
 	doRefreshFiles();
 
 	//--
@@ -274,7 +277,7 @@ void ofxSurfingPresets::startup()
 	//ofxSurfingHelpers::loadGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	// workflow
-	// Load first
+	// Load first preset
 	index = 0;
 
 	//-
@@ -301,8 +304,8 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 
 	//--
 
-#ifdef USE__BASIC_TWEENER
-	updateTweeners();
+#ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
+	updateSmoother();
 #endif
 }
 
@@ -326,17 +329,79 @@ void ofxSurfingPresets::draw(ofEventArgs & args)
 	}
 }
 
-#ifdef USE__BASIC_TWEENER
+//TODO:
+#ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
 //--------------------------------------------------------------
-void ofxSurfingPresets::updateTweeners()
+void ofxSurfingPresets::updateSmoother()
 {
-	//int size = mParamsGroup_COPY.size();
-	//for (auto &p : mParamsGroup_COPY)
-	//{
+	if (!bSmooth) return;
 
-	//}
+	//-
+
+	// Smoothed
+	{
+		//-
+
+		// Map Speed to tweak limits
+
+		//MAX_CLAMP_SMOOTH = 0.85f;
+		sp = ofMap(smoothSpeed, 1, 0, 0.45f, MAX_CLAMP_SMOOTH);
+
+		//-
+
+		auto &g = params_Preset_Smoothed.castGroup();
+
+		for (int i = 0; i < g.size(); i++) 
+		{
+			auto &ap = g[i]; // ofAbstractParameter
+
+			updateSmoothParam(ap);
+		}
+	}
 }
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
+{
+	auto type = ap.type();
+	auto name = ap.getName();
+
+	bool isFloat = type == typeid(ofParameter<float>).name();
+	bool isInt = type == typeid(ofParameter<int>).name();
+	bool isGroup = type == typeid(ofParameterGroup).name();
+
+	// Float
+	if (isFloat) {
+		ofParameter<float> pVal = ap.cast<float>();
+		ofParameter<float> pTar = params_Preset.getFloat(name); ;
+		float v = pVal.get();
+		ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
+		pVal = v;
+	}
+	// Int
+	else if (isInt) {
+		ofParameter<int> pVal = ap.cast<int>();
+		ofParameter<int> pTar = params_Preset.getInt(name); ;
+		int v = pVal.get();
+		ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
+		pVal = v;
+	}
+	// Group
+	else if (isGroup) {
+			auto &g = ap.castGroup();
+			for (int i = 0; i < g.size(); i++) { // ofAbstractParameters
+				updateSmoothParam(g.get(i));
+			}
+	}
+	else
+	{
+		//ofLogError(__FUNCTION__) << "Not the expected type for ofParam: " << name;
+	}
+}
+
 #endif
+
+//--
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_EditorControl()
