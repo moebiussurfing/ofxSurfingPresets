@@ -10,12 +10,13 @@ Presets System for **openFrameworks** with an **ImGui** based GUI.
 ## Features
 - De/Serializes JSON files from/to an **ofParameterGroup**.  
 - **ImGui** based Gui.
-- Minimizable. Easy to integrate to your projects/add-ons.
+- Easy to integrate to your projects/add-ons.
 - Reset and basic Randomize parameters.
 - One Memory slot to Store/Recall compare and copy presets.
 - Key Commands.
 - Clear and auto populate (randomized or not) kit of Presets.
 - Compatible with some Midi add-ons.
+- Simple smoother and player.
 
 ## Usage
 
@@ -46,6 +47,7 @@ void ofApp::setup()
 * [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui)
 * [ofxImGui](https://github.com/Daandelange/ofxImGui/)  [ _FORK from_ @**Daandelange** ]  
 * [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams)  [ _FORK Optional_ ]  
+* [ofxSurfingPlayer](https://github.com/moebiussurfing/ofxSurfingPlayer)  [ _Optional_ ]  
 
 <details>
   <summary>A MORE POWERFUL ALTERNATIVE</summary>

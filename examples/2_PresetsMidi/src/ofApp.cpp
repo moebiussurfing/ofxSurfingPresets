@@ -3,7 +3,6 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 	ofSetCircleResolution(200);
-	//ofSetWindowPosition(1920, 25);
 
 	// Group
 	params.setName("paramsGroup");
@@ -14,26 +13,12 @@ void ofApp::setup() {
 	params.add(indexColor.set("indexColor", 0, 0, 2));
 
 	presets.addGroup(params);
-
-	//// Extra Controls for this app
-	//presets.addParamsAppExtra(params_SmoothControl);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw()
 {
 	drawScene();
-}
-
-//--------------------------------------------------------------
-void ofApp::keyPressed(int key)
-{
-	if (key == 'g') {
-		presets.bGui = !presets.bGui;
-	}
-	if (key == ' ') {
-		presets.doLoadNext();
-	}
 }
 
 //--------------------------------------------------------------

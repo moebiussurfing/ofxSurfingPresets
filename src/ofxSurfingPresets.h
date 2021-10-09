@@ -23,11 +23,12 @@ TODO:
 
 // OPTIONAL
 
-// Midi
+// Midi -> Two alternatives
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 
 #define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
+#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser.
 
 //--------------------------------------
 
@@ -42,7 +43,10 @@ TODO:
 
 #include "ofxSurfingHelpers.h"
 #include "ofxSurfingImGui.h"
-//#include "ofxGui.h"
+
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+#include "ofxSurfingPlayer.h"
+#endif
 
 #define NUM_KEY_COMMANDS 19
 
@@ -59,7 +63,9 @@ public:
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
 
-	//-
+	//--
+
+	// OPTIONAL STUFF
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 private:
@@ -71,7 +77,17 @@ private:
 	ofxSurfingMidi mMidiParams;
 #endif
 
-	//-
+	//--
+
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+	SurfingPlayer surfingPlayer;
+	ofEventListener listener_Beat;
+	ofParameter<bool> bRandomPlay{ "Random", false };
+	std::vector<std::string> randomTypesPlay = { "Next Index", "Random Index", "Random Params" };
+	ofParameter<int> randomTypePlay{ "Type", 0, 0, 2 };
+#endif
+
+	//--
 
 public:
 	vector<ofParameter<bool>> notesIndex;
@@ -282,7 +298,7 @@ public:
 
 		//-
 
-		// Basic Tweener
+		// Simple Smoother
 #ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
 		addSmooth(group);
 
@@ -290,6 +306,10 @@ public:
 #endif
 
 		//-
+
+		//TODO:
+		// Should modify to allow queue more groups.
+		// Now we can add one single group!
 
 		// Refresh
 		startup();
@@ -399,6 +419,7 @@ public:
 
 	void setActive(bool b);
 	void setGuiVisible(bool b);
+	void setGuiVisibleToggle() { bGui = !bGui; }
 	void setLogLevel(ofLogLevel level);
 
 	//--------------------------------------------------------------
@@ -507,7 +528,7 @@ private:
 	//--------------------------------------------------------------
 
 	//TODO:
-	
+
 	// Simple Smoother
 
 #ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
@@ -521,11 +542,11 @@ private:
 private:
 	ofParameterGroup params_Preset_Smoothed{ "params_Tweened" };
 
-	string suffix = "";//to append to the soomthed copied params
-	//string suffix = "_Tween_";
+	std::string suffix = "";//to append to the soomthed copied params
+	//std::string suffix = "_Tween_";
 
 	//----
-	
+
 private:
 
 	//--------------------------------------------------------------
@@ -533,7 +554,7 @@ private:
 
 		// https://forum.openframeworks.cc/t/ofxparametercollection-manage-multiple-ofparameters/34888/3
 
-		string _name = aparam.getName();
+		std::string _name = aparam.getName();
 		auto type = aparam.type();
 
 		bool isGroup = type == typeid(ofParameterGroup).name();
@@ -665,8 +686,8 @@ public:
 
 	//--------------------------------------------------------------
 	float get(ofParameter<float> &e) { // Gets smoothed value for passed param. Will use his name and search into param group.
-		string name = e.getName();
-		
+		std::string name = e.getName();
+
 		if (bSmooth) {
 			auto &p = params_Preset_Smoothed.get(name); // Smoothed
 			if (p.type() == typeid(ofParameter<float>).name())
@@ -690,13 +711,13 @@ public:
 				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
 				return -1;
 			}
-		}		
+		}
 	}
 
 	//--------------------------------------------------------------
 	int get(ofParameter<int> &e) { // Gets smoothed value for passed param. Will use his name and search into param group.
-		string name = e.getName();
-		
+		std::string name = e.getName();
+
 		if (bSmooth) {
 			auto &p = params_Preset_Smoothed.get(name); // Smoothed
 			if (p.type() == typeid(ofParameter<int>).name())
@@ -720,7 +741,7 @@ public:
 				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
 				return -1;
 			}
-		}	
+		}
 	}
 
 	void updateSmoother();

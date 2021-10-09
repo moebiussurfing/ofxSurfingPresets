@@ -4,4 +4,5 @@ ofxMidi
 ofxMidiParams
 ofxSurfingHelpers
 ofxSurfingImGui
+ofxSurfingPlayer
 ofxSurfingPresets

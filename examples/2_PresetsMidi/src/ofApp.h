@@ -10,7 +10,6 @@ public:
 	void setup();
 	void draw();
 	void drawScene();
-	void keyPressed(int key);
 
 	ofxSurfingPresets presets;
 

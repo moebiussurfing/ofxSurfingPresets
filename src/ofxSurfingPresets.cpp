@@ -145,14 +145,45 @@ void ofxSurfingPresets::setup()
 
 	//-
 
+	// Simple Smoother
+
+#ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
+	params_AppSettings.add(params_SmoothControl);
+#endif
+
+	//-
+
+	// Player
+
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+	params_AppSettings.add(surfingPlayer.params_AppSettings);
+	//--------------------------------------------------------------
+	listener_Beat = surfingPlayer.bPlayerBeat.newListener([this](bool &b) {
+		ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
+
+		if (surfingPlayer.bPlay)
+		{
+			switch (randomTypePlay)
+			{
+			case 0: doLoadNext(); break;
+			case 1: doRandomizeIndex(); break;
+			case 2: doRandomizeParams(); break;
+			default:break;
+			}
+		}
+	});
+#endif
+
+	//-
+
 	params_FloatClicker.clear();
 	params_FloatClicker.setName("FLOAT CLICKER");
-	//params_FloatClicker.add(bShowControl);
 	params_FloatClicker.add(amntBtnsFloatClicker);
 	params_FloatClicker.add(respBtnsFloatClicker);
 	params_FloatClicker.add(bExtraFloatClicker);
 	params_FloatClicker.add(bAutoResizeFloatClicker);
 	params_AppSettings.add(params_FloatClicker);
+	//params_FloatClicker.add(bShowControl);
 
 	//-
 
@@ -351,7 +382,7 @@ void ofxSurfingPresets::updateSmoother()
 
 		auto &g = params_Preset_Smoothed.castGroup();
 
-		for (int i = 0; i < g.size(); i++) 
+		for (int i = 0; i < g.size(); i++)
 		{
 			auto &ap = g[i]; // ofAbstractParameter
 
@@ -386,12 +417,16 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 		ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
 		pVal = v;
 	}
+
+	//TODO:
+	// add more types
+
 	// Group
 	else if (isGroup) {
-			auto &g = ap.castGroup();
-			for (int i = 0; i < g.size(); i++) { // ofAbstractParameters
-				updateSmoothParam(g.get(i));
-			}
+		auto &g = ap.castGroup();
+		for (int i = 0; i < g.size(); i++) { // ofAbstractParameters
+			updateSmoothParam(g.get(i));
+		}
 	}
 	else
 	{
@@ -623,6 +658,16 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 					// Clicker
 					ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
+
+					// Player
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+					ofxImGuiSurfing::AddToggleRoundedButton(surfingPlayer.bGui_Player);
+					if (surfingPlayer.bGui_Player)
+					{
+						ofxImGuiSurfing::AddCombo(randomTypePlay, randomTypesPlay);
+					}
+#endif
+					//-
 
 					if (!guiManager.bMinimize)
 					{
@@ -1010,51 +1055,46 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 				//----
 
-				// AppExtra
-				if (params_AppExtra.getName() != "-1")
-				{
-					static ofParameter<bool> b = params_AppExtra.getBool("Smooth");
-					static ofParameter<float> v = params_AppExtra.getFloat("Speed");
-					//static ofParameter<bool> b = params_AppExtra.getBool("Smoother");
-					//static ofParameter<bool> e = params_AppExtra.getBool("Enable");
-
-					ofxImGuiSurfing::AddToggleRoundedButton(b);
-					if (b)
-					{
-						ImGui::Indent();
-						ImGui::PushItemWidth(_w2);
-						ofxImGuiSurfing::AddParameter(v, "%.1f");
-						ImGui::PopItemWidth();
-						ImGui::Unindent();
-
-						//ofxImGuiSurfing::AddParameter(e);
-						//ofxImGuiSurfing::AddGroup(params_AppExtra, ImGuiTreeNodeFlags_None);
-						//static ofParameterGroup g = params_AppExtra.getGroup("Smoother");
-						//guiManager.AddGroup(g);
-					}
-				}
-
-				//----
-
-				// Floating
+				// Extra Floating
 				ofxImGuiSurfing::AddToggleRoundedButton(bExtraFloatClicker);
 				if (bExtraFloatClicker)
 				{
 					ImGui::Indent();
-
-					//ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
-					ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
-					ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
-					if (respBtnsFloatClicker)
 					{
-						//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-						//ImGui::PushItemWidth(_w3);
-						guiManager.Add(amntBtnsFloatClicker, SurfingImGuiTypes::OFX_IM_STEPPER);
-						//ofxImGuiSurfing::AddIntStepped(amntBtnsFloatClicker);
-						//ofxImGuiSurfing::AddParameter(amntBtnsFloatClicker);
-						//ImGui::PopItemWidth();
-					}
+						// AppExtra
+						if (params_AppExtra.getName() != "-1")
+						{
+							static ofParameter<bool> b = params_AppExtra.getBool("Smooth");
+							static ofParameter<float> v = params_AppExtra.getFloat("Speed");
 
+							ofxImGuiSurfing::AddToggleRoundedButton(b);
+							if (b)
+							{
+								ImGui::Indent();
+								ImGui::PushItemWidth(_w2);
+								ofxImGuiSurfing::AddParameter(v, "%.1f");
+								ImGui::PopItemWidth();
+								ImGui::Unindent();
+							}
+						}
+						
+						ImGui::Spacing();
+
+						//----
+
+						//ofxImGuiSurfing::AddToggleRoundedButton(bShowControl);
+						ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
+						ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
+						if (respBtnsFloatClicker)
+						{
+							//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+							//ImGui::PushItemWidth(_w3);
+							guiManager.Add(amntBtnsFloatClicker, SurfingImGuiTypes::OFX_IM_STEPPER);
+							//ofxImGuiSurfing::AddIntStepped(amntBtnsFloatClicker);
+							//ofxImGuiSurfing::AddParameter(amntBtnsFloatClicker);
+							//ImGui::PopItemWidth();
+						}
+					}
 					ImGui::Unindent();
 				}
 			}
@@ -1233,6 +1273,25 @@ void ofxSurfingPresets::draw_ImGui()
 		//----
 
 		draw_ImGui_Parameters();
+
+		//--
+
+		// Player
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+		if (surfingPlayer.bGui_Player)
+		{
+			ImGuiWindowFlags flagw = ImGuiWindowFlags_None;
+			if (guiManager.bAutoResize) flagw += ImGuiWindowFlags_AlwaysAutoResize;
+
+			if (guiManager.beginWindow(surfingPlayer.bGui_Player, flagw))
+			{
+				surfingPlayer.draw();
+			}
+			guiManager.endWindow();
+		}
+#endif
+
+		//--
 	}
 	guiManager.end();
 }
@@ -1260,10 +1319,18 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 		ofLogNotice(__FUNCTION__) << "mod_SHIFT: " << (mod_SHIFT ? "ON" : "OFF");
 	}
 
-	if (key == OF_KEY_LEFT) {
+	if (0) {}
+
+	else if (key == 'g') {
+		setGuiVisibleToggle();
+	}
+	else if (key == OF_KEY_LEFT) {
 		doLoadPrevious();
 	}
 	else if (key == OF_KEY_RIGHT) {
+		doLoadNext();
+	}
+	if (key == ' ') {
 		doLoadNext();
 	}
 	else if (key == OF_KEY_RETURN) {
@@ -1272,6 +1339,11 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 	else if (key == OF_KEY_BACKSPACE) {
 		doRandomizeParams();
 	}
+
+	// Player
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+	else if (key == OF_KEY_RETURN) { surfingPlayer.setPlayToggle(); }
+#endif
 
 	else
 		for (int i = 0; i < NUM_KEY_COMMANDS; i++) {
