@@ -27,7 +27,7 @@ TODO:
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 
-#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
+#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
 
 //--------------------------------------
 
