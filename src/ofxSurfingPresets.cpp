@@ -10,7 +10,7 @@ ofxSurfingPresets::ofxSurfingPresets()
 	bAutoDraw = false;
 
 	ofAddListener(ofEvents().update, this, &ofxSurfingPresets::update);
-	ofAddListener(ofEvents().draw, this, &ofxSurfingPresets::draw, OF_EVENT_ORDER_AFTER_APP);
+	//ofAddListener(ofEvents().draw, this, &ofxSurfingPresets::draw, OF_EVENT_ORDER_AFTER_APP);
 
 	path_Global = "ofxSurfingPresets/"; // this is to folder all files to avoid mixing with other addons data
 	path_Presets = "ofxSurfingPresets/Presets";
@@ -30,7 +30,7 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	setActive(false);// remove keys and mouse listeners
 
 	ofRemoveListener(ofEvents().update, this, &ofxSurfingPresets::update);
-	ofRemoveListener(ofEvents().draw, this, &ofxSurfingPresets::draw, OF_EVENT_ORDER_AFTER_APP);
+	//ofRemoveListener(ofEvents().draw, this, &ofxSurfingPresets::draw, OF_EVENT_ORDER_AFTER_APP);
 
 	// remove params callbacks listeners
 	//ofRemoveListener(params.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params);
@@ -156,7 +156,11 @@ void ofxSurfingPresets::setup()
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+	//surfingPlayer.setNamePanel("PRESETS Player");
+	surfingPlayer.setNameSubPanel("Camera");
+
 	params_AppSettings.add(surfingPlayer.params_AppSettings);
+
 	//--------------------------------------------------------------
 	listener_Beat = surfingPlayer.bPlayerBeat.newListener([this](bool &b) {
 		ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
@@ -341,10 +345,12 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::draw(ofEventArgs & args)
+//void ofxSurfingPresets::draw(ofEventArgs & args)
+void ofxSurfingPresets::draw()
 {
 	if (bGui)
 	{
+		//TODO: shoulb be done manually to avoid some locking trouble when multiinstances
 		draw_ImGui();
 
 		//-
@@ -633,8 +639,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 						//ImGui::Dummy(ImVec2(0, 1));
 
-						guiManager.Add(bSave, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
-						guiManager.Add(bLoad, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
+						guiManager.Add(bSave, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, 2, true);
+						guiManager.Add(bLoad, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, 2, false);
 
 						guiManager.Add(bAutoSave, SurfingImGuiTypes::OFX_IM_TOGGLE_SMALL);
 					}
@@ -687,6 +693,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						if (ImGui::TreeNodeEx("TOOLS", _flagt))
 						{
 							//ImGui::SameLine();
+
+							// 1. Preset
 
 							if (ImGui::TreeNodeEx("PRESET", _flagt))
 							{
@@ -762,6 +770,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 							}
 
 							//--
+							
+							// 2. Kit
 
 							if (ImGui::TreeNodeEx("KIT", _flagt))
 							{
@@ -772,8 +782,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 								_w25 = getWidgetsWidth(4);
 								_h = getWidgetsHeightUnit();
 
-								guiManager.Add(bRefresh, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, true, 2);
-								guiManager.Add(bSetPathPresets, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, false, 2);
+								guiManager.Add(bRefresh, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, 2, true);
+								guiManager.Add(bSetPathPresets, SurfingImGuiTypes::OFX_IM_BUTTON_SMALL, 2, false);
 
 								//TODO:
 								//if (ImGui::Button("COPY", ImVec2(_w2, _h)))
@@ -789,7 +799,11 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 									//	doClearPresets();
 									//}
 
-									if (ImGui::Button("CLEAR KIT", ImVec2(_w100, _h))) ImGui::OpenPopup("CLEAR KIT?");
+									if (ImGui::Button("CLEAR KIT", ImVec2(_w100, _h))) 
+									{
+										ImGui::OpenPopup("CLEAR KIT?");
+									}
+									
 									if (ImGui::BeginPopupModal("CLEAR KIT?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 									{
 										ImGui::Text("User Kit will be erased.\nThis operation cannot be undone!\n\n");

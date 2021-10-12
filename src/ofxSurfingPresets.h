@@ -241,11 +241,12 @@ private:
 private:
 
 	void update(ofEventArgs & args);
-	void draw(ofEventArgs & args);
+	//void draw(ofEventArgs & args);
 	void exit();
 	void startup();
 
 public:
+	void draw();
 
 	void draw_ImGui_Minimal();
 	void draw_ImGui_FloatingClicker();
