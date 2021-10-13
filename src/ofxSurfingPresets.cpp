@@ -55,10 +55,15 @@ void ofxSurfingPresets::refreshToggleNotes()
 {
 	if (DISABLE_Callbacks) return;
 
+	// Sets to true the respective toggle for current index and set to false for the others.
+
 	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
-		if (i == index.get()) notesIndex[i].set(true);
-		else notesIndex[i].set(false);
+		//if (i == index.get()) notesIndex[i].set(true);
+		//else notesIndex[i].set(false);
+
+		if (i == index.get()) notesIndex[i].setWithoutEventNotifications(true);
+		else notesIndex[i].setWithoutEventNotifications(false);
 	}
 }
 #endif
@@ -85,7 +90,7 @@ void ofxSurfingPresets::setup()
 	bLoad.set("LOAD", false);
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
-	index.set("INDEX", 0, 0, 0);
+	index.set("Preset Index", 0, 0, 0);
 	bGui_InnerClicker.set("Inner Clicker", false);
 	bGui_FloatingClicker.set("Clicker", true);
 	//bGui_FloatingClicker.set("Float Clicker", true);
@@ -134,6 +139,7 @@ void ofxSurfingPresets::setup()
 	params_AppSettings.add(bCycled);
 	params_AppSettings.add(bKeys);
 	params_AppSettings.add(bMinimize_Clicker);
+	params_AppSettings.add(bMinimize_Params);
 	params_AppSettings.add(MODE_Active);
 
 	//params_AppSettings.add(guiManager.bAutoResize);
@@ -147,7 +153,7 @@ void ofxSurfingPresets::setup()
 	//params_AppSettings.add(ENABLE_Debug);
 
 	//-
-	
+
 	// MIDI
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 	params_AppSettings.add(surfingMIDI.bGui);
@@ -275,6 +281,14 @@ void ofxSurfingPresets::startup()
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		surfingMIDI.connect();
 
+		//// Group all together
+		//params_MIDI.clear();
+		//params_MIDI.add(params_Preset); // -> The ofParams of each Preset 
+		//params_MIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
+		//params_MIDI.add(index); // -> Add an int to select the index preset
+		//surfingMIDI.add(params_MIDI);
+
+		// Splitted
 		surfingMIDI.add(params_Preset); // -> The ofParams of each Preset 
 		surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
 		surfingMIDI.add(index); // -> Add an int to select the index preset
@@ -656,7 +670,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 					{
 						ImGui::Indent();
 						guiManager.Add(surfingPlayer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-						ofxImGuiSurfing::AddCombo(randomTypePlay, randomTypesPlay);
+						if (!guiManager.bMinimize)
+							ofxImGuiSurfing::AddCombo(randomTypePlay, randomTypesPlay);
 						ImGui::Unindent();
 					}
 #endif
@@ -668,17 +683,11 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 #endif
 					//-
 
+					// Keys
+					ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
+
 					if (!guiManager.bMinimize)
 					{
-						// Keys
-						ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
-
-						//						// MIDI
-						//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-						//						guiManager.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-						//						//ofxImGuiSurfing::AddToggleRoundedButton(surfingMIDI.bGui);
-						//#endif
-
 						{
 							bool bOpen = false;
 							ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
@@ -845,43 +854,66 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 					if (!guiManager.bMinimize)
 					{
-						ImGui::Dummy(ImVec2(0, 4));
-						ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
+						ImGui::Spacing();
+
+						//ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
+						guiManager.Add(guiManager.bExtra, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
 						ImGui::Indent();
-
-						if (guiManager.bExtra)
 						{
-							ofxImGuiSurfing::AddToggleRoundedButton(bGui_InnerClicker);
-							if (bGui_InnerClicker)
+							if (guiManager.bExtra)
 							{
-								ImGui::Indent();
-
-								ofxImGuiSurfing::AddToggleRoundedButton(respBtns);
-								if (respBtns)
+								// Smooth
+								// AppExtra
+								if (params_AppExtra.getName() != "-1")
 								{
-									//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-									//ofxImGuiSurfing::AddIntStepped(amntBtns);
-									//ImGui::PopItemWidth();
-									guiManager.Add(amntBtns, OFX_IM_STEPPER);
+									static ofParameter<bool> b = params_AppExtra.getBool("Smooth");
+									static ofParameter<float> v = params_AppExtra.getFloat("Speed");
+
+									ofxImGuiSurfing::AddToggleRoundedButton(b);
+									if (b)
+									{
+										ImGui::Indent();
+										ImGui::PushItemWidth(_w50);
+										ofxImGuiSurfing::AddParameter(v, "%.1f");
+										ImGui::PopItemWidth();
+										//guiManager.Add(v, OFX_IM_HSLIDER_SMALL_NO_LABELS, 2);
+										ImGui::Unindent();
+									}
 								}
 
-								ImGui::Unindent();
-							}
-							ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
-							ofxImGuiSurfing::AddToggleRoundedButton(bAutoSaveTimer);
-							ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
-							ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
+								ofxImGuiSurfing::AddToggleRoundedButton(bGui_InnerClicker);
+								if (bGui_InnerClicker)
+								{
+									ImGui::Indent();
 
-							bool bOpen = false;
-							ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-							_flagt |= ImGuiTreeNodeFlags_Framed;
-							if (ImGui::TreeNodeEx("Paths", _flagt))
-							{
-								ImGui::Text(path_Presets.data()); // -> show path
-								ImGui::TreePop();
+									ofxImGuiSurfing::AddToggleRoundedButton(respBtns);
+									if (respBtns)
+									{
+										//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
+										//ofxImGuiSurfing::AddIntStepped(amntBtns);
+										//ImGui::PopItemWidth();
+										guiManager.Add(amntBtns, OFX_IM_STEPPER);
+									}
+
+									ImGui::Unindent();
+								}
+								ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
+								ofxImGuiSurfing::AddToggleRoundedButton(bAutoSaveTimer);
+								ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
+								ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
+
+								bool bOpen = false;
+								ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+								//_flagt |= ImGuiTreeNodeFlags_Framed;
+								if (ImGui::TreeNodeEx("Paths", _flagt))
+								{
+									ImGui::Text(path_Presets.data()); // -> show path
+									ImGui::TreePop();
+								}
 							}
 						}
+						//ImGui::Unindent();
 					}
 
 					//-
@@ -915,13 +947,15 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						{
 							//-
 
-							// buttons selector
+							// Files
+							// Buttons Selector
 
 							if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
 							{
-								// buttons matrix
+								// Buttons Matrix
 
-								//TODO. index back not working
+								//TODO: 
+								// Index back not working
 								// this is a workaround
 								// could fail on macOS/Linux -> requires fix paths slashes
 
@@ -946,6 +980,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 								ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
 							}
+							ImGui::Unindent();
 						}
 					}
 
@@ -1049,43 +1084,24 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 					//ofxImGuiSurfing::AddToggleRoundedButton(bExtraFloatClicker);
 				}
 
-				if (bExtraFloatClicker)
-				{
-					ImGui::Indent();
+				if (!bMinimize_Clicker)
+					if (bExtraFloatClicker)
 					{
-						guiManager.refreshLayout();
-
-						// AppExtra
-						if (params_AppExtra.getName() != "-1")
+						ImGui::Indent();
 						{
-							static ofParameter<bool> b = params_AppExtra.getBool("Smooth");
-							static ofParameter<float> v = params_AppExtra.getFloat("Speed");
+							guiManager.refreshLayout();
 
-							ofxImGuiSurfing::AddToggleRoundedButton(b);
-							if (b)
+							//----
+
+							ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
+							ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
+							if (respBtnsFloatClicker)
 							{
-								ImGui::Indent();
-								ImGui::PushItemWidth(_w2);
-								ofxImGuiSurfing::AddParameter(v, "%.1f");
-								ImGui::PopItemWidth();
-								//guiManager.Add(v, OFX_IM_HSLIDER_SMALL_NO_LABELS, 2);
-								ImGui::Unindent();
+								guiManager.Add(amntBtnsFloatClicker, OFX_IM_STEPPER, 2);
 							}
 						}
-
-						ImGui::Spacing();
-
-						//----
-
-						ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
-						ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
-						if (respBtnsFloatClicker)
-						{
-							guiManager.Add(amntBtnsFloatClicker, OFX_IM_STEPPER, 2);
-						}
+						ImGui::Unindent();
 					}
-					ImGui::Unindent();
-				}
 			}
 			guiManager.endWindow();
 		}
@@ -1207,26 +1223,33 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 				{
 					ImGui::Text(params_Preset.getName().c_str());
 
+					//-
+
+					// Minimize
+					ofxImGuiSurfing::AddToggleRoundedButton(bMinimize_Params);
+
 					ImGuiTreeNodeFlags flagst;
 					flagst = ImGuiTreeNodeFlags_None;
 					flagst |= ImGuiTreeNodeFlags_DefaultOpen;
 
 					ofxImGuiSurfing::AddGroup(params_Preset, flagst);
 
-					ofxImGuiSurfing::AddSpacingSeparated();
-
-					if (bReset.getName() != "-1")
-					{
-						guiManager.Add(bReset, OFX_IM_BUTTON_SMALL);
-					}
-
 					//-
 
-					guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-					guiManager.Add(bGui_FloatingClicker, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+					if (!bMinimize_Params)
+					{
+						ofxImGuiSurfing::AddSpacingSeparated();
 
-					//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
-					//ofxImGuiSurfing::AddToggleRoundedButton(bGui_FloatingClicker);
+						if (bReset.getName() != "-1")
+						{
+							guiManager.Add(bReset, OFX_IM_BUTTON_SMALL);
+						}
+
+						//-
+
+						guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						guiManager.Add(bGui_FloatingClicker, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+					}
 				}
 				guiManager.endWindow();
 			}
@@ -1423,17 +1446,21 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 			ofLogNotice(__FUNCTION__) << name << " : " << e;
 		}
 
-		// Index
+		//--
+
+		// Preset Index
 
 		if (name == index.getName())
 		{
-			index = ofClamp(index.get(), index.getMin(), index.getMax());
+			index = ofClamp(index.get(), index.getMin(), index.getMax()); // clamp inside dir
 
 			// Changed 
 
 			if (index.get() != index_PRE)
 			{
-				ofLogNotice(__FUNCTION__) << "Changed index: " << ofToString(index_PRE) << " > " << ofToString(index);
+				ofLogNotice(__FUNCTION__) << "Changed \n\nPreset Index : " << ofToString(index_PRE) << " > " << ofToString(index) << "\n";
+
+				//-
 
 				// Autosave
 
@@ -1441,26 +1468,10 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 				{
 					if (dir.size() > 0 && index_PRE < dir.size())
 					{
-						//std::string _fileName = dir.getName(index_PRE);
-						//std::string _filePath = dir.getPath(index_PRE);
-
-						//int i = index_PRE;
-						//std::string si = ofToString(i);
-						//if (i < 10) si = "0" + si;
-						//std::string ss = nameRoot + "_" + si;
-						//fileName = ss;
-						//filePath = path_Presets + "/" + ss + _ext;
-						//ofLogNotice(__FUNCTION__) << filePath;
-
-						int i = index_PRE;
-						filePath = getFilepathForIndexPreset(i);
-
+						filePath = getFilepathForIndexPreset(index_PRE);
 						save(filePath);
 					}
-					else
-					{
-						ofLogError(__FUNCTION__) << "File out of range";
-					}
+					else { ofLogError(__FUNCTION__) << "Preset Index points an out of range file!"; }
 				}
 
 				index_PRE = index;
@@ -1469,21 +1480,18 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 				// Load
 
-				ofLogNotice(__FUNCTION__) << "index: " << ofToString(index);
+				ofLogNotice(__FUNCTION__) << index.getName() + " : " << ofToString(index);
 
 				if (dir.size() > 0 && index < dir.size())
 				{
-					//fileName = dir.getName(index);
-					//filePath = dir.getPath(index);
-
 					filePath = getFilepathForIndexPreset(index);
 					load(filePath);
 
 					//-
 
-					//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					refreshToggleNotes();
-					//#endif
+#endif
 				}
 				else
 				{
@@ -1492,6 +1500,8 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 			}
 			else { bIsRetrigged = true; }
 		}
+
+		//--
 
 		if (name == bSave.getName() && bSave)
 		{
@@ -1523,7 +1533,8 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		}
 		if (name == bGui_Editor.getName())
 		{
-			if (bGui_Editor) {
+			if (bGui_Editor)
+			{
 				if (!bGui) bGui = true;
 			}
 		}
@@ -1544,7 +1555,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 	if (DISABLE_Callbacks) return;
 
 	std::string name = e.getName();
-	
+
 	bool bdone = false;
 
 	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
@@ -1658,7 +1669,7 @@ void ofxSurfingPresets::load(std::string path)
 void ofxSurfingPresets::save(std::string path)
 {
 	ofLogNotice(__FUNCTION__) << path;
-	ofxSurfingHelpers::saveGroup(params_Preset, path);
+	ofxSurfingHelpers::saveGroup(params_Preset, path, false); // exclude debug
 
 	//-
 

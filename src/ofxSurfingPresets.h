@@ -80,6 +80,10 @@ private:
 	ofxSurfingMidi surfingMIDI;
 #endif
 
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+	ofParameterGroup params_MIDI{ "MIDI" };
+#endif
+
 	//--
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
@@ -286,6 +290,7 @@ private:
 private:
 
 	ofParameter<bool> bMinimize_Clicker{ "Minimize", false};
+	ofParameter<bool> bMinimize_Params{ "Minimize", false};
 
 private:
 
@@ -405,7 +410,8 @@ public:
 	// Bc each group could have different appropiated reset values
 
 private:
-	ofParameter <bool> bReset{ "-1", false };
+	ofParameter <bool> bReset{ "-1", false }; // TODO: Must set a name when defined a callback function..
+	//TODO: we could use a memory state save/load(reset) that we will use as "Reset State"
 public:
 	//--------------------------------------------------------------
 	void setResetPtr(ofParameter<bool> &b) {
