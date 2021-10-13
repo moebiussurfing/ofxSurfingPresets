@@ -1,4 +1,5 @@
 ofxImGui
 ofxSurfingHelpers
 ofxSurfingImGui
+ofxSurfingPlayer
 ofxSurfingPresets

@@ -19,6 +19,8 @@ void ofApp::setup() {
 void ofApp::draw()
 {
 	drawScene();
+
+	presets.draw(); // Gui
 }
 
 //--------------------------------------------------------------
@@ -32,7 +34,7 @@ void ofApp::drawScene()
 	static float _rotation1;
 	static float _rotation2;
 
-	//-
+	//--
 
 	//// A. No smooth. Raw values.
 	//_size1 = size1;
@@ -46,7 +48,7 @@ void ofApp::drawScene()
 	_rotation1 = presets.get(rotation1);
 	_rotation2 = presets.get(rotation2);
 
-	//-
+	//--
 
 	// Preprocess
 	_size1 += 0.2;
@@ -84,8 +86,6 @@ void ofApp::drawScene()
 	ofPushMatrix();
 	{
 		ofTranslate(ofGetWidth()*.5f, ofGetHeight()*.5f);
-		ofRotateDeg(ofGetElapsedTimef() * TWO_PI);
-
 		ofRotateDeg(ofGetElapsedTimef() * TWO_PI);
 		ofRotateZDeg(_rotation1 * 45);
 		ofScale(1.3f);

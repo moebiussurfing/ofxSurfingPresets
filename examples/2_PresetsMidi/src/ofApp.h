@@ -4,20 +4,34 @@
 
 #include "ofxSurfingPresets.h"
 
-class ofApp : public ofBaseApp {
+/*
 
+	To run this example out-of-the-box,
+	due to the addons.make content,
+	you must go to the file ofxSurfingPresets.h 
+	and to uncomment the line
+	#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+
+*/
+
+class ofApp : public ofBaseApp {
 public:
+
 	void setup();
 	void draw();
 	void drawScene();
 
 	ofxSurfingPresets presets;
 
+	//-
+
 	// Scene Parameters 
+
 	ofParameterGroup params;
+
 	ofParameter<float> size1;
+	ofParameter<int> size2;
 	ofParameter<float> rotation1;
 	ofParameter<float> rotation2;
-	ofParameter<int> size2;
 	ofParameter<int> indexColor;
 };

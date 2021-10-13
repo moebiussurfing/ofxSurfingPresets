@@ -11,10 +11,9 @@ TODO:
 +	sorting: ctrl + click = copy, drag ?
 		get copy/drag preset sorting from ofxPresetsManager
 +	add multi groups
-+	add easy tween
 +	float clicker full responsible height too
 +	add undo engine here.
-+	add random engine.
++	add basic random engine.
 
 */
 
@@ -23,9 +22,11 @@ TODO:
 
 // OPTIONAL
 
-// Midi -> Two alternatives
+// MIDI -> Two Alternatives
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
-//#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+
+//-
 
 #define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
 #define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser.
@@ -35,10 +36,11 @@ TODO:
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 #include "ofxSurfingMidi.h"
+#define INCLUDE__OFX_SURFING_PRESET__MIDI__
 #endif
-
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 #include "ofxMidiParams.h"
+#define INCLUDE__OFX_SURFING_PRESET__MIDI__
 #endif
 
 #include "ofxSurfingHelpers.h"
@@ -55,6 +57,7 @@ TODO:
 class ofxSurfingPresets
 {
 private:
+
 #define AMOUNT_KIT_SIZE_DEFAULT 9 // Default common amount presets but can be resized
 
 	//----
@@ -65,7 +68,7 @@ public:
 
 	//--
 
-	// OPTIONAL STUFF
+	// Optional Stuff
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 private:
@@ -90,6 +93,7 @@ private:
 	//--
 
 public:
+
 	vector<ofParameter<bool>> notesIndex;
 	ofParameterGroup params_PresetToggles{ "Presets" };
 	void Changed_Params_PresetToggles(ofAbstractParameter &e);
@@ -126,6 +130,7 @@ public:
 	// To retrig when preset not changed but is clicked again.
 
 public:
+
 	//--------------------------------------------------------------
 	bool isRetrigged()
 	{
@@ -136,7 +141,9 @@ public:
 		}
 		else return false;
 	}
+
 private:
+
 	bool bIsRetrigged = false;
 
 	//----
@@ -147,6 +154,7 @@ private:
 	// To check in update() as callback
 
 public:
+
 	//--------------------------------------------------------------
 	bool isDoneLoad()
 	{
@@ -157,12 +165,15 @@ public:
 		}
 		return false;
 	}
+
 private:
+
 	bool bIsDoneLoad = false;
 
 	//--
 
 public:
+
 	//--------------------------------------------------------------
 	bool isDoneSave()
 	{
@@ -173,7 +184,9 @@ public:
 		}
 		return false;
 	}
+
 private:
+
 	bool bIsDoneSave = false;
 
 	//--
@@ -196,8 +209,11 @@ public:
 	// 4. But we want to use the user box click to trig something
 
 private:
+
 	bool bMustTrig = false;
+
 public:
+
 	//--------------------------------------------------------------
 	bool isMustTrig() // Trig on select preset or not. this is useful when preset selected not changed, but we want to retrig current preset settings
 	{
@@ -215,6 +231,7 @@ public:
 	//----
 
 private:
+
 	char keyCommands[NUM_KEY_COMMANDS] = {
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 		'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' };
@@ -241,35 +258,38 @@ private:
 private:
 
 	void update(ofEventArgs & args);
-	//void draw(ofEventArgs & args);
 	void exit();
 	void startup();
 
 public:
+
 	void draw();
 
 	void draw_ImGui_Minimal();
 	void draw_ImGui_FloatingClicker();
 	void draw_ImGui_Parameters();
 
+	// Inner clicker layout
 	void draw_ImGui_MiniClicker();
-	//float inner clicker layout
-	ofParameter<int> amntBtns{ "Amt Buttons", 4, 1, 4 };
-	ofParameter<bool> respBtns{ "Responsive", true };
-	//int amntBtns = 4;
-	//bool respBtns = true;
-	ofParameterGroup params_InnerClicker;
-
 
 private:
+
+	ofParameter<int> amntBtns{ "Amt Buttons", 4, 1, 4 };
+	ofParameter<bool> respBtns{ "Responsive", true };
+	ofParameterGroup params_InnerClicker;
+
+private:
+
+	ofParameter<bool> bMinimize_Clicker{ "Minimize", false};
+
+private:
+
 	void draw_ImGui();
 	void draw_ImGui_EditorControl();
 
 	//-
 
 private:
-
-	//bool bDebug = false;
 
 	std::string nameSelected;
 

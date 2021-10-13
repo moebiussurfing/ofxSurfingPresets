@@ -2,111 +2,135 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	//ofSetWindowPosition(-1920, 26);
-	
 	ofSetCircleResolution(200);
 
-	// group
+	// Group
 	params.setName("paramsGroup");
-	params.add(size1.set("size1", 1, 0, 2));
+	params.add(size1.set("size1", 0.5, 0, 1));
 	params.add(size2.set("size2", ofGetHeight() * 0.5, 0, ofGetHeight() * 0.25));
-	params.add(rotation.set("rotation", 1, 0, 2));
-	params.add(rotationOffset.set("rotOffset", 180, 0, 360));
+	params.add(rotation1.set("rotation1", 1, 0, 2));
+	params.add(rotation2.set("rotation2", 180, 0, 360));
+	params.add(indexColor.set("indexColor", 0, 0, 2));
 
-	presets.setImGuiAutodraw(true); // -> required true when using only one ImGui instance inside the add-ons of your ofApp
 	presets.addGroup(params);
 }
 
 //--------------------------------------------------------------
-void ofApp::update() {
+void ofApp::update()
+{
 }
 
 //--------------------------------------------------------------
 void ofApp::draw()
 {
 	drawScene();
-}
 
-//--------------------------------------------------------------
-void ofApp::exit() {
+	presets.draw();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	if (key == 'g') {
-		presets.bGui = !presets.bGui;
-	}
-	if (key == ' ') {
-		presets.doLoadNext();
+	if (key == OF_KEY_F1) {
+		presets.setGuiVisibleToggle();
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::drawScene()
 {
-	float _size1 = (size1) + 0.2;
-	float _size2 = (size2);
-	float _rotation = (rotation);
-	float _rotationOffset = (rotationOffset);
-
-	//--
-
-	static ofColor colorBg = 255;
-	//static ofColor colorBg = 32;
-	ofClear(colorBg);
-
-	ofPushStyle();
-	ofPushMatrix();
-
-	// some code from @Daandelange > https://github.com/Daandelange/ofxImGui/tree/master/example-sharedcontext
-
-	ofParameter<ofFloatColor> background{ "Background", ofFloatColor::black };
-	ofParameter<ofFloatColor> foreground{ "Foreground", ofFloatColor::black };
-	ImVec4 color = { 0,0,0,1.0 };
-
-	int a1 = ofMap(_size1, 0, 2, 255, 170);
-	int a2 = ofMap(_size2, 0, size2.getMax(), 255, 170);
+	// The final variables to apply to draw the below Scene.
+	// Notice that: 
+	// If declared here, they must be static to mantain the previous frame setted values!
+	static float _size1;
+	static int _size2;
+	static float _rotation1;
+	static float _rotation2;
 
 	//-
 
-	ofSetColor(color.x * 255, color.y * 255, color.z * 255, color.w * a1);
-	float _scale = 0.1f;
-	float r = ofGetHeight()*_scale*_size1*(1);
-	ofDrawCircle(ofGetWidth()*0.5f, ofGetHeight()*0.5f, r);
+	//// A. No smooth. Raw values.
+	//_size1 = size1;
+	//_size2 = size2;
+	//_rotation1 = rotation1;
+	//_rotation2 = rotation2;
 
-	float _scale2 = 0.2f;
-	float staticAnimationPos = 1;
-	int rectSize = _size2 + abs((((ofGetHeight() * _scale2 - _size2)*_size1))*(staticAnimationPos));
-	//rectSize /= 2;
+	// B. Addon Smoother
+	_size1 = presets.get(size1);
+	_size2 = presets.get(size2);
+	_rotation1 = presets.get(rotation1);
+	_rotation2 = presets.get(rotation2);
 
-	ofTranslate(ofGetWidth()*.5f, ofGetHeight()*.5f);
-	ofRotateDeg(ofGetElapsedTimef() * TWO_PI);
+	//-
 
-	float rot = _rotationOffset / 3.0;
-	ofRotateDeg(ofGetElapsedTimef() * TWO_PI);
-	ofRotateZDeg(_rotation * 45);
-	ofScale(1.3);
-	ofRotateDeg(rot);
+	// Preprocess
+	_size1 += 0.2;
+	float _scale2 = _size1 / 5.f;
+	int _rSz = _size2 + (ofGetHeight() * _scale2);
+	float _rot = _rotation2 / 3.0;
+	float _rat = ofMap(_rotation2, 0, 360, 1, 0.5f + _size1 * 0.4);
+	float _rag = ofMap(_size1, 0, 1, 0, -30);
 
+	//-
 
-	ofSetColor(background->r * 255, background->g * 255, background->b * 255, background->a * a2);
-	ofDrawRectangle(-rectSize * .5f, -rectSize * .5f, rectSize, rectSize);
+	// Bg Color
+	ofColor _colorBg = 255;//white
 
-	ofRotateDeg(rot);
-	ofSetColor(background->r * 255, background->g * 255, background->b * 255, background->a * a2);
-	ofDrawRectangle(-rectSize * .5f, -rectSize * .5f, rectSize, rectSize);
+	// Shape Color
+	ofColor _color;
+	switch (indexColor)
+	{
+	case 0: _color = ofColor::black; break;
+	case 1: _color = ofColor::orange; break;
+	case 2: _color = ofColor::green; break;
+	default: _color = ofColor::red; break;
+	}
 
-	ofRotateDeg(rot);
-	ofSetColor(foreground->r * 255, foreground->g * 255, foreground->b * 255, foreground->a * a2);
-	ofDrawRectangle(-rectSize * .5f, -rectSize * .5f, rectSize, rectSize);
+	int _alpha = ofMap(_size2, 0, size2.getMax(), 200, 245);
+	ofColor c(_color.r, _color.g, _color.b, _alpha);
 
-	//// inner circle
-	//ofFill();
-	//ofSetColor(colorBg);
-	//int r2 = ofMap(_size1, 0, size1.getMax(), 3, 20, true);
-	//ofDrawCircle(0,0, r2);
+	//--
 
+	// Draw
+
+	ofClear(_colorBg);
+
+	ofPushStyle();
+	ofPushMatrix();
+	{
+		ofTranslate(ofGetWidth()*.5f, ofGetHeight()*.5f);
+		ofRotateDeg(ofGetElapsedTimef() * TWO_PI);
+		ofRotateZDeg(_rotation1 * 45);
+		ofScale(1.3f);
+		ofRotateDeg(_rot);
+
+		ofSetColor(c);
+		ofDrawRectangle(-_rSz * .5f, -_rSz * .5f, _rSz, _rSz);
+
+		_rSz *= _rat;
+		ofRotateDeg(_rot);
+		ofTranslate(0, 0);
+		_rot += _rag;
+
+		ofSetColor(c);
+		ofDrawRectangle(-_rSz * .5f, -_rSz * .5f, _rSz, _rSz);
+
+		_rSz *= _rat;
+		ofRotateDeg(_rot);
+		ofTranslate(0, 0);
+		_rot += _rag;
+
+		ofSetColor(c);
+		ofDrawRectangle(-_rSz * .5f, -_rSz * .5f, _rSz, _rSz);
+
+		_rSz *= _rat;
+		ofRotateDeg(_rot);
+		ofTranslate(0, 0);
+		_rot += _rag;
+
+		ofSetColor(c);
+		ofDrawRectangle(-_rSz * .5f, -_rSz * .5f, _rSz, _rSz);
+	}
 	ofPopMatrix();
 	ofPopStyle();
 }
