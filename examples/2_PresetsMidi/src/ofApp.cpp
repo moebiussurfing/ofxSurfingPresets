@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 	ofSetCircleResolution(200);
+	ofSetWindowPosition(1920, 25);
 
 	// Group
 	params.setName("paramsGroup");
@@ -10,7 +11,7 @@ void ofApp::setup() {
 	params.add(size2.set("size2", ofGetHeight() * 0.5, 0, ofGetHeight() * 0.25));
 	params.add(rotation1.set("rotation1", 1, 0, 2));
 	params.add(rotation2.set("rotation2", 180, 0, 360));
-	params.add(indexColor.set("indexColor", 0, 0, 2));
+	params.add(colorIndex.set("colorIndex", 0, 0, 2));
 
 	presets.addGroup(params);
 }
@@ -65,7 +66,7 @@ void ofApp::drawScene()
 
 	// Shape Color
 	ofColor _color;
-	switch (indexColor)
+	switch (colorIndex)
 	{
 	case 0: _color = ofColor::black; break;
 	case 1: _color = ofColor::orange; break;

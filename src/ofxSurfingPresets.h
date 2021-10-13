@@ -72,12 +72,12 @@ public:
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 private:
-	ofxMidiParams mMidiParams;
+	ofxMidiParams surfingMIDI;
 #endif
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 private:
-	ofxSurfingMidi mMidiParams;
+	ofxSurfingMidi surfingMIDI;
 #endif
 
 	//--
@@ -91,6 +91,8 @@ private:
 #endif
 
 	//--
+
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 
 public:
 
@@ -118,16 +120,19 @@ public:
 //}
 //ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 //
-//	mMidiParams.clear();
-//	mMidiParams.add(params_Preset); // -> to control preset params
-//	mMidiParams.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
+//	surfingMIDI.clear();
+//	surfingMIDI.add(params_Preset); // -> to control preset params
+//	surfingMIDI.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
 //#endif
 
 		return params_PresetToggles;
 	}
+#endif
+
+	//----
 
 	// Easy callbacks
-	// To retrig when preset not changed but is clicked again.
+	// To retrig when preset index not changed but is clicked again.
 
 public:
 
@@ -310,7 +315,7 @@ public:
 	}
 
 	//--------------------------------------------------------------
-	void addGroup(ofParameterGroup &group) { // Main group add
+	void addGroup(ofParameterGroup &group) { // Main group add. WARNING! You must add only one group. Call this only once!
 		setup();
 
 		params_Preset = group;
@@ -333,6 +338,7 @@ public:
 		// Now we can add one single group!
 
 		// Refresh
+
 		startup();
 	}
 

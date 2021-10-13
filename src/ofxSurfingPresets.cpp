@@ -49,7 +49,7 @@ ofxSurfingPresets::~ofxSurfingPresets()
 }
 
 //TODO:
-//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 //--------------------------------------------------------------
 void ofxSurfingPresets::refreshToggleNotes()
 {
@@ -61,12 +61,12 @@ void ofxSurfingPresets::refreshToggleNotes()
 		else notesIndex[i].set(false);
 	}
 }
-//#endif
+#endif
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::setup()
 {
-	// Log mode
+	// Log Mode
 	ofSetLogLevel("ofxSurfingPresets", OF_LOG_NOTICE);
 	//ofSetLogLevel("ofxSurfingPresets", OF_LOG_SILENT);
 
@@ -135,6 +135,7 @@ void ofxSurfingPresets::setup()
 	params_AppSettings.add(bKeys);
 	params_AppSettings.add(bMinimize_Clicker);
 	params_AppSettings.add(MODE_Active);
+
 	//params_AppSettings.add(guiManager.bAutoResize);
 	//params_AppSettings.add(guiManager.bExtra);
 	//params_AppSettings.add(guiManager.bMinimize);
@@ -146,25 +147,24 @@ void ofxSurfingPresets::setup()
 	//params_AppSettings.add(ENABLE_Debug);
 
 	//-
+	
+	// MIDI
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+	params_AppSettings.add(surfingMIDI.bGui);
+#endif
 
 	// Simple Smoother
-
 #ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
 	params_AppSettings.add(params_SmoothControl);
 #endif
 
-	//-
-
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-
-	//TODO:
-	//split change gui toggle too. add another label ?
-	//surfingPlayer.setNamePanel("PRESETS Player");
-	surfingPlayer.setNameSubPanel("Presets");
-
 	params_AppSettings.add(surfingPlayer.params_AppSettings);
+	//TODO:
+	// Split change gui toggle too. add another label ?
+	surfingPlayer.setNameSubPanel("Presets");
 
 	//--------------------------------------------------------------
 	listener_Beat = surfingPlayer.bPlayerBeatBang.newListener([this](bool &b) {
@@ -205,8 +205,6 @@ void ofxSurfingPresets::setup()
 	// External extra or smooth params
 	if (params_AppExtra.getName() != "-1") params_AppSettings.add(params_AppExtra);
 
-	//ofAddListener(params_AppSettings.parameterChangedE(), this, &ofxSurfingPresets::Changed_AppSettings);
-
 	// Exclude
 	bSave.setSerializable(false);
 	bNewPreset.setSerializable(false);
@@ -223,18 +221,12 @@ void ofxSurfingPresets::setup()
 	params.add(params_Control);
 	params.add(params_AppSettings);
 
-	// All back
-	//ofAddListener(params.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params);
 
 	//--
 
 	// Gui
-	//guiManager.setImGuiAutodraw(bAutoDraw);
-	//guiManager.setup(); // this instantiates and configurates ofxImGui inside the class object.
-	////guiManager.bAutoResize = false;
 
 	guiManager.setSettingsPathLabel("ofxSurfingPresets");
-	//guiManager.setAutoSaveSettings(true);
 
 	guiManager.setup(IM_GUI_MODE_INSTANTIATED);
 
@@ -258,31 +250,44 @@ void ofxSurfingPresets::startup()
 	//--
 
 	// MIDI
-
-	notesIndex.clear();
-	params_PresetToggles.clear();
-	for (int i = 0; i <= index.getMax(); i++)
 	{
-		string n = "Preset ";
-		//n += ofToString(i < 10 ? "0" : "");
-		n += ofToString(i);
+		//--
 
-		ofParameter<bool> b{ n, false };
-		notesIndex.push_back(b);
-		params_PresetToggles.add(b);
-	}
-	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+		notesIndex.clear();
+		params_PresetToggles.clear();
+
+		for (int i = 0; i <= index.getMax(); i++)
+		{
+			std::string n = "Preset ";
+			//n += ofToString(i < 10 ? "0" : "");
+			n += ofToString(i);
+
+			ofParameter<bool> b{ n, false };
+			notesIndex.push_back(b);
+			params_PresetToggles.add(b);
+		}
+		ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+#endif
+
+		//--
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-	mMidiParams.connect();
-	mMidiParams.add(params_Preset); // -> to control preset params
-	mMidiParams.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
-	//mMidiParams.add(index);
+		surfingMIDI.connect();
+
+		surfingMIDI.add(params_Preset); // -> The ofParams of each Preset 
+		surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
+		surfingMIDI.add(index); // -> Add an int to select the index preset
+
+		//surfingMIDI.startup();
 #endif
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
-	mMidiParams.setup(params_Preset);
+		surfingMIDI.setup(params_Preset); // -> The ofParams of each Preset 
+		surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
+		surfingMIDI.add(index); // -> Add an int to select the index preset
 #endif
+	}
 
 	//-
 
@@ -361,11 +366,11 @@ void ofxSurfingPresets::draw()
 		//-
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-		mMidiParams.draw();
+		surfingMIDI.draw();
 #endif
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
-		mMidiParams.drawImGui();
+		surfingMIDI.drawImGui();
 #endif
 
 	}
@@ -538,7 +543,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						//ImGui::Text(path_Global.data());
 						//ImGui::Text(filePath.data());
 
-						string ss;
+						std::string ss;
 						if (dir.size() == 0) ss = "NO PRESETS";
 						else ss = ofToString(index) + "/" + ofToString(index.getMax());
 						//ss = ofToString(index) + "/" + ofToString(index.getMax());
@@ -659,7 +664,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 					// MIDI
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
-					guiManager.Add(mMidiParams.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+					guiManager.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 #endif
 					//-
 
@@ -670,10 +675,10 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 						//						// MIDI
 						//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-						//						guiManager.Add(mMidiParams.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-						//						//ofxImGuiSurfing::AddToggleRoundedButton(mMidiParams.bGui);
+						//						guiManager.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						//						//ofxImGuiSurfing::AddToggleRoundedButton(surfingMIDI.bGui);
 						//#endif
-					
+
 						{
 							bool bOpen = false;
 							ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
@@ -922,16 +927,16 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 								for (int i = 0; i < dir.size(); i++)
 								{
-									string si = ofToString(i);
+									std::string si = ofToString(i);
 									if (i < 10) si = "0" + si;
-									string ss = nameRoot + "_" + si;
+									std::string ss = nameRoot + "_" + si;
 									fileName = ss;
 
 									auto s0 = ofSplitString(nameSelected, "\\", true);
-									string s1 = s0[s0.size() - 1]; // filename
+									std::string s1 = s0[s0.size() - 1]; // filename
 									auto s = ofSplitString(s1, ".json");
 
-									string _nameSelected = s[0];
+									std::string _nameSelected = s[0];
 
 									if (_nameSelected == fileName)
 									{
@@ -1034,7 +1039,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 #endif
 					// MIDI
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
-					guiManager.Add(mMidiParams.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+					guiManager.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 #endif
 					//----
 
@@ -1187,7 +1192,7 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 	{
 		if (params_Preset.getName() != "-1")
 		{
-			string n;
+			std::string n;
 			n = "PARAMETERS";
 
 			ImGuiWindowFlags flagsw;
@@ -1386,7 +1391,7 @@ void ofxSurfingPresets::setGuiVisible(bool b)
 //	if (DISABLE_Callbacks) return;
 //
 //	{
-//		string name = e.getName();
+//		std::string name = e.getName();
 //
 //		// exclude debugs
 //		if (name != "exclude"
@@ -1409,7 +1414,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 	if (DISABLE_Callbacks) return;
 
 	{
-		string name = e.getName();
+		std::string name = e.getName();
 
 		// Exclude debugs
 
@@ -1436,13 +1441,13 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 				{
 					if (dir.size() > 0 && index_PRE < dir.size())
 					{
-						//string _fileName = dir.getName(index_PRE);
-						//string _filePath = dir.getPath(index_PRE);
+						//std::string _fileName = dir.getName(index_PRE);
+						//std::string _filePath = dir.getPath(index_PRE);
 
 						//int i = index_PRE;
-						//string si = ofToString(i);
+						//std::string si = ofToString(i);
 						//if (i < 10) si = "0" + si;
-						//string ss = nameRoot + "_" + si;
+						//std::string ss = nameRoot + "_" + si;
 						//fileName = ss;
 						//filePath = path_Presets + "/" + ss + _ext;
 						//ofLogNotice(__FUNCTION__) << filePath;
@@ -1532,90 +1537,41 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 	}
 }
 
-////--------------------------------------------------------------
-//void ofxSurfingPresets::Changed_AppSettings(ofAbstractParameter &e)
-//{
-//	if (DISABLE_Callbacks) return;
-//
-//	{
-//		//string name = e.getName();
-//
-//		//// exclude debugs
-//		//if (name != "exclude"
-//		//	&& name != "exclude")
-//		//{
-//		//	ofLogNotice(__FUNCTION__) << name << " : " << e;
-//		//}
-//
-//		//// control params
-//		//if (name == "")
-//		//{
-//		//}
-//		//else if (name == "APP MODE")
-//		//{
-//		//	switch (MODE_App)
-//		//	{
-//		//	case 0:
-//		//		MODE_App_Name = "RUN";
-//		//		//setActive(false);
-//		//		break;
-//		//	case 1:
-//		//		MODE_App_Name = "EDIT";
-//		//		//setActive(true);
-//		//		break;
-//		//	default:
-//		//		MODE_App_Name = "UNKNOWN";
-//		//		break;
-//		//	}
-//		//}
-//
-//		//// filter params
-//		//if (name == "GUI POSITION")
-//		//{
-//		//	gui_Control.setPosition(Gui_Position.get().x, Gui_Position.get().y);
-//		//}
-//		//else if (name == "GUI")
-//		//{
-//		//}
-//		//else if (name == "HELP")
-//		//{
-//		//}
-//		//else if (name == "APP MODE")
-//		//{
-//		//}
-//		//else if (name == "DEBUG")
-//		//{
-//		//}
-//	}
-//}
-
-//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 //--------------------------------------------------------------
 void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 {
 	if (DISABLE_Callbacks) return;
 
-	string name = e.getName();
+	std::string name = e.getName();
+	
+	bool bdone = false;
 
 	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
+		// true
 		if (notesIndex[i].get() && name == notesIndex[i].getName())
 		{
 			index = i;
-			//continue;
+			ofLogNotice(__FUNCTION__) << name << " : TRUE";
+			bdone = true;
+			continue;
 		}
 	}
+	if (!bdone) return; // not any detected note true
 
-	// make exclusive
+	//-
+
+	// Make exclusive. all others to false
 	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
-		if (index != i && notesIndex[i].get())
+		if (i != index && notesIndex[i].get())
 		{
 			notesIndex[i] = false;
 		}
 	}
 }
-//#endif
+#endif
 
 ////--------------------------------------------------------------
 //void ofxSurfingPresets::setKey_MODE_App(int k)
@@ -1624,7 +1580,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 //}
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::setPathGlobal(string s) // Must call before setup. disabled by default
+void ofxSurfingPresets::setPathGlobal(std::string s) // Must call before setup. disabled by default
 {
 	ofLogNotice(__FUNCTION__) << s;
 	path_Global = s;
@@ -1632,7 +1588,7 @@ void ofxSurfingPresets::setPathGlobal(string s) // Must call before setup. disab
 	ofxSurfingHelpers::CheckFolder(path_Global);
 }
 //--------------------------------------------------------------
-void ofxSurfingPresets::setPathPresets(string s)
+void ofxSurfingPresets::setPathPresets(std::string s)
 {
 	ofLogNotice(__FUNCTION__) << s;
 	path_Presets = s;
@@ -1682,7 +1638,7 @@ void ofxSurfingPresets::load(int _index)
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::load(string path)
+void ofxSurfingPresets::load(std::string path)
 {
 	ofLogNotice(__FUNCTION__) << path;
 	ofxSurfingHelpers::loadGroup(params_Preset, path);
@@ -1699,7 +1655,7 @@ void ofxSurfingPresets::load(string path)
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::save(string path)
+void ofxSurfingPresets::save(std::string path)
 {
 	ofLogNotice(__FUNCTION__) << path;
 	ofxSurfingHelpers::saveGroup(params_Preset, path);
@@ -1718,12 +1674,12 @@ void ofxSurfingPresets::save(string path)
 //--------------------------------------------------------------
 void ofxSurfingPresets::doNewPreset()
 {
-	//string ss = fileNames[index];
+	//std::string ss = fileNames[index];
 
 	int _i = dir.size();
-	string s = ofToString(_i);
+	std::string s = ofToString(_i);
 	if (_i < 10) s = "0" + s;
-	string ss = nameRoot + "_" + s;
+	std::string ss = nameRoot + "_" + s;
 	fileName = ss;
 	filePath = path_Presets + "/" + ss + _ext;
 	ofLogNotice(__FUNCTION__) << filePath;
@@ -1745,18 +1701,21 @@ void ofxSurfingPresets::doNewPreset()
 	//-
 
 	//TODO:
+	// Autocreate notes for each index preset
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 	int diff = index.getMax() - (notesIndex.size() - 1);
 	if (diff <= 0) return;
 
 	for (int i = 0; i < diff; i++) {
-		string n = "Preset ";
+		std::string n = "Preset ";
 		n += ofToString(notesIndex.size() + i);
 		ofParameter<bool> b{ n, false };
 		notesIndex.push_back(b);
 		params_PresetToggles.add(b);
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-		mMidiParams.add(b);
+		surfingMIDI.add(b);
+#endif
 #endif
 	}
 
@@ -1783,9 +1742,9 @@ void ofxSurfingPresets::doDeletePreset(int pos)
 	else
 	{
 		int i = index;
-		string si = ofToString(i);
+		std::string si = ofToString(i);
 		if (i < 10) si = "0" + si;
-		string ss = nameRoot + "_" + si;
+		std::string ss = nameRoot + "_" + si;
 		fileName = ss;
 		filePath = path_Presets + "/" + ss + _ext;
 		ofLogNotice(__FUNCTION__) << "Remove: " << filePath;
@@ -1880,7 +1839,7 @@ void ofxSurfingPresets::doCopyPreset()
 {
 	//TODO:
 
-	//string ss = fileNames[index];
+	//std::string ss = fileNames[index];
 	//ss += "_";
 	//ss += ofToString(dir.size());
 	////ss += ofToString(index);
@@ -1899,7 +1858,7 @@ void ofxSurfingPresets::doCopyPreset()
 	//for (int i = 0; i < fileNames.size(); i++)
 	//{
 	//	auto _ss = ofSplitString(fileNames[i], ".");
-	//	string _filename = "NoName";
+	//	std::string _filename = "NoName";
 	//	if (_ss.size() > 0) _filename = _ss[0];
 
 	//	if (fileNames[i] == _filename)
@@ -1929,7 +1888,7 @@ bool ofxSurfingPresets::doRefreshFiles()
 	{
 		ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
 
-		string _name = "NoName"; // without ext
+		std::string _name = "NoName"; // without ext
 		auto _names = ofSplitString(dir.getName(i), ".");
 		if (_names.size() > 0) {
 			_name = _names[0];
@@ -1959,26 +1918,28 @@ bool ofxSurfingPresets::doRefreshFiles()
 
 	//-
 
-//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-//	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-//	notesIndex.clear();
-//	params_PresetToggles.clear();
-//	for (int i = 0; i <= index.getMax(); i++)
-//	{
-//		string n = "Preset ";
-//		//n += ofToString(i < 10 ? "0" : "");
-//		n += ofToString(i);
-//
-//		ofParameter<bool> b{ n, false };
-//		notesIndex.push_back(b);
-//		params_PresetToggles.add(b);
-//	}
-//	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-//
-//	mMidiParams.clear();
-//	mMidiParams.add(params_Preset); // -> to control preset params
-//	mMidiParams.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
-//#endif
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+
+	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+	notesIndex.clear();
+	params_PresetToggles.clear();
+	for (int i = 0; i <= index.getMax(); i++)
+	{
+		std::string n = "Preset ";
+		//n += ofToString(i < 10 ? "0" : "");
+		n += ofToString(i);
+
+		ofParameter<bool> b{ n, false };
+		notesIndex.push_back(b);
+		params_PresetToggles.add(b);
+	}
+	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+
+	surfingMIDI.clear();
+	surfingMIDI.add(params_Preset); // -> To control preset params
+	surfingMIDI.add(params_PresetToggles); // -> To select index prest by note/toggle and exclusive
+
+#endif
 }
 
 //--------------------------------------------------------------
@@ -1999,9 +1960,9 @@ void ofxSurfingPresets::doRefreshFilesAndRename()
 	{
 		ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
 
-		string si = ofToString(i);
+		std::string si = ofToString(i);
 		if (i < 10) si = "0" + si;
-		string ss = nameRoot + "_" + si;
+		std::string ss = nameRoot + "_" + si;
 		fileName = ss;
 		filePath = path_Presets + "/" + ss + _ext;
 		ofLogNotice(__FUNCTION__) << "Remove: " << filePath;

@@ -33,5 +33,5 @@ public:
 	ofParameter<int> size2;
 	ofParameter<float> rotation1;
 	ofParameter<float> rotation2;
-	ofParameter<int> indexColor;
+	ofParameter<int> colorIndex;
 };
