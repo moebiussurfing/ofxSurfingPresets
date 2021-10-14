@@ -59,11 +59,11 @@ void ofxSurfingPresets::refreshToggleNotes()
 
 	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
-		//if (i == index.get()) notesIndex[i].set(true);
-		//else notesIndex[i].set(false);
+		if (i == index.get()) notesIndex[i].set(true);
+		else notesIndex[i].set(false);
 
-		if (i == index.get()) notesIndex[i].setWithoutEventNotifications(true);
-		else notesIndex[i].setWithoutEventNotifications(false);
+		//if (i == index.get()) notesIndex[i].setWithoutEventNotifications(true);
+		//else notesIndex[i].setWithoutEventNotifications(false);
 	}
 }
 #endif
@@ -86,8 +86,8 @@ void ofxSurfingPresets::setup()
 	bAutoSave.set("AutoSave", true);
 	bAutoSaveTimer.set("AutoSave Timed", false);
 	bNewPreset.set("New", false);
-	bSave.set("SAVE", false);
-	bLoad.set("LOAD", false);
+	bSave.set("Save", false);
+	bLoad.set("Load", false);
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 	index.set("Preset Index", 0, 0, 0);
@@ -527,42 +527,14 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 					if (!guiManager.bMinimize)
 					{
-						//--
-
-						//guiManager.refreshLayout();
-						//_w1 = getWidgetsWidth(1);
-						//_w2 = getWidgetsWidth(2);
-						//_w3 = getWidgetsWidth(3);
-						//_w4 = getWidgetsWidth(4);
-
-						//--
-
-						//// Textinput
-						//{
-						//	// input text
-						//	static int keyboardFocus;
-						//	//static char str0[128] = fileName.c_str();
-						//	//std::string fileName = "Name";
-						//	char *cstr = new char[fileName.length() + 1];
-						//	strcpy(cstr, fileName.c_str());
-						//	ImGui::InputText("Name", cstr, IM_ARRAYSIZE(cstr));
-						//	//if (ImGui::IsItemClicked()) {
-						//	//	keyboardFocus = 0;
-						//	//}
-						//	//if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive()) {
-						//	//	ImGui::SetKeyboardFocusHere(keyboardFocus);
-						//	//}
-						//}
-
 						//ImGui::Text(path_Global.data());
 						//ImGui::Text(filePath.data());
 
 						std::string ss;
 						if (dir.size() == 0) ss = "NO PRESETS";
 						else ss = ofToString(index) + "/" + ofToString(index.getMax());
-						//ss = ofToString(index) + "/" + ofToString(index.getMax());
-
 						ImGui::Text(ss.data());
+
 						if (guiManager.bMinimize) ImGui::Text(fileName.data()); // -> using text input below
 						//if (guiManager.bExtra) ImGui::Text(path_Presets.data()); // -> show path
 					}
@@ -584,14 +556,10 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 							}
 						}
 					}
-
-					//// index
-					//if (!guiManager.bMinimize && guiManager.bExtra) ofxImGuiSurfing::AddIntStepped(index);
-
-					// index
+					// Index
 					ofxImGuiSurfing::AddParameter(index);
 
-					// next
+					// Browse
 					if (guiManager.bMinimize)
 					{
 						ImGui::PushButtonRepeat(true);
@@ -611,19 +579,13 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 					//--
 
-					// TODO: copy this code to my ImGui hewlpers..
-
+					// Clicker Matrix
 					if (bGui_InnerClicker)
 					{
 						draw_ImGui_MiniClicker();
 					}
 
 					//--
-
-					//// spinner
-					//static int v = 1;
-					//ImGuiInputTextFlags flags = 0;
-					//Surfing::SpinInt("Index", &v, 1, 100, flags);
 
 					if (!guiManager.bMinimize)
 					{
@@ -644,15 +606,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						guiManager.Add(bSave, OFX_IM_BUTTON_SMALL, 2, true);
 						guiManager.Add(bLoad, OFX_IM_BUTTON_SMALL, 2, false);
 
-						guiManager.Add(bAutoSave, OFX_IM_TOGGLE_SMALL);
-					}
-
-
-					//if (guiManager.bMinimize)
-					if (ImGui::Button("NEW", ImVec2(_w100, _h)))
-					{
-						//bNewPreset = true;
-						doNewPreset();
+						guiManager.Add(bNewPreset, OFX_IM_BUTTON_SMALL, 2, true);
+						guiManager.Add(bAutoSave, OFX_IM_TOGGLE_SMALL, 2, false);
 					}
 
 					//-
@@ -682,9 +637,6 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 					guiManager.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 #endif
 					//-
-
-					// Keys
-					ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
 
 					if (!guiManager.bMinimize)
 					{
@@ -851,6 +803,8 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 					}
 
 					//-
+					
+					static ofParameter<bool> bFiles{ "Files", false };
 
 					if (!guiManager.bMinimize)
 					{
@@ -863,6 +817,9 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						{
 							if (guiManager.bExtra)
 							{
+								// Keys
+								ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
+
 								// Smooth
 								// AppExtra
 								if (params_AppExtra.getName() != "-1")
@@ -903,13 +860,19 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 								ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
 								ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
 
-								bool bOpen = false;
-								ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-								//_flagt |= ImGuiTreeNodeFlags_Framed;
-								if (ImGui::TreeNodeEx("Paths", _flagt))
+								// Files 
+								ofxImGuiSurfing::AddToggleRoundedButton(bFiles);
+								if (bFiles)
 								{
-									ImGui::Text(path_Presets.data()); // -> show path
-									ImGui::TreePop();
+									ImGui::Indent();
+									bool bOpen = false;
+									ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+									//_flagt |= ImGuiTreeNodeFlags_Framed;
+									if (ImGui::TreeNodeEx("Paths", _flagt))
+									{
+										ImGui::Text(path_Presets.data()); // -> show path
+										ImGui::TreePop();
+									}
 								}
 							}
 						}
@@ -945,42 +908,44 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 					{
 						if (guiManager.bExtra)
 						{
-							//-
-
 							// Files
-							// Buttons Selector
 
-							if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
+							// Buttons Selector for each file
+							if (bFiles)
 							{
-								// Buttons Matrix
-
-								//TODO: 
-								// Index back not working
-								// this is a workaround
-								// could fail on macOS/Linux -> requires fix paths slashes
-
-								for (int i = 0; i < dir.size(); i++)
+								if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
 								{
-									std::string si = ofToString(i);
-									if (i < 10) si = "0" + si;
-									std::string ss = nameRoot + "_" + si;
-									fileName = ss;
+									// Buttons Matrix
 
-									auto s0 = ofSplitString(nameSelected, "\\", true);
-									std::string s1 = s0[s0.size() - 1]; // filename
-									auto s = ofSplitString(s1, ".json");
+									//TODO: 
+									// Index back not working
+									// this is a workaround
+									// could fail on macOS/Linux -> requires fix paths slashes
 
-									std::string _nameSelected = s[0];
-
-									if (_nameSelected == fileName)
+									for (int i = 0; i < dir.size(); i++)
 									{
-										index = i;
-									}
-								}
+										std::string si = ofToString(i);
+										if (i < 10) si = "0" + si;
+										std::string ss = nameRoot + "_" + si;
+										fileName = ss;
 
-								ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
+										auto s0 = ofSplitString(nameSelected, "\\", true);
+										std::string s1 = s0[s0.size() - 1]; // filename
+										auto s = ofSplitString(s1, ".json");
+
+										std::string _nameSelected = s[0];
+
+										if (_nameSelected == fileName)
+										{
+											index = i;
+										}
+									}
+
+									ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
+								}
+								ImGui::Unindent();
+								ImGui::Unindent();
 							}
-							ImGui::Unindent();
 						}
 					}
 
@@ -1049,7 +1014,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 				//----
 
-				// Clicker
+				// Clicker Matrix
 				{
 					float sizey = ofxImGuiSurfing::getWidgetsHeightRelative() * 2;
 					ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
@@ -1066,7 +1031,8 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 					// Player 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 					guiManager.Add(surfingPlayer.bGui_Player, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-					if (surfingPlayer.bGui_Player) {
+					if (surfingPlayer.bGui_Player)
+					{
 						ImGui::Indent();
 						guiManager.Add(surfingPlayer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 						ImGui::Unindent();
