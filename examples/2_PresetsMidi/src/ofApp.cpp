@@ -16,6 +16,8 @@ void ofApp::setup() {
 	presets.addGroup(params); 
 	// -> WARNING! You must add only one group. Call this only once!
 	// Put all your groups into one main container if you need it.
+
+	//presets.setLogLevel(OF_LOG_SILENT); // disable log
 }
 
 //--------------------------------------------------------------
@@ -60,7 +62,7 @@ void ofApp::drawScene()
 	float _rot = _rotation2 / 3.0;
 	float _rat = ofMap(_rotation2, 0, 360, 1, 0.5f + _size1 * 0.4);
 	float _rag = ofMap(_size1, 0, 1, 0, -30);
-	float _round = ofMap(rotation1, rotation1.getMin(), rotation1.getMax(), 0, 14, true);
+	float _round = ofMap(rotation1, rotation1.getMin(), rotation1.getMax(), 0, 20, true);
 
 	//-
 

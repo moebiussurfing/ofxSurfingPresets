@@ -27,22 +27,20 @@ ofxSurfingPresets::ofxSurfingPresets()
 //--------------------------------------------------------------
 ofxSurfingPresets::~ofxSurfingPresets()
 {
-	setActive(false);// remove keys and mouse listeners
+	setActive(false); // remove keys and mouse listeners
 
 	ofRemoveListener(ofEvents().update, this, &ofxSurfingPresets::update);
-	//ofRemoveListener(ofEvents().draw, this, &ofxSurfingPresets::draw, OF_EVENT_ORDER_AFTER_APP);
 
-	// remove params callbacks listeners
-	//ofRemoveListener(params.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params);
-	//ofRemoveListener(params_AppSettings.parameterChangedE(), this, &ofxSurfingPresets::Changed_AppSettings);
+	// Remove params callbacks listeners
 	ofRemoveListener(params_Control.parameterChangedE(), this, &ofxSurfingPresets::Changed_Control);
 
-	//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-	//#endif
+#endif
 
 	ofxSurfingHelpers::saveGroup(params_AppSettings, path_Global + path_Params_Control);
-
+	
+	//TODO:
 	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	exit();
@@ -59,12 +57,10 @@ void ofxSurfingPresets::refreshToggleNotes()
 
 	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
-		if (i == index.get()) notesIndex[i].set(true);
-		else notesIndex[i].set(false);
-
-		//if (i == index.get()) notesIndex[i].setWithoutEventNotifications(true);
-		//else notesIndex[i].setWithoutEventNotifications(false);
+		notesIndex[i].set(false);
 	}
+	if (index <= index.getMax() && index < notesIndex.size())
+		notesIndex[index].set(true);
 }
 #endif
 
@@ -128,7 +124,7 @@ void ofxSurfingPresets::setup()
 	// Params AppSettings
 
 	params_AppSettings.clear();
-	params_AppSettings.setName("AppSettings");
+	params_AppSettings.setName("ofxSurfingPresets_AppSettings");
 	params_AppSettings.add(bGui);
 	params_AppSettings.add(bGui_Editor);
 	params_AppSettings.add(bGui_Parameters);
@@ -141,16 +137,11 @@ void ofxSurfingPresets::setup()
 	params_AppSettings.add(bMinimize_Clicker);
 	params_AppSettings.add(bMinimize_Params);
 	params_AppSettings.add(MODE_Active);
-
+	params_AppSettings.add(index);
+	//params_AppSettings.add(bShowControl);
 	//params_AppSettings.add(guiManager.bAutoResize);
 	//params_AppSettings.add(guiManager.bExtra);
 	//params_AppSettings.add(guiManager.bMinimize);
-	//params_AppSettings.add(bShowControl);
-	//params_AppSettings.add(bDebug);
-	//params_AppSettings.add(MODE_App);
-	//params_AppSettings.add(MODE_App_Name);
-	//params_AppSettings.add(bHelp);
-	//params_AppSettings.add(ENABLE_Debug);
 
 	//-
 
@@ -176,9 +167,9 @@ void ofxSurfingPresets::setup()
 	listener_Beat = surfingPlayer.bPlayerBeatBang.newListener([this](bool &b) {
 		ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
 
-		if (surfingPlayer.bPlay)
+		//if (surfingPlayer.bPlay)
 		{
-			switch (randomTypePlay)
+			switch (randomTypePlayIndex)
 			{
 			case 0: doLoadNext(); break;
 			case 1: doRandomizeIndex(); break;
@@ -248,6 +239,47 @@ void ofxSurfingPresets::setup()
 	//--
 }
 
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doRecreateMidi()
+{
+	ofLogNotice(__FUNCTION__);
+
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+	//// Group all together
+	//params_MIDI.clear();
+	//params_MIDI.add(params_Preset); // -> The ofParams of each Preset 
+	//params_MIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
+	//params_MIDI.add(index); // -> Add an int to select the index preset
+	//surfingMIDI.add(params_MIDI);
+
+	// Splitted
+	//surfingMIDI.clear(); //- This clears all settings!
+	surfingMIDI.add(params_Preset); // -> The ofParams of each Preset 
+	surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
+	surfingMIDI.add(index); // -> Add an int to select the index preset
+	surfingMIDI.add(surfingPlayer.bPlay); // -> Add an int to select the index preset
+
+	//surfingMIDI.connect();
+	//surfingMIDI.startup();
+#endif
+
+	//-
+
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
+	// Group all together
+	params_MIDI.clear();
+	params_MIDI.add(params_Preset); // -> The ofParams of each Preset 
+	params_MIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
+	params_MIDI.add(index); // -> Add an int to select the index preset
+
+	surfingMIDI.setup(params_MIDI); // -> The ofParams of each Preset 
+#endif
+}
+
+#endif
+
 //--------------------------------------------------------------
 void ofxSurfingPresets::startup()
 {
@@ -258,6 +290,9 @@ void ofxSurfingPresets::startup()
 	// MIDI
 	{
 		//--
+
+		// Toggles 
+		// Prepare. Exclusive for index selector
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 		notesIndex.clear();
@@ -273,36 +308,23 @@ void ofxSurfingPresets::startup()
 			notesIndex.push_back(b);
 			params_PresetToggles.add(b);
 		}
+
 		ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 #endif
 
 		//--
 
+		// Initiates
+
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		surfingMIDI.connect();
-
-		//// Group all together
-		//params_MIDI.clear();
-		//params_MIDI.add(params_Preset); // -> The ofParams of each Preset 
-		//params_MIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
-		//params_MIDI.add(index); // -> Add an int to select the index preset
-		//surfingMIDI.add(params_MIDI);
-
-		// Splitted
-		surfingMIDI.add(params_Preset); // -> The ofParams of each Preset 
-		surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
-		surfingMIDI.add(index); // -> Add an int to select the index preset
-
-		//surfingMIDI.startup();
 #endif
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
-		// Group all together
-		params_MIDI.clear();
-		params_MIDI.add(params_Preset); // -> The ofParams of each Preset 
-		params_MIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
-		params_MIDI.add(index); // -> Add an int to select the index preset
-		surfingMIDI.setup(params_MIDI); // -> The ofParams of each Preset 
+#endif
+
+#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+		doRecreateMidi();
 #endif
 	}
 
@@ -341,7 +363,7 @@ void ofxSurfingPresets::startup()
 
 	// workflow
 	// Load first preset
-	index = 0;
+	//index = 0;
 
 	//-
 
@@ -351,8 +373,9 @@ void ofxSurfingPresets::startup()
 //--------------------------------------------------------------
 void ofxSurfingPresets::update(ofEventArgs & args)
 {
-	// autosave
+	// Autosave
 	//bAutoSave = false;
+
 	if (bAutoSaveTimer && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave)
 	{
 		DISABLE_Callbacks = true;
@@ -390,7 +413,7 @@ void ofxSurfingPresets::draw()
 		surfingMIDI.drawImGui();
 #endif
 
-}
+	}
 }
 
 //TODO:
@@ -611,7 +634,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						guiManager.Add(bLoad, OFX_IM_BUTTON_SMALL, 2, false);
 
 						guiManager.Add(bNewPreset, OFX_IM_BUTTON_SMALL, 2, true);
-						guiManager.Add(bAutoSave, OFX_IM_TOGGLE_SMALL, 2, false);
+						guiManager.Add(bAutoSave, OFX_IM_TOGGLE_SMALL_BORDER_BLINK, 2, false);
 					}
 
 					//-
@@ -630,7 +653,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 						ImGui::Indent();
 						guiManager.Add(surfingPlayer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 						if (!guiManager.bMinimize)
-							ofxImGuiSurfing::AddCombo(randomTypePlay, randomTypesPlay);
+							ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
 						ImGui::Unindent();
 					}
 #endif
@@ -814,17 +837,17 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 					{
 						ImGui::Spacing();
 
-						//ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bExtra);
 						guiManager.Add(guiManager.bExtra, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
-						ImGui::Indent();
+						if (guiManager.bExtra)
 						{
-							if (guiManager.bExtra)
+							ImGui::Indent();
 							{
 								// Keys
 								ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
 
 								// Smooth
+
 								// AppExtra
 								if (params_AppExtra.getName() != "-1")
 								{
@@ -861,101 +884,74 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 								}
 								ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
 								ofxImGuiSurfing::AddToggleRoundedButton(bAutoSaveTimer);
-								ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
-								ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
+								//ofxImGuiSurfing::AddToggleRoundedButton(bAutoSave);
 
-								// Files 
+								//-
+
+								// Files
 								ofxImGuiSurfing::AddToggleRoundedButton(bFiles);
 								if (bFiles)
 								{
 									ImGui::Indent();
-									bool bOpen = false;
-									ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-									//_flagt |= ImGuiTreeNodeFlags_Framed;
-									if (ImGui::TreeNodeEx("Paths", _flagt))
 									{
-										ImGui::Text(path_Presets.data()); // -> show path
-										ImGui::TreePop();
-									}
-								}
-							}
-						}
-						//ImGui::Unindent();
-					}
-
-					//-
-
-					// all
-
-					//if (bDebug) {
-					//	xx += ww + pad;
-					//	ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
-					//	ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
-					//	n = "ofxSurfingPresets";
-					//	guiManager.beginWindow(n.c_str(), &bOpen1, flagsw);
-					//	{
-					//		ImGuiTreeNodeFlags flagst;
-					//		flagst = ImGuiTreeNodeFlags_None;
-					//		flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-					//		flagst |= ImGuiTreeNodeFlags_Framed;
-					//		ofxImGuiSurfing::AddGroup(params_AppSettings, flagst);
-					//		ofxImGuiSurfing::AddGroup(params_Control, flagst);
-					//	}
-					//	guiManager.endWindow();
-					//}
-
-					//-
-
-					// Extra
-
-					if (!guiManager.bMinimize)
-					{
-						if (guiManager.bExtra)
-						{
-							// Files
-
-							// Buttons Selector for each file
-							if (bFiles)
-							{
-								if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
-								{
-									// Buttons Matrix
-
-									//TODO: 
-									// Index back not working
-									// this is a workaround
-									// could fail on macOS/Linux -> requires fix paths slashes
-
-									for (int i = 0; i < dir.size(); i++)
-									{
-										std::string si = ofToString(i);
-										if (i < 10) si = "0" + si;
-										std::string ss = nameRoot + "_" + si;
-										fileName = ss;
-
-										auto s0 = ofSplitString(nameSelected, "\\", true);
-										std::string s1 = s0[s0.size() - 1]; // filename
-										auto s = ofSplitString(s1, ".json");
-
-										std::string _nameSelected = s[0];
-
-										if (_nameSelected == fileName)
+										// Paths
 										{
-											index = i;
+											bool bOpen = false;
+											ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+											//_flagt |= ImGuiTreeNodeFlags_Framed;
+											if (ImGui::TreeNodeEx("Paths", _flagt))
+											{
+												ImGui::Text(path_Presets.data()); // -> show path
+												ImGui::TreePop();
+											}
+										}
+
+										// Files
+										// Buttons Selector for each file
+										if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
+										{
+											// Buttons Matrix
+
+											//TODO: 
+											// Index back not working
+											// this is a workaround
+											// could fail on macOS/Linux -> requires fix paths slashes
+
+											for (int i = 0; i < dir.size(); i++)
+											{
+												std::string si = ofToString(i);
+												if (i < 10) si = "0" + si;
+												std::string ss = nameRoot + "_" + si;
+												fileName = ss;
+
+												auto s0 = ofSplitString(nameSelected, "\\", true);
+												std::string s1 = s0[s0.size() - 1]; // filename
+												auto s = ofSplitString(s1, ".json");
+
+												std::string _nameSelected = s[0];
+
+												if (_nameSelected == fileName)
+												{
+													index = i;
+												}
+											}
+
+											ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
 										}
 									}
-
-									ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
+									ImGui::Unindent();
 								}
-								ImGui::Unindent();
-								ImGui::Unindent();
+
+								ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
 							}
+							ImGui::Unindent();
 						}
 					}
 
 					//-
 
-					// Extra panel
+					// Extra Panel
+
 					if (guiManager.bExtra)
 					{
 						if (!guiManager.bMinimize)
@@ -1465,14 +1461,14 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					refreshToggleNotes();
 #endif
-			}
+				}
 				else
 				{
 					ofLogError(__FUNCTION__) << "File out of range";
 				}
-		}
+			}
 			else { bIsRetrigged = true; }
-	}
+		}
 
 		//--
 
@@ -1518,7 +1514,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 				bGui_Editor = true;
 			}
 		}
-}
+	}
 }
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
@@ -1542,11 +1538,11 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 			continue;
 		}
 	}
-	if (!bdone) return; // not any detected note true
+	if (!bdone) return; // Not any detected note true
 
 	//-
 
-	// Make exclusive. all others to false
+	// Make exclusive. All others to false
 	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
 		if (i != index && notesIndex[i].get())
@@ -1685,10 +1681,12 @@ void ofxSurfingPresets::doNewPreset()
 	//-
 
 	//TODO:
+	// Must fix!
+
 	// Autocreate notes for each index preset
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 	int diff = index.getMax() - (notesIndex.size() - 1);
-	if (diff <= 0) return;
+	if (diff <= 0) return;//trick?
 
 	for (int i = 0; i < diff; i++) {
 		std::string n = "Preset ";
@@ -1700,8 +1698,10 @@ void ofxSurfingPresets::doNewPreset()
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		surfingMIDI.add(b);
 #endif
-#endif
+
+		//doRecreateMidi();
 }
+#endif
 }
 
 //--------------------------------------------------------------
@@ -1909,9 +1909,11 @@ bool ofxSurfingPresets::doRefreshFiles()
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 
+	//TODO:
 	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 	notesIndex.clear();
 	params_PresetToggles.clear();
+
 	for (int i = 0; i <= index.getMax(); i++)
 	{
 		std::string n = "Preset ";
@@ -1924,11 +1926,15 @@ bool ofxSurfingPresets::doRefreshFiles()
 	}
 	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 
-#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-	surfingMIDI.clear();
-	surfingMIDI.add(params_Preset); // -> To control preset params
-	surfingMIDI.add(params_PresetToggles); // -> To select index prest by note/toggle and exclusive
-#endif
+	doRecreateMidi();
+
+//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+//	// Splitted
+//	surfingMIDI.clear();
+//	surfingMIDI.add(params_Preset); // -> The ofParams of each Preset 
+//	surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
+//	surfingMIDI.add(index); // -> Add an int to select the index preset
+//#endif
 
 #endif
 }

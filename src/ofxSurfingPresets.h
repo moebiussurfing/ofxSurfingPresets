@@ -12,6 +12,7 @@ TODO:
 		get copy/drag preset sorting from ofxPresetsManager
 +	add multi groups
 +	add undo engine here.
++	save a reset preset in another folder
 
 */
 
@@ -21,11 +22,8 @@ TODO:
 // OPTIONAL
 
 // MIDI -> Two Alternatives
-
-//#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC // A
-#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS // B
-
-//-
+#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS // A -> Recommended
+//#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC // B -> WIP
 
 #define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
 #define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser.
@@ -81,16 +79,7 @@ private:
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 	ofParameterGroup params_MIDI{ "ofxSurfingPresets MIDI" };
-#endif
-
-	//--
-
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-	SurfingPlayer surfingPlayer;
-	ofEventListener listener_Beat;
-	ofParameter<bool> bRandomPlay{ "Random", false };
-	std::vector<std::string> randomTypesPlay = { "Next Index", "Random Index", "Random Params" };
-	ofParameter<int> randomTypePlay{ "Type", 0, 0, 2 };
+	void doRecreateMidi();
 #endif
 
 	//--
@@ -130,6 +119,16 @@ public:
 
 		return params_PresetToggles;
 	}
+#endif
+
+	//--
+
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+	SurfingPlayer surfingPlayer;
+	ofEventListener listener_Beat;
+	ofParameter<bool> bRandomPlay{ "Random", false };
+	std::vector<std::string> randomTypesPlayNames = { "Next Index", "Random Index", "Random Params" };
+	ofParameter<int> randomTypePlayIndex{ "Type", 0, 0, 2 };
 #endif
 
 	//----
