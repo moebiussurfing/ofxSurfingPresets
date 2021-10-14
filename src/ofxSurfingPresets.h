@@ -11,9 +11,7 @@ TODO:
 +	sorting: ctrl + click = copy, drag ?
 		get copy/drag preset sorting from ofxPresetsManager
 +	add multi groups
-+	float clicker full responsible height too
 +	add undo engine here.
-+	add basic random engine.
 
 */
 
@@ -23,8 +21,9 @@ TODO:
 // OPTIONAL
 
 // MIDI -> Two Alternatives
-//#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
-#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+
+//#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC // A
+#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS // B
 
 //-
 
@@ -81,7 +80,7 @@ private:
 #endif
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
-	ofParameterGroup params_MIDI{ "MIDI" };
+	ofParameterGroup params_MIDI{ "ofxSurfingPresets MIDI" };
 #endif
 
 	//--

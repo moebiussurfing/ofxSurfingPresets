@@ -2,6 +2,7 @@ ofxGui
 ofxImGui
 ofxMidi
 ofxMidiParams
+ofxParameterMidiSync
 ofxSurfingHelpers
 ofxSurfingImGui
 ofxSurfingPlayer
