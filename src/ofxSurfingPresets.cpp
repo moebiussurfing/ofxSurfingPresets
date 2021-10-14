@@ -167,7 +167,7 @@ void ofxSurfingPresets::setup()
 	listener_Beat = surfingPlayer.bPlayerBeatBang.newListener([this](bool &b) {
 		ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
 
-		//if (surfingPlayer.bPlay)
+		//if (surfingPlayer.bPlay) // gui bangs are bypassed if not..
 		{
 			switch (randomTypePlayIndex)
 			{
