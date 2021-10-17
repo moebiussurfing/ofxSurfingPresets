@@ -39,7 +39,7 @@ ofxSurfingPresets::~ofxSurfingPresets()
 #endif
 
 	ofxSurfingHelpers::saveGroup(params_AppSettings, path_Global + path_Params_Control);
-	
+
 	//TODO:
 	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
@@ -495,7 +495,7 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 //--
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::draw_ImGui_EditorControl()
+void ofxSurfingPresets::draw_ImGui_Editor()
 {
 	if (bGui_Editor)
 	{
@@ -525,7 +525,7 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 
 		//-
 
-		// 1. Control
+		// 1. Editor
 		{
 			ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 			ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
@@ -583,8 +583,13 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 							}
 						}
 					}
+
 					// Index
+					ImGui::PushItemWidth(_w50);
 					ofxImGuiSurfing::AddParameter(index);
+					ImGui::PopItemWidth();
+					//guiManager.Add(index, OFX_IM_SLIDER, 2);
+					//ofxImGuiSurfing::AddParameter(index);
 
 					// Browse
 					if (guiManager.bMinimize)
@@ -652,8 +657,11 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 					{
 						ImGui::Indent();
 						guiManager.Add(surfingPlayer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-						if (!guiManager.bMinimize)
+						if (!guiManager.bMinimize) {
+							ImGui::PushItemWidth(_w100 * 0.7);
 							ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
+							ImGui::PushItemWidth(_w100 * 0.7);
+						}
 						ImGui::Unindent();
 					}
 #endif
@@ -722,14 +730,14 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 										ImGui::EndPopup();
 									}
 
-									if (ImGui::Button("STORE", ImVec2(_w50, _h)))
-									{
-										doStoreState();
-									}
-									ImGui::SameLine();
 									if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
 									{
 										doRecallState();
+									}
+									ImGui::SameLine();
+									if (ImGui::Button("STORE", ImVec2(_w50, _h)))
+									{
+										doStoreState();
 									}
 
 									if (ImGui::Button("RESET", ImVec2(_w50, _h)))
@@ -959,6 +967,11 @@ void ofxSurfingPresets::draw_ImGui_EditorControl()
 							guiManager.drawAdvanced();
 						}
 					}
+
+					//-
+
+					ImGui::Spacing();
+					guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 				}
 				guiManager.endWindow();
 			}
@@ -1068,6 +1081,11 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 						}
 						ImGui::Unindent();
 					}
+
+				//-
+
+				ImGui::Spacing();
+				guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 			}
 			guiManager.endWindow();
 		}
@@ -1155,7 +1173,7 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 		//static bool bEdit = false;
 		//ofxImGuiSurfing::ToggleRoundedButton("Edit", &bEdit);
 		//if (bEdit) {
-		//	draw_ImGui_EditorControl();
+		//	draw_ImGui_Editor();
 		//}
 
 		ImGui::TreePop();
@@ -1187,6 +1205,10 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 
 				if (guiManager.beginWindow(n.c_str(), (bool*)&bGui_Parameters.get(), flagsw))
 				{
+					float _h = getWidgetsHeightUnit();
+					float _w100 = getWidgetsWidth(1);
+					float _w50 = getWidgetsWidth(2);
+
 					ImGui::Text(params_Preset.getName().c_str());
 
 					//-
@@ -1206,6 +1228,31 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 					{
 						ofxImGuiSurfing::AddSpacingSeparated();
 
+						if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
+						{
+							doRecallState();
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("STORE", ImVec2(_w50, _h)))
+						{
+							doStoreState();
+						}
+
+						if (ImGui::Button("RESET", ImVec2(_w50, _h)))
+						{
+							doResetParams();
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("RANDOM", ImVec2(_w50, _h)))
+						{
+							doRandomizeParams();
+						}
+
+						//-
+
+						ofxImGuiSurfing::AddSpacingSeparated();
+
+						//TODO: not implemented yet
 						if (bReset.getName() != "-1")
 						{
 							guiManager.Add(bReset, OFX_IM_BUTTON_SMALL);
@@ -1229,7 +1276,7 @@ void ofxSurfingPresets::draw_ImGui()
 {
 	guiManager.begin();
 	{
-		draw_ImGui_EditorControl();
+		draw_ImGui_Editor();
 
 		//---
 
@@ -1596,6 +1643,8 @@ void ofxSurfingPresets::doStoreState()
 	ofLogNotice(__FUNCTION__) << path_Global + path_filePreset + _ext;
 	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
+	bResetDefined = true;
+
 	DONE_save = true;
 
 	// Simple callback
@@ -1700,7 +1749,7 @@ void ofxSurfingPresets::doNewPreset()
 #endif
 
 		//doRecreateMidi();
-}
+	}
 #endif
 }
 
@@ -1928,13 +1977,13 @@ bool ofxSurfingPresets::doRefreshFiles()
 
 	doRecreateMidi();
 
-//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-//	// Splitted
-//	surfingMIDI.clear();
-//	surfingMIDI.add(params_Preset); // -> The ofParams of each Preset 
-//	surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
-//	surfingMIDI.add(index); // -> Add an int to select the index preset
-//#endif
+	//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+	//	// Splitted
+	//	surfingMIDI.clear();
+	//	surfingMIDI.add(params_Preset); // -> The ofParams of each Preset 
+	//	surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
+	//	surfingMIDI.add(index); // -> Add an int to select the index preset
+	//#endif
 
 #endif
 }

@@ -21,8 +21,8 @@ TODO:
 
 // OPTIONAL
 
-// MIDI -> Two Alternatives
-#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS // A -> Recommended
+// MIDI -> Two Alternatives. (One or none)
+//#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS // A -> Recommended
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC // B -> WIP
 
 #define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
@@ -67,13 +67,14 @@ public:
 
 	// Optional Stuff
 
+	// MIDI
+//private:
+public:
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-private:
 	ofxMidiParams surfingMIDI;
 #endif
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
-private:
 	ofxSurfingMidi surfingMIDI;
 #endif
 
@@ -121,8 +122,9 @@ public:
 	}
 #endif
 
-	//--
+	//----
 
+	// Player
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 	SurfingPlayer surfingPlayer;
 	ofEventListener listener_Beat;
@@ -130,6 +132,24 @@ public:
 	std::vector<std::string> randomTypesPlayNames = { "Next Index", "Random Index", "Random Params" };
 	ofParameter<int> randomTypePlayIndex{ "Type", 0, 0, 2 };
 #endif
+
+	//--
+
+//	// User beat
+//private:
+//	bool bBeatBang = false;
+//public:
+//	//--------------------------------------------------------------
+//	bool isBeatBang() {
+//		if (bBeatBang) {
+//			bBeatBang = false;
+//			return true;
+//		}
+//		else {
+//			return false;
+//		}
+//	}
+//#endif
 
 	//----
 
@@ -287,13 +307,13 @@ private:
 
 private:
 
-	ofParameter<bool> bMinimize_Clicker{ "Minimize", false};
-	ofParameter<bool> bMinimize_Params{ "Minimize", false};
+	ofParameter<bool> bMinimize_Clicker{ "Minimize", false };
+	ofParameter<bool> bMinimize_Params{ "Minimize", false };
 
 private:
 
 	void draw_ImGui();
-	void draw_ImGui_EditorControl();
+	void draw_ImGui_Editor();
 
 	//-
 
@@ -394,6 +414,8 @@ public:
 	void doRefreshFilesAndRename();
 	void setPath();
 
+	bool bResetDefined = false;
+
 	//--------------------------------------------------------------
 	void setRandomizerBpm(float bpm) {
 
@@ -419,8 +441,10 @@ public:
 	//-
 
 public:
+	// Exposed to gui's
 	ofParameter<bool> bAutoSave;
 	ofParameter<bool> bNewPreset;
+	ofParameter<bool> bSave;
 
 private:
 
@@ -433,7 +457,6 @@ private:
 
 	int index_PRE = -1;
 
-	ofParameter<bool> bSave;
 	ofParameter<bool> bLoad;
 	ofParameter<bool> bSetPathPresets;
 	ofParameter<bool> bRefresh;
