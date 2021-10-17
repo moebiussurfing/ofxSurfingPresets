@@ -612,6 +612,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					//--
 
 					// Clicker Matrix
+
 					if (bGui_InnerClicker)
 					{
 						draw_ImGui_MiniClicker();
@@ -1014,6 +1015,8 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 			{
 				ImGui::Text(params_Preset.getName().c_str());
 
+				//ImGui::Checkbox("Key Ctrl", &bKeyCtrl);
+
 				guiManager.refreshLayout();
 				_w1 = getWidgetsWidth(1);
 				_w2 = getWidgetsWidth(2);
@@ -1315,6 +1318,22 @@ void ofxSurfingPresets::draw_ImGui()
 #endif
 
 }
+//--------------------------------------------------------------
+void ofxSurfingPresets::keyReleased(ofKeyEventArgs &eventArgs)
+{
+	if (!bKeys) return;
+
+	const int &key = eventArgs.key;
+	ofLogNotice(__FUNCTION__) << (char)key << " [" << key << "]";
+
+	// modifiers
+	bool mod_COMMAND = eventArgs.hasModifier(OF_KEY_COMMAND);
+	bool mod_CONTROL = eventArgs.hasModifier(OF_KEY_CONTROL);
+	bool mod_ALT = eventArgs.hasModifier(OF_KEY_ALT);
+	bool mod_SHIFT = eventArgs.hasModifier(OF_KEY_SHIFT);
+
+	if (!mod_CONTROL) bKeyCtrl = false;
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
@@ -1329,6 +1348,8 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 	bool mod_CONTROL = eventArgs.hasModifier(OF_KEY_CONTROL);
 	bool mod_ALT = eventArgs.hasModifier(OF_KEY_ALT);
 	bool mod_SHIFT = eventArgs.hasModifier(OF_KEY_SHIFT);
+
+	if(mod_CONTROL) bKeyCtrl = true;
 
 	bool debug = false;
 	if (debug)
@@ -1380,11 +1401,13 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 void ofxSurfingPresets::addKeysListeners()
 {
 	ofAddListener(ofEvents().keyPressed, this, &ofxSurfingPresets::keyPressed);
+	ofAddListener(ofEvents().keyReleased, this, &ofxSurfingPresets::keyReleased);
 }
 //--------------------------------------------------------------
 void ofxSurfingPresets::removeKeysListeners()
 {
 	ofRemoveListener(ofEvents().keyPressed, this, &ofxSurfingPresets::keyPressed);
+	ofRemoveListener(ofEvents().keyReleased, this, &ofxSurfingPresets::keyReleased);
 }
 
 //--------------------------------------------------------------
@@ -1478,40 +1501,59 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 				//-
 
-				// Autosave
+				// 1. Common Save
 
-				if (bAutoSave)
+				if (!bKeyCtrl)
 				{
-					if (dir.size() > 0 && index_PRE < dir.size())
-					{
-						filePath = getFilepathForIndexPreset(index_PRE);
-						save(filePath);
-					}
-					else { ofLogError(__FUNCTION__) << "Preset Index points an out of range file!"; }
-				}
+					// Autosave
 
-				index_PRE = index;
+					if (bAutoSave)
+					{
+						if (dir.size() > 0 && index_PRE < dir.size())
+						{
+							filePath = getFilepathForIndexPreset(index_PRE);
+							save(filePath);
+						}
+						else { ofLogError(__FUNCTION__) << "Preset Index points an out of range file!"; }
+					}
+
+					index_PRE = index;
+
+					//-
+
+					// Load
+
+					ofLogNotice(__FUNCTION__) << index.getName() + " : " << ofToString(index);
+
+					if (dir.size() > 0 && index < dir.size())
+					{
+						filePath = getFilepathForIndexPreset(index);
+						load(filePath);
+
+						//-
+
+#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+						refreshToggleNotes();
+#endif
+					}
+					else
+					{
+						ofLogError(__FUNCTION__) << "File out of range";
+					}
+				}
 
 				//-
 
-				// Load
+				//TODO:
+				// 2. Swap Save
 
-				ofLogNotice(__FUNCTION__) << index.getName() + " : " << ofToString(index);
-
-				if (dir.size() > 0 && index < dir.size())
-				{
+				else { // copy/save into clicked
 					filePath = getFilepathForIndexPreset(index);
-					load(filePath);
-
-					//-
+					save(filePath);
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					refreshToggleNotes();
 #endif
-				}
-				else
-				{
-					ofLogError(__FUNCTION__) << "File out of range";
 				}
 			}
 			else { bIsRetrigged = true; }

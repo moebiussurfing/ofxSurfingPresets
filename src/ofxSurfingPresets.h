@@ -315,6 +315,10 @@ private:
 	void draw_ImGui();
 	void draw_ImGui_Editor();
 
+public:
+
+	void draw_ImGui_ToolsWidgets();
+
 	//-
 
 private:
@@ -576,8 +580,11 @@ private:
 
 	// Keys
 	void keyPressed(ofKeyEventArgs &eventArgs);
+	void keyReleased(ofKeyEventArgs &eventArgs);
 	void addKeysListeners();
 	void removeKeysListeners();
+
+	bool bKeyCtrl = false;
 
 	//--------------------------------------------------------------
 
