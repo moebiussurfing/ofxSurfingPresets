@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 	ofSetCircleResolution(200);
+	ofSetWindowPosition(1920, 25);
 
 	// Group
 	params.setName("paramsGroup");

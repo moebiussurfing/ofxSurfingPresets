@@ -11,8 +11,8 @@ TODO:
 +	sorting: ctrl + click = copy, drag ?
 		get copy/drag preset sorting from ofxPresetsManager
 +	add multi groups
++	add kits/folders
 +	add undo engine here.
-+	save a reset preset in another folder
 
 */
 

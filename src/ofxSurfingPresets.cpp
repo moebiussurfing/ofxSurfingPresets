@@ -586,7 +586,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					// Index
 					ImGui::PushItemWidth(_w50);
-					ofxImGuiSurfing::AddParameter(index);
+					guiManager.Add(index);
+					//ofxImGuiSurfing::AddParameter(index);
 					ImGui::PopItemWidth();
 					//guiManager.Add(index, OFX_IM_SLIDER, 2);
 					//ofxImGuiSurfing::AddParameter(index);
@@ -731,25 +732,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 										ImGui::EndPopup();
 									}
 
-									if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
-									{
-										doRecallState();
-									}
-									ImGui::SameLine();
-									if (ImGui::Button("STORE", ImVec2(_w50, _h)))
-									{
-										doStoreState();
-									}
-
-									if (ImGui::Button("RESET", ImVec2(_w50, _h)))
-									{
-										doResetParams();
-									}
-									ImGui::SameLine();
-									if (ImGui::Button("RANDOM", ImVec2(_w50, _h)))
-									{
-										doRandomizeParams();
-									}
+									draw_ImGui_ToolsWidgets();
 
 									ImGui::TreePop();
 								}
@@ -1028,6 +1011,12 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 				// Minimize
 				ofxImGuiSurfing::AddToggleRoundedButton(bMinimize_Clicker);
 
+				// Play
+				if (bMinimize_Clicker)
+				{
+					guiManager.Add(surfingPlayer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				}
+
 				//----
 
 				// Clicker Matrix
@@ -1075,12 +1064,12 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 							//----
 
-							ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
-							ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
 							if (respBtnsFloatClicker)
 							{
 								guiManager.Add(amntBtnsFloatClicker, OFX_IM_STEPPER, 2);
 							}
+							ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
+							ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
 						}
 						ImGui::Unindent();
 					}
@@ -1219,11 +1208,8 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 					// Minimize
 					ofxImGuiSurfing::AddToggleRoundedButton(bMinimize_Params);
 
-					ImGuiTreeNodeFlags flagst;
-					flagst = ImGuiTreeNodeFlags_None;
-					flagst |= ImGuiTreeNodeFlags_DefaultOpen;
-
-					ofxImGuiSurfing::AddGroup(params_Preset, flagst);
+					//ofxImGuiSurfing::AddGroup(params_Preset, ImGuiTreeNodeFlags_DefaultOpen);
+					guiManager.AddGroup(params_Preset);
 
 					//-
 
@@ -1231,24 +1217,20 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 					{
 						ofxImGuiSurfing::AddSpacingSeparated();
 
-						if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
-						{
-							doRecallState();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("STORE", ImVec2(_w50, _h)))
-						{
-							doStoreState();
-						}
+						//--
 
-						if (ImGui::Button("RESET", ImVec2(_w50, _h)))
+						// Tools
+
+						ImGuiTreeNodeFlags flagst;
+						flagst = ImGuiTreeNodeFlags_None;
+						flagst |= ImGuiTreeNodeFlags_Framed;
+						//flagst |= ImGuiTreeNodeFlags_DefaultOpen;
+
+						if (ImGui::TreeNodeEx("TOOLS", flagst))
 						{
-							doResetParams();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("RANDOM", ImVec2(_w50, _h)))
-						{
-							doRandomizeParams();
+							draw_ImGui_ToolsWidgets();
+
+							ImGui::TreePop();
 						}
 
 						//-
@@ -1271,6 +1253,34 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 			}
 			ImGui::PopID();
 		}
+	}
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::draw_ImGui_ToolsWidgets()
+{
+	float _w100 = ofxImGuiSurfing::getWidgetsWidth(1);
+	float _w50 = ofxImGuiSurfing::getWidgetsWidth(2);
+	float _h = getWidgetsHeightRelative();
+
+	if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
+	{
+		doRecallState();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("STORE", ImVec2(_w50, _h)))
+	{
+		doStoreState();
+	}
+
+	if (ImGui::Button("RESET", ImVec2(_w50, _h)))
+	{
+		doResetParams();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("RANDOM", ImVec2(_w50, _h)))
+	{
+		doRandomizeParams();
 	}
 }
 
@@ -1349,7 +1359,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 	bool mod_ALT = eventArgs.hasModifier(OF_KEY_ALT);
 	bool mod_SHIFT = eventArgs.hasModifier(OF_KEY_SHIFT);
 
-	if(mod_CONTROL) bKeyCtrl = true;
+	if (mod_CONTROL) bKeyCtrl = true;
 
 	bool debug = false;
 	if (debug)
@@ -1539,8 +1549,8 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					else
 					{
 						ofLogError(__FUNCTION__) << "File out of range";
-					}
 				}
+			}
 
 				//-
 
