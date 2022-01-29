@@ -34,7 +34,7 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	// Remove params callbacks listeners
 	ofRemoveListener(params_Control.parameterChangedE(), this, &ofxSurfingPresets::Changed_Control);
 
-//#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+	//#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
 #if defined(INCLUDE__OFX_SURFING_PRESET__MIDI__) || defined(INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER)
 	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
 #endif
@@ -43,6 +43,12 @@ ofxSurfingPresets::~ofxSurfingPresets()
 
 	//TODO:
 	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
+
+	// Remote
+// Server
+#ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+	ofRemoveListener(params_Preset.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_Preset);
+#endif
 
 	exit();
 }
@@ -64,6 +70,10 @@ void ofxSurfingPresets::refreshToggleNotes()
 	}
 	if (index <= index.getMax() && index < notesIndex.size())
 		notesIndex[index].set(true);
+
+#ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+		bSyncRemote = true;
+#endif
 }
 #endif
 
@@ -335,7 +345,7 @@ void ofxSurfingPresets::startup()
 	}
 
 	//-
-	
+
 	// Remote
 	// Server
 #ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
@@ -346,6 +356,9 @@ void ofxSurfingPresets::startup()
 	params_Server.add(params_Preset); // -> The ofParams of each Preset 
 
 	remoteServer.setup(params_Server);
+
+	// listen local changes to update connected client remote app!
+	ofAddListener(params_Preset.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_Preset);
 #endif
 
 	//-
@@ -407,6 +420,17 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 		timerLast_Autosave = ofGetElapsedTimeMillis();
 		ofLogNotice(__FUNCTION__) << "Autosaved DONE";
 	}
+
+	//--
+
+#ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+	if (bSyncRemote) {
+		bSyncRemote = false;
+		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
+		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
+		remoteServer.syncParameters();
+	}
+#endif
 
 	//--
 
@@ -1566,15 +1590,16 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 						//-
 
-#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+#if defined(INCLUDE__OFX_SURFING_PRESET__MIDI__) || defined(INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER)
+//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 						refreshToggleNotes();
 #endif
 					}
 					else
 					{
 						ofLogError(__FUNCTION__) << "File out of range";
+					}
 				}
-			}
 
 				//-
 
@@ -1585,7 +1610,8 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					filePath = getFilepathForIndexPreset(index);
 					save(filePath);
 
-#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+#if defined(INCLUDE__OFX_SURFING_PRESET__MIDI__) || defined(INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER)
+//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					refreshToggleNotes();
 #endif
 				}
@@ -1675,6 +1701,21 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 			notesIndex[i] = false;
 		}
 	}
+}
+#endif
+
+#ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+//--------------------------------------------------------------
+void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter &e)
+{
+	//ofLogVerbose(__FUNCTION__);
+
+	bSyncRemote = true;
+	// update on next frame to reduce calls when multiple params changed.
+
+	//// Note that if you use the GUI the client does not update automatically. If you want the client to update
+	//// you will need to call paramServer.syncParameters() whenever a parameter does change.
+	//remoteServer.syncParameters();
 }
 #endif
 

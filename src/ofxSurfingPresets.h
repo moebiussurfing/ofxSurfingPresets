@@ -30,12 +30,12 @@ TODO:
 //--
 
 // 2. Smooth
-//#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
+#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
 
 //--
 
 // 3. Index Player
-//#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser.
+#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser.
 
 //--
 
@@ -125,6 +125,7 @@ public:
 	ofParameterGroup params_PresetToggles{ "Presets" };
 	void Changed_Params_PresetToggles(ofAbstractParameter &e);
 	void refreshToggleNotes();
+	bool bSyncRemote;
 
 	//--------------------------------------------------------------
 	ofParameterGroup & getParametersSelectorToggles() { // To select index preset using bool toggle parameters triggers!
@@ -160,6 +161,7 @@ public:
 #ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 	ofxRemoteParameters::Server remoteServer;
 	ofParameterGroup params_Server;
+	void Changed_Params_Preset(ofAbstractParameter &e);
 #endif
 
 	//----
