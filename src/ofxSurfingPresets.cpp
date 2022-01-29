@@ -72,7 +72,7 @@ void ofxSurfingPresets::refreshToggleNotes()
 		notesIndex[index].set(true);
 
 #ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
-		bSyncRemote = true;
+	bSyncRemote = true;
 #endif
 }
 #endif
@@ -656,7 +656,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					//--
 
-					// Clicker Matrix
+					// Inner (not floating) Clicker Matrix
 
 					if (bGui_InnerClicker)
 					{
@@ -880,7 +880,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 							ImGui::Indent();
 							{
 								// Keys
-								ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
+								//ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
 
 								// Smooth
 
@@ -999,7 +999,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					//-
 
 					ImGui::Spacing();
-					guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+					if (!guiManager.bMinimize) guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 				}
 				guiManager.endWindow();
 			}
@@ -1123,7 +1123,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 				//-
 
 				ImGui::Spacing();
-				guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				if (!guiManager.bMinimize) guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 			}
 			guiManager.endWindow();
 		}
@@ -1611,7 +1611,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					save(filePath);
 
 #if defined(INCLUDE__OFX_SURFING_PRESET__MIDI__) || defined(INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER)
-//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+					//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					refreshToggleNotes();
 #endif
 				}
@@ -2110,7 +2110,7 @@ bool ofxSurfingPresets::doRefreshFiles()
 	//#endif
 
 #endif
-}
+	}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRefreshFilesAndRename()
