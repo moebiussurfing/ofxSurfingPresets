@@ -21,24 +21,55 @@ TODO:
 
 // OPTIONAL
 
-// MIDI -> Two Alternatives. (One or none)
+//--
+
+// 1. MIDI -> Optional. Two Alternatives. (Uncomment One or none)
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS // A -> Recommended
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC // B -> WIP
 
-#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
-#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser.
+//--
+
+// 2. Smooth
+//#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
+
+//--
+
+// 3. Index Player
+//#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser.
+
+//--
+
+// 4. Remote
+// Server using ofxRemoteParameters
+// ->This will serve all the parameters to be controlled by a Flutter based remote app,
+// like on your mobile device.Powered by RemoteRemote and ofxRemoteParamaters tools by c-mendoza.
+#define INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 
 //--------------------------------------
 
+
+// Midi
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 #include "ofxSurfingMidi.h"
 #define INCLUDE__OFX_SURFING_PRESET__MIDI__
 #endif
+
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 #include "ofxMidiParams.h"
 #define INCLUDE__OFX_SURFING_PRESET__MIDI__
 #endif
+
+//-
+
+// Remote Server
+
+#ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+#include "ofxRemoteParameters/Server.h"
+#endif
+
+//----
+
 
 #include "ofxSurfingHelpers.h"
 #include "ofxSurfingImGui.h"
@@ -49,7 +80,7 @@ TODO:
 
 #define NUM_KEY_COMMANDS 19
 
-//-
+//----
 
 class ofxSurfingPresets
 {
@@ -85,7 +116,8 @@ public:
 
 	//--
 
-#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+//#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+#if defined(INCLUDE__OFX_SURFING_PRESET__MIDI__) || defined(INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER)
 
 public:
 
@@ -119,7 +151,15 @@ public:
 //#endif
 
 		return params_PresetToggles;
-	}
+}
+#endif
+
+	//----
+
+	// Server
+#ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+	ofxRemoteParameters::Server remoteServer;
+	ofParameterGroup params_Server;
 #endif
 
 	//----
@@ -132,6 +172,8 @@ public:
 	std::vector<std::string> randomTypesPlayNames = { "Next Index", "Random Index", "Random Params" };
 	ofParameter<int> randomTypePlayIndex{ "Type", 0, 0, 2 };
 #endif
+
+	//--
 
 	//--
 
@@ -332,7 +374,7 @@ private:
 
 	//----
 
-	// Api
+	// API
 
 public:
 
@@ -387,6 +429,10 @@ public:
 
 public:
 
+	void save(std::string path);
+	void load(int _index);
+	void load(std::string path);
+
 	void doSaveCurrent();
 	//--------------------------------------------------------------
 	void saveCurrentPreset(int i = -1) { // Legacy api
@@ -400,9 +446,6 @@ public:
 
 	void doLoadNext();
 	void doLoadPrevious();
-	void load(int _index);
-	void load(std::string path);
-	void save(std::string path);
 	void doStoreState();
 	void doRecallState();
 	void doNewPreset();
@@ -416,6 +459,7 @@ public:
 	void doRandomizeIndex();
 	bool doRefreshFiles();
 	void doRefreshFilesAndRename();
+
 	void setPath();
 
 	bool bResetDefined = false;
@@ -450,6 +494,8 @@ public:
 	ofParameter<bool> bNewPreset;
 	ofParameter<bool> bSave;
 
+	ofParameter<bool> bGui_InnerClicker;
+
 private:
 
 	// Gui Params
@@ -465,7 +511,6 @@ private:
 	ofParameter<bool> bSetPathPresets;
 	ofParameter<bool> bRefresh;
 	ofParameter<bool> bDebug;
-	ofParameter<bool> bGui_InnerClicker;
 	//ofParameter<bool> bShowControl;
 	ofParameter<int> index;
 
@@ -523,11 +568,17 @@ private:
 
 public:
 
-	// Exposed public to use on external gui's
+	// Exposed public to use on external Gui's
 	ofParameter<bool> bGui;
 	ofParameter<bool> bGui_Editor;
 	ofParameter<bool> bGui_FloatingClicker;
 	ofParameter<bool> bGui_Parameters;
+
+	//--------------------------------------------------------------
+	void setClickerAmount(int num) {
+		amntBtnsFloatClicker = num;
+		amntBtns = num;
+	}
 
 private:
 
@@ -809,6 +860,45 @@ public:
 	void updateSmoothParam(ofAbstractParameter& aparam);
 	// To allow recursive group levels using a funtion to each param
 
+#endif
+
+#ifndef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
+
+public:
+	//--------------------------------------------------------------
+	float get(ofParameter<float> &e) { // Gets raw value for passed param. Will use his name and search into param group.
+		std::string name = e.getName();
+
+		{
+			auto &p = params_Preset.get(name); // Raw
+			if (p.type() == typeid(ofParameter<float>).name())
+			{
+				return p.cast<float>().get();
+			}
+			else
+			{
+				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
+				return -1;
+			}
+		}
+	}
+
+	//--------------------------------------------------------------
+	int get(ofParameter<int> &e) { // Gets raw value for passed param. Will use his name and search into param group.
+		std::string name = e.getName();
+		{
+			auto &p = params_Preset.get(name); // Raw
+			if (p.type() == typeid(ofParameter<int>).name())
+			{
+				return p.cast<int>().get();
+			}
+			else
+			{
+				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
+				return -1;
+			}
+		}
+	}
 #endif
 
 };
