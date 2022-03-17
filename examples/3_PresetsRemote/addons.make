@@ -1,6 +1,6 @@
 ofxGui
-ofxOsc
 ofxImGui
+ofxOsc
 ofxRemoteParameters
 ofxScaleDragRect
 ofxSurfingHelpers
