@@ -43,7 +43,7 @@ TODO:
 // Server using ofxRemoteParameters
 // ->This will serve all the parameters to be controlled by a Flutter based remote app,
 // like on your mobile device.Powered by RemoteRemote and ofxRemoteParamaters tools by c-mendoza.
-#define INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+//#define INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 
 //--------------------------------------
 
