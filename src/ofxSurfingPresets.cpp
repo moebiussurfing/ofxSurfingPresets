@@ -90,7 +90,10 @@ void ofxSurfingPresets::setup()
 
 	bGui.set("SURFING PRESETS", true);
 	bGui_Editor.set("Editor", true);
-	//bGui_Editor.set("Presets Editor", true);
+	bGui_InnerClicker.set("Inner Clicker", false);
+	bGui_FloatingClicker.set("Clicker", true);
+	bGui_Parameters.set("Parameters", false);
+	
 	bCycled.set("Cycled", true);
 	bAutoSave.set("AutoSave", true);
 	bAutoSaveTimer.set("AutoSave Timed", false);
@@ -100,19 +103,19 @@ void ofxSurfingPresets::setup()
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 	index.set("Preset Index", 0, 0, 0);
-	bGui_InnerClicker.set("Inner Clicker", false);
-	bGui_FloatingClicker.set("Clicker", true);
-	//bGui_FloatingClicker.set("Float Clicker", true);
-	bGui_Parameters.set("Parameters", false);
-	MODE_Active.set("Active", true);
+
+	bMODE_Active.set("Active", true);
 	bDebug.set("Debug", true);
 	bKeys.set("Keys", true);
+	bKeySpace.set("Key Space", true);
 	//bShowControl.set("Main Panel", true);
 	//bHelp.set("HELP", false);	
 	//MODE_App.set("APP MODE", 0, 0, NUM_MODES_APP - 1);
 	//MODE_App_Name.set("", "");
 	//MODE_App_Name.setSerializable(false);
 	//ENABLE_Debug.set("DEBUG", true);
+
+	//-
 
 	params_Control.clear();
 	params_Control.setName("PRESETS CONTROL");
@@ -149,14 +152,14 @@ void ofxSurfingPresets::setup()
 	params_AppSettings.add(bKeys);
 	//params_AppSettings.add(bMinimize_Clicker);
 	params_AppSettings.add(bMinimize_Params);
-	params_AppSettings.add(MODE_Active);
+	params_AppSettings.add(bMODE_Active);
 	params_AppSettings.add(index);
 	//params_AppSettings.add(bShowControl);
 	//params_AppSettings.add(guiManager.bAutoResize);
 	//params_AppSettings.add(guiManager.bExtra);
 	//params_AppSettings.add(guiManager.bMinimize);
 
-	//-
+	//--
 
 	// MIDI
 #ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
@@ -167,6 +170,8 @@ void ofxSurfingPresets::setup()
 #ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
 	params_AppSettings.add(params_SmoothControl);
 #endif
+
+	//--
 
 	// Player
 
@@ -222,7 +227,7 @@ void ofxSurfingPresets::setup()
 	bLoad.setSerializable(false);
 	bSetPathPresets.setSerializable(false);
 	bRefresh.setSerializable(false);
-	MODE_Active.setSerializable(false);
+	bMODE_Active.setSerializable(false);
 
 	//-
 
@@ -231,8 +236,7 @@ void ofxSurfingPresets::setup()
 	params.setName("ALL PARAMS");
 	params.add(params_Control);
 	params.add(params_AppSettings);
-
-
+	
 	//--
 
 	// Gui
@@ -241,7 +245,10 @@ void ofxSurfingPresets::setup()
 
 	guiManager.setup(IM_GUI_MODE_INSTANTIATED);
 
-	//-
+	// linked to be exposed public. could be useful in some situations.
+	bMinimize.makeReferenceTo(guiManager.bMinimize);
+
+	//--
 
 	// Files
 	doRefreshFiles();
@@ -370,7 +377,7 @@ void ofxSurfingPresets::startup()
 	// Settings
 	ofxSurfingHelpers::loadGroup(params_AppSettings, path_Global + path_Params_Control);
 
-	MODE_Active = true;
+	bMODE_Active = true;
 
 	// Path for settings
 	ofxSurfingHelpers::CheckFolder(path_Global);
@@ -1071,6 +1078,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 					ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
 				}
 
+				// Toggles to show Panels
 				if (!bMinimize_Clicker)
 				{
 					// Parameters
@@ -1142,8 +1150,10 @@ void ofxSurfingPresets::draw_ImGui_MiniClicker() {
 	if (ImGui::TreeNodeEx("PRESETS", _flagt))
 	{
 		ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns, true, WIDGETS_HEIGHT / 2);
+		
 		//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
-
+		guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+		
 		ImGui::TreePop();
 	}
 }
@@ -1430,7 +1440,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 		doLoadNext();
 	}
 	if (key == ' ') {
-		doLoadNext();
+		if(bKeySpace) doLoadNext();
 	}
 	else if (key == OF_KEY_RETURN) {
 		doSaveCurrent();
@@ -1484,7 +1494,7 @@ void ofxSurfingPresets::setActive(bool b)
 {
 	// disables all keys and mouse interaction listeners from the addon
 
-	MODE_Active = b;
+	bMODE_Active = b;
 
 	if (!b)
 	{
@@ -1645,9 +1655,9 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		{
 			setPath();
 		}
-		if (name == MODE_Active.getName())
+		if (name == bMODE_Active.getName())
 		{
-			setActive(MODE_Active);
+			setActive(bMODE_Active);
 		}
 		if (name == bGui_Editor.getName())
 		{

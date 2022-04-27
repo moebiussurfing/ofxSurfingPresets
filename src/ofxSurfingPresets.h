@@ -30,12 +30,12 @@ TODO:
 //--
 
 // 2. Smooth
-#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple smoothing.
+#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple core smoothing.
 
 //--
 
 // 3. Index Player
-#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser.
+//#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser add-on.
 
 //--
 
@@ -84,15 +84,23 @@ TODO:
 
 class ofxSurfingPresets
 {
-private:
-
-#define AMOUNT_KIT_SIZE_DEFAULT 9 // Default common amount presets but can be resized
-
 	//----
 
 public:
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
+
+	//--
+
+private:
+	// Default common amount presetsManager but can be resized
+#define AMOUNT_KIT_SIZE_DEFAULT_ 9
+	int AMOUNT_KIT_SIZE_DEFAULT = AMOUNT_KIT_SIZE_DEFAULT_;
+
+public:
+	void setMaxPresetsAmount(int amt) {//must be called first! before adding groups (who calls setup)
+		AMOUNT_KIT_SIZE_DEFAULT = amt;
+	}
 
 	//--
 
@@ -341,7 +349,7 @@ public:
 	void draw_ImGui_Parameters();
 
 	// Inner clicker layout
-	void draw_ImGui_MiniClicker();
+	void draw_ImGui_MiniClicker();//inner clicker to fast integrate clicker to an external ImGui panel windows.
 
 private:
 
@@ -349,10 +357,11 @@ private:
 	ofParameter<bool> respBtns{ "Responsive", true };
 	ofParameterGroup params_InnerClicker;
 
-private:
-
+public:
 	ofParameter<bool> bMinimize_Clicker{ "Minimize", false };
-	ofParameter<bool> bMinimize_Params{ "Minimize", false };
+
+private:
+	ofParameter<bool> bMinimize_Params{ "Minimize", true };
 
 private:
 
@@ -373,6 +382,9 @@ private:
 
 	// Preset Params
 	ofParameterGroup params_Preset{ "-1" }; //-> The params that we are storing into each preset file.
+
+public:
+	ofParameter<bool> bMinimize{ "Minimize", true }; // to to mirror the gui manager internal bool and made it public.
 
 	//----
 
@@ -526,6 +538,9 @@ public:
 	void setGuiVisible(bool b);
 	void setGuiVisibleToggle() { bGui = !bGui; }
 	void setLogLevel(ofLogLevel level);
+	void setEnableKeySpace(bool b) {
+		bKeySpace = b;
+	};
 
 	//--------------------------------------------------------------
 	void setModeAutoSave(bool b) { setAutoSave(b); }; // Legacy Api
@@ -577,16 +592,17 @@ public:
 	ofParameter<bool> bGui_Parameters;
 
 	//--------------------------------------------------------------
-	void setClickerAmount(int num) {
+	void setClickerAmount(int num) {//amount of preset buttons per row
 		amntBtnsFloatClicker = num;
 		amntBtns = num;
 	}
 
 private:
 
-	ofParameter<bool> MODE_Active;
+	ofParameter<bool> bMODE_Active;
 	ofParameter<bool> ENABLE_Debug;
 	ofParameter<bool> bKeys;
+	ofParameter<bool> bKeySpace;
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> bHelp;
 	//ofParameter<int> MODE_App;
@@ -708,8 +724,8 @@ private:
 			// Draw()
 			static float _size1;
 			static int _size2;
-			_size1 = presets.get(size1);
-			_size2 = presets.get(size2);
+			_size1 = presetsManager.get(size1);
+			_size2 = presetsManager.get(size2);
 		*/
 
 		if (isFloat) {

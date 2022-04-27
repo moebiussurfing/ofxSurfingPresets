@@ -3,7 +3,6 @@ ofxImGui
 ofxMidi
 ofxMidiParams
 ofxParameterMidiSync
-ofxScaleDragRect
 ofxSurfingHelpers
 ofxSurfingImGui
 ofxSurfingPlayer

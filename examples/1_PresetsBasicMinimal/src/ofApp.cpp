@@ -12,7 +12,7 @@ void ofApp::setup() {
 	params.add(rotation2.set("rotation2", 180, 0, 360));
 	params.add(indexColor.set("indexColor", 0, 0, 2));
 
-	presetsManager.addGroup(params);
+	presets.addGroup(params);
 }
 
 //--------------------------------------------------------------
@@ -25,14 +25,14 @@ void ofApp::draw()
 {
 	drawScene();
 
-	presetsManager.draw();
+	presets.draw();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
 	if (key == OF_KEY_F1) {
-		presetsManager.setGuiVisibleToggle();
+		presets.setGuiVisibleToggle();
 	}
 }
 
@@ -40,7 +40,6 @@ void ofApp::keyPressed(int key)
 void ofApp::drawScene()
 {
 	// The final variables to apply to draw the below Scene.
-
 	// Notice that: 
 	// If declared here, they must be static to mantain the previous frame setted values!
 	static float _size1;
@@ -49,11 +48,6 @@ void ofApp::drawScene()
 	static float _rotation2;
 
 	//-
-	
-	// These above variables are kind of aux variables 
-	// and they are not required if you are not using the smoothing feature!
-	// You can use the params variables (the ones added to the preset manager) directly:
-	// size1, size2, rotation1, rotation2
 
 	//// A. No smooth. Raw values.
 	//_size1 = size1;
@@ -61,19 +55,15 @@ void ofApp::drawScene()
 	//_rotation1 = rotation1;
 	//_rotation2 = rotation2;
 
-	//-
-
 	// B. Addon Smoother
-	// Will smooth the variations of the variables.
-	// Can be adjusted on the gui.
-	_size1 = presetsManager.get(size1);
-	_size2 = presetsManager.get(size2);
-	_rotation1 = presetsManager.get(rotation1);
-	_rotation2 = presetsManager.get(rotation2);
+	_size1 = presets.get(size1);
+	_size2 = presets.get(size2);
+	_rotation1 = presets.get(rotation1);
+	_rotation2 = presets.get(rotation2);
 
 	//-
 
-	// Some preprocess
+	// Preprocess
 	_size1 += 0.2;
 	float _scale2 = _size1 / 5.f;
 	int _rSz = _size2 + (ofGetHeight() * _scale2);
@@ -101,7 +91,7 @@ void ofApp::drawScene()
 
 	//--
 
-	// Draw the Scene
+	// Draw
 
 	ofClear(_colorBg);
 

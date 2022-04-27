@@ -13,7 +13,7 @@ public:
 		void drawScene();
 		void keyPressed(int key);
 
-		ofxSurfingPresets presetsManager;
+		ofxSurfingPresets presets;
 
 		//-
 

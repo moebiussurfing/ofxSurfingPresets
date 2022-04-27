@@ -2,7 +2,6 @@ ofxGui
 ofxImGui
 ofxOsc
 ofxRemoteParameters
-ofxScaleDragRect
 ofxSurfingHelpers
 ofxSurfingImGui
 ofxSurfingPlayer
