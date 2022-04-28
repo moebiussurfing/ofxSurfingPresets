@@ -103,7 +103,7 @@ void ofxSurfingPresets::setup()
 	bGui_InnerClicker.set("Inner Clicker", false);
 	bGui_FloatingClicker.set("Clicker", true);
 	bGui_Parameters.set("Parameters", false);
-	
+
 	bCycled.set("Cycled", true);
 	bAutoSave.set("AutoSave", true);
 	bAutoSaveTimer.set("AutoSave Timed", false);
@@ -115,11 +115,11 @@ void ofxSurfingPresets::setup()
 
 	index.set("Preset Index", 0, 0, 0);
 
-	bMODE_Active.set("Active", true);
 	bDebug.set("Debug", true);
 	bKeys.set("Keys", true);
 	bKeySpace.set("Key Space", true);
 	bKeysArrows.set("Keys Arrows", true);
+	//bMODE_Active.set("Active", true);
 	//bShowControl.set("Main Panel", true);
 	//bHelp.set("HELP", false);	
 	//MODE_App.set("APP MODE", 0, 0, NUM_MODES_APP - 1);
@@ -163,8 +163,8 @@ void ofxSurfingPresets::setup()
 	params_AppSettings.add(bCycled);
 	params_AppSettings.add(bKeys);
 	params_AppSettings.add(bMinimize_Params);
-	params_AppSettings.add(bMODE_Active);
 	params_AppSettings.add(index);
+	//params_AppSettings.add(bMODE_Active);
 	//params_AppSettings.add(bMinimize_Clicker);
 	//params_AppSettings.add(bShowControl);
 	//params_AppSettings.add(guiManager.bAutoResize);
@@ -239,7 +239,7 @@ void ofxSurfingPresets::setup()
 	bLoad.setSerializable(false);
 	bSetPathPresets.setSerializable(false);
 	bRefresh.setSerializable(false);
-	bMODE_Active.setSerializable(false);
+	//bMODE_Active.setSerializable(false);
 
 	//-
 
@@ -248,7 +248,7 @@ void ofxSurfingPresets::setup()
 	params.setName("ALL PARAMS");
 	params.add(params_Control);
 	params.add(params_AppSettings);
-	
+
 	//--
 
 	// Gui
@@ -389,7 +389,7 @@ void ofxSurfingPresets::startup()
 	// Settings
 	ofxSurfingHelpers::loadGroup(params_AppSettings, path_Global + path_Params_Control);
 
-	bMODE_Active = true;
+	//bMODE_Active = true;
 
 	// Path for settings
 	ofxSurfingHelpers::CheckFolder(path_Global);
@@ -1044,6 +1044,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 		float _h = WIDGETS_HEIGHT;
 
 		// 3. Floating Clicker
+
 		ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
 		if (bAutoResizeFloatClicker) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 
@@ -1091,7 +1092,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 					ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommands, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
 					//ofxImGuiSurfing::AddMatrixClickerLabels(index, (char *) keyCommands, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
-					
+
 					//ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
 				}
 
@@ -1167,11 +1168,11 @@ void ofxSurfingPresets::draw_ImGui_MiniClicker() {
 	if (ImGui::TreeNodeEx("PRESETS", _flagt))
 	{
 		guiManager.refreshLayout();
-		
+
 		// Index
 		guiManager.Add(index, OFX_IM_HSLIDER_SMALL_NO_LABELS);
 		//ofxImGuiSurfing::AddParameter(index);
-		
+
 		ImGui::Spacing();
 
 		// Clicker
@@ -1181,7 +1182,7 @@ void ofxSurfingPresets::draw_ImGui_MiniClicker() {
 		// Editor window
 		guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 		//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
-		
+
 		ImGui::TreePop();
 	}
 }
@@ -1429,6 +1430,7 @@ void ofxSurfingPresets::keyReleased(ofKeyEventArgs &eventArgs)
 	bool mod_SHIFT = eventArgs.hasModifier(OF_KEY_SHIFT);
 
 	if (!mod_CONTROL) bKeyCtrl = false;
+	if (!mod_ALT) bKeyAlt = false;
 }
 
 //--------------------------------------------------------------
@@ -1446,8 +1448,9 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 	bool mod_SHIFT = eventArgs.hasModifier(OF_KEY_SHIFT);
 
 	if (mod_CONTROL) bKeyCtrl = true;
+	if (mod_ALT) bKeyAlt = true;
 
-	bool debug = false;
+	bool debug = 0;
 	if (debug)
 	{
 		ofLogNotice(__FUNCTION__) << "mod_COMMAND: " << (mod_COMMAND ? "ON" : "OFF");
@@ -1463,13 +1466,13 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 	}
 
 	else if (key == OF_KEY_LEFT) {
-		if(bKeysArrows) doLoadPrevious();
+		if (bKeysArrows) doLoadPrevious();
 	}
 	else if (key == OF_KEY_RIGHT) {
 		if (bKeysArrows) doLoadNext();
 	}
 	if (key == ' ') {
-		if(bKeySpace) doLoadNext();
+		if (bKeySpace) doLoadNext();
 	}
 	else if (key == OF_KEY_BACKSPACE) {
 		doRandomizeParams();
@@ -1492,13 +1495,13 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 				return;
 			}
 		}
-		//for (int i = 0; i < NUM_KEY_COMMANDS; i++) {
-		//	if (key == keyCommands[i]) {
-		//		load(i);
-		//		//continue;
-		//		return;
-		//	}
-		//}
+	//for (int i = 0; i < NUM_KEY_COMMANDS; i++) {
+	//	if (key == keyCommands[i]) {
+	//		load(i);
+	//		//continue;
+	//		return;
+	//	}
+	//}
 }
 
 //--------------------------------------------------------------
@@ -1531,7 +1534,7 @@ void ofxSurfingPresets::setActive(bool b)
 {
 	// disables all keys and mouse interaction listeners from the addon
 
-	bMODE_Active = b;
+	//bMODE_Active = b;
 
 	if (!b)
 	{
@@ -1596,19 +1599,25 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 		if (name == index.getName())
 		{
-			index = ofClamp(index.get(), index.getMin(), index.getMax()); // clamp inside dir
+			index = ofClamp(index.get(), index.getMin(), index.getMax()); // clamp inside dir files amount limits
 
-			// Changed 
+			// Changed?
 
 			if (index.get() != index_PRE)
 			{
-				ofLogNotice(__FUNCTION__) << "Changed \n\nPreset Index : " << ofToString(index_PRE) << " > " << ofToString(index) << "\n";
+				if (index_PRE != -1)
+				{
+					ofLogNotice(__FUNCTION__) << "\n\n  Changed \n  Preset Index : "
+						<< ofToString(index_PRE) << " > " << ofToString(index)
+						<< "      " << ofToString(keyCommands[index_PRE]) << " > " << ofToString(keyCommands[index])
+						<< "\n";
+				}
 
-				//-
+				//--
 
-				// 1. Common Save
+				// 1. Common Load but AutoSave
 
-				if (!bKeyCtrl)
+				if (!bKeyCtrl && !bKeyAlt) // Ctrl nor Alt not pressed
 				{
 					// Autosave
 
@@ -1624,8 +1633,8 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 					index_PRE = index;
 
-					//-
-
+					//--
+					
 					// Load
 
 					ofLogNotice(__FUNCTION__) << index.getName() + " : " << ofToString(index);
@@ -1648,12 +1657,15 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					}
 				}
 
-				//-
+				//--
 
-				//TODO:
-				// 2. Swap Save
+				// 2. Save / Copy
 
-				else { // copy/save into clicked
+				// Save to clicked preset index
+				// Ctrl pressed. Alt not pressed
+
+				else if (bKeyCtrl && !bKeyAlt)
+				{
 					filePath = getFilepathForIndexPreset(index);
 					save(filePath);
 
@@ -1661,9 +1673,44 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					refreshToggleNotes();
 #endif
+					ofLogNotice(__FUNCTION__) << "PRESET COPY!";
+				}
+
+				//--
+
+				//TODO:
+
+				// 3. Swap
+
+				// (from/to) pre/current index
+				// Ctrl not pressed. Alt pressed
+
+				else if (!bKeyCtrl && bKeyAlt)
+				{
+					// rename target to source
+					string _fFrom = getFilepathForIndexPreset(index_PRE);
+					string _fTo = getFilepathForIndexPreset(index);
+					ofFile f;
+
+					f.open(_fTo);
+					f.renameTo(_fFrom);
+
+					// Save current to
+					save(_fTo);
+
+					ofLogNotice(__FUNCTION__) << "PRESET SWAP!";
+					ofLogNotice(__FUNCTION__) << _fFrom << " > " << _fTo;
 				}
 			}
-			else { bIsRetrigged = true; }
+
+			//--
+
+			// Index not changed, 
+			// but we flag it happens to catch a retrig. sometimes useful	
+			else
+			{
+				bIsRetrigged = true;
+			}
 		}
 
 		//--
@@ -1692,10 +1739,13 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		{
 			setPath();
 		}
-		if (name == bMODE_Active.getName())
-		{
-			setActive(bMODE_Active);
-		}
+
+		// workflow
+
+		//if (name == bMODE_Active.getName())
+		//{
+		//	setActive(bMODE_Active);
+		//}
 		if (name == bGui_Editor.getName())
 		{
 			if (bGui_Editor)
@@ -1703,7 +1753,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 				if (!bGui) bGui = true;
 			}
 		}
-		if (name == bGui.getName()) // workflow
+		if (name == bGui.getName())
 		{
 			if (!bGui_Editor && !bGui_FloatingClicker)
 			{
@@ -1862,7 +1912,7 @@ void ofxSurfingPresets::save(std::string path)
 	ofLogVerbose(__FUNCTION__) << "DONE_save";
 	DONE_save = true;
 
-	//simple callback
+	// Simple callback
 	bIsDoneSave = true;
 }
 
@@ -1917,7 +1967,7 @@ void ofxSurfingPresets::doNewPreset()
 #endif
 
 		//doRecreateMidi();
-	}
+}
 #endif
 }
 
@@ -2157,12 +2207,11 @@ bool ofxSurfingPresets::doRefreshFiles()
 	//#endif
 
 #endif
-	}
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRefreshFilesAndRename()
 {
-	// Load dragged images folder
 	ofLogNotice(__FUNCTION__) << "list files " << path_Presets;
 
 	// Dir
@@ -2309,7 +2358,8 @@ void ofxSurfingPresets::doRandomizeParams() {
 		}
 	}
 
-	bMustTrig = true;
+	//bMustTrig = true;
+	bIsRetrigged = true;
 }
 
 //--------------------------------------------------------------
@@ -2334,5 +2384,6 @@ void ofxSurfingPresets::doResetParams() {
 		}
 	}
 
-	bMustTrig = true;
+	//bMustTrig = true;
+	bIsRetrigged = true;
 }

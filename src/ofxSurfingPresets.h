@@ -185,8 +185,7 @@ public:
 
 	//--
 
-	//--
-
+	//TODO:
 //	// User beat
 //private:
 //	bool bBeatBang = false;
@@ -206,31 +205,14 @@ public:
 	//----
 
 	// Easy callbacks
-	// To retrig when preset index not changed but is clicked again.
 
-public:
-
-	//--------------------------------------------------------------
-	bool isRetrigged()
-	{
-		if (bIsRetrigged)
-		{
-			bIsRetrigged = false;
-			return true;
-		}
-		else return false;
-	}
-
-private:
-
-	bool bIsRetrigged = false;
-
-	//----
+	//--
 
 	// A. Easy callbacks
-	// Loaded / saved
-	// To faster ofApp integration 
-	// To check in update() as callback
+
+	// Loaded / Saved
+	// To faster ofApp integration. 
+	// To check in update() as simple callback.
 
 public:
 
@@ -268,9 +250,10 @@ private:
 
 	bool bIsDoneSave = false;
 
-	//--
+	//----
 
 	// B. Better Callbacks
+
 	// Loaded / saved
 	// To get (from ofApp) when it happens
 public:
@@ -279,7 +262,8 @@ public:
 
 	//--
 
-	// C. Easy trig-callback
+	// C. Easy ReTrig - callback
+
 	// Used to get alerted when preset has not changed but we like to retrig something
 	// In some situation we would like this feature:
 	// 1. User clicked a preset box
@@ -287,33 +271,75 @@ public:
 	// 3. No need to reload the file settings
 	// 4. But we want to use the user box click to trig something
 
-private:
+//private:
+//
+//	bool bMustTrig = false;
+//
+//public:
+//
+//	//--------------------------------------------------------------
+//
+//	// Trig on select preset or not. 
+//	// this is useful when preset selected not changed, 
+//	// but we want to retrig current preset settings
+//	bool isMustTrig()
+//	{
+//		if (bMustTrig)
+//		{
+//			bMustTrig = false;
+//			return true;
+//		}
+//		else
+//		{
+//			return false;
+//		}
+//	}
 
-	bool bMustTrig = false;
+	// To retrig when preset index not changed but is clicked again.
+	// In some scenarios we will want to trig again some method,
+	// ie: when trigging video loops that are currently playing but we want to restart from the begining.
 
 public:
 
 	//--------------------------------------------------------------
-	bool isMustTrig() // Trig on select preset or not. this is useful when preset selected not changed, but we want to retrig current preset settings
+	bool isRetrigged()
 	{
-		if (bMustTrig)
+		if (bIsRetrigged)
 		{
-			bMustTrig = false;
+			bIsRetrigged = false;
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+		else return false;
 	}
+
+private:
+
+	bool bIsRetrigged = false;
 
 	//----
 
-public:
-
 	// These methods allows to customize key commands assignments to trig the presets selector.
 
+private:
+
 #define NUM_KEY_COMMANDS 36
+
+	// This is the sorted map of keys:
+	// We will select the starting key, then will follow next ones to assign to next preset index command!
+	// Then we avoid to collide keycommands when using multiple presets manager instances 
+	// or when colliding with other add-ons.
+
+	char keysFullMap[NUM_KEY_COMMANDS] = { // predefined picked keys to assign commands
+	'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+	'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+	'z', 'x', 'c', 'v', 'b', 'n', 'm' };
+
+	int keyFirstPos = -1;
+	char keyFirstChar = '0';
+	vector<char> keyCommands;
+
+public:
 
 	//--------------------------------------------------------------
 	void setKeyFirstChar(char kChar)//Customizable keys to avoid collide when using multiple presets manager instances!
@@ -338,7 +364,7 @@ public:
 	}
 
 private:
-	
+
 	//--------------------------------------------------------------
 	void setKeyFirstPos(int kPos)
 	{
@@ -361,22 +387,6 @@ private:
 		return pos;
 	}
 
-private:
-
-	int keyFirstPos = -1;
-	char keyFirstChar = '0';
-	vector<char> keyCommands;
-
-	char keysFullMap[NUM_KEY_COMMANDS] = { // predefined picked keys to assign commands
-	'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
-	'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
-	'z', 'x', 'c', 'v', 'b', 'n', 'm' };
-
-	//char _keyCommands[_NUM_KEY_COMMANDS] = {
-	//	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-	//	'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' };
-
 	//--
 
 private:
@@ -384,13 +394,6 @@ private:
 	bool bAutoDraw; // Must be false when multiple ImGui instances created!
 
 public:
-
-	// Required to set to false when only one ImGui instance is created. 
-	// By default is setted to ImGui multi instances
-	//--------------------------------------------------------------
-	void setImGuiAutodraw(bool b) {
-		bAutoDraw = b;
-	}
 
 	void setup();
 
@@ -414,6 +417,14 @@ public:
 
 	// Inner clicker layout
 	void draw_ImGui_MiniClicker();//inner clicker to fast integrate clicker to an external ImGui panel windows.
+
+	// TODO: REMOVE. This is deprecated!
+	// Required to set to false when only one ImGui instance is created. 
+	// By default is setted to ImGui multi instances
+	//--------------------------------------------------------------
+	void setImGuiAutodraw(bool b) {
+		bAutoDraw = b;
+	}
 
 private:
 
@@ -607,7 +618,7 @@ public:
 	void setEnableKeySpace(bool b) {
 		bKeySpace = b;
 	};
-	
+
 	//--------------------------------------------------------------
 	void setEnableKeysArrows(bool b) {
 		bKeysArrows = b;
@@ -674,7 +685,7 @@ public:
 
 private:
 
-	ofParameter<bool> bMODE_Active;
+	//ofParameter<bool> bMODE_Active;
 	ofParameter<bool> bKeySpace;
 	ofParameter<bool> bKeysArrows;
 
@@ -729,6 +740,7 @@ private:
 	void removeKeysListeners();
 
 	bool bKeyCtrl = false;
+	bool bKeyAlt = false;
 
 	//--------------------------------------------------------------
 
@@ -990,7 +1002,7 @@ public:
 				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
 				return -1;
 			}
-		}
+}
 	}
 #endif
 
