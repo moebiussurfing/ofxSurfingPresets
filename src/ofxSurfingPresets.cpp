@@ -41,8 +41,8 @@ ofxSurfingPresets::~ofxSurfingPresets()
 
 	ofxSurfingHelpers::saveGroup(params_AppSettings, path_Global + path_Params_Control);
 
-	//TODO:
-	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
+	////TODO:
+	//ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	// Remote
 // Server
@@ -1149,10 +1149,20 @@ void ofxSurfingPresets::draw_ImGui_MiniClicker() {
 
 	if (ImGui::TreeNodeEx("PRESETS", _flagt))
 	{
+		guiManager.refreshLayout();
+		
+		// Index
+		guiManager.Add(index, OFX_IM_HSLIDER_SMALL_NO_NAME);
+		//ofxImGuiSurfing::AddParameter(index);
+		
+		ImGui::Spacing();
+
+		// Clicker
 		ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns, true, WIDGETS_HEIGHT / 2);
 		
-		//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
+		// Editor window
 		guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+		//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 		
 		ImGui::TreePop();
 	}
@@ -1481,6 +1491,7 @@ void ofxSurfingPresets::removeKeysListeners()
 //--------------------------------------------------------------
 void ofxSurfingPresets::exit()
 {
+	doSaveCurrent();
 }
 
 //--------------------------------------------------------------
