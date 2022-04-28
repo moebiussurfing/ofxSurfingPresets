@@ -78,7 +78,7 @@ TODO:
 #include "ofxSurfingPlayer.h"
 #endif
 
-#define NUM_KEY_COMMANDS 19
+//#define _NUM_KEY_COMMANDS 19
 
 //----
 
@@ -160,7 +160,7 @@ public:
 //#endif
 
 		return params_PresetToggles;
-}
+	}
 #endif
 
 	//----
@@ -309,11 +309,75 @@ public:
 
 	//----
 
+public:
+
+	// These methods allows to customize key commands assignments to trig the presets selector.
+
+#define NUM_KEY_COMMANDS 36
+
+	//--------------------------------------------------------------
+	void setKeyFirstChar(char kChar)//Customizable keys to avoid collide when using multiple presets manager instances!
+	{
+		int p = getKeyCommandPosition(kChar);
+		if (p == -1)
+		{
+			ofLogError(__FUNCTION__) << "Can't found key: " << kChar;
+		}
+		else
+		{
+			ofLogNotice(__FUNCTION__) << "Set key first command (to correlative keys starting) at key: " << kChar;
+
+			setKeyFirstPos(p);
+
+			keyCommands.clear();
+			for (size_t i = p; i < NUM_KEY_COMMANDS; i++)
+			{
+				keyCommands.push_back(keysFullMap[i]);
+			}
+		}
+	}
+
+private:
+	
+	//--------------------------------------------------------------
+	void setKeyFirstPos(int kPos)
+	{
+		ofLogNotice(__FUNCTION__) << "Set key first position at index: " << kPos;
+
+		keyFirstPos = kPos;
+	}
+
+	//--------------------------------------------------------------
+	int getKeyCommandPosition(char key) {
+		int pos = -1;
+		for (size_t i = 0; i < NUM_KEY_COMMANDS; i++)
+		{
+			if (key == keysFullMap[i])
+			{
+				pos = i;
+				return pos;
+			}
+		}
+		return pos;
+	}
+
 private:
 
-	char keyCommands[NUM_KEY_COMMANDS] = {
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-		'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' };
+	int keyFirstPos = -1;
+	char keyFirstChar = '0';
+	vector<char> keyCommands;
+
+	char keysFullMap[NUM_KEY_COMMANDS] = { // predefined picked keys to assign commands
+	'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+	'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+	'z', 'x', 'c', 'v', 'b', 'n', 'm' };
+
+	//char _keyCommands[_NUM_KEY_COMMANDS] = {
+	//	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	//	'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' };
+
+	//--
 
 private:
 
@@ -538,8 +602,15 @@ public:
 	void setGuiVisible(bool b);
 	void setGuiVisibleToggle() { bGui = !bGui; }
 	void setLogLevel(ofLogLevel level);
+
+	//--------------------------------------------------------------
 	void setEnableKeySpace(bool b) {
 		bKeySpace = b;
+	};
+	
+	//--------------------------------------------------------------
+	void setEnableKeysArrows(bool b) {
+		bKeysArrows = b;
 	};
 
 	//--------------------------------------------------------------
@@ -573,7 +644,7 @@ private:
 	// Updating some params before save will trigs also the group callbacks
 	// So we disable this callbacks just in case params updatings are required
 	// In this case we will need to update gui position param
-	bool DISABLE_Callbacks = false;
+	bool bDISABLECALLBACKS = false;
 
 	//-
 
@@ -597,12 +668,16 @@ public:
 		amntBtns = num;
 	}
 
+public:
+	ofParameter<bool> bKeys;//public to be shared to link with external keys toggles.
+	//that's useful when using many add-ons working together.
+
 private:
 
 	ofParameter<bool> bMODE_Active;
-	ofParameter<bool> ENABLE_Debug;
-	ofParameter<bool> bKeys;
 	ofParameter<bool> bKeySpace;
+	ofParameter<bool> bKeysArrows;
+
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> bHelp;
 	//ofParameter<int> MODE_App;

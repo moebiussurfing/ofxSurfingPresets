@@ -17,9 +17,19 @@ ofxSurfingPresets::ofxSurfingPresets()
 	path_Params_Control = "ofxSurfingPresets_Settings.xml";
 	path_filePreset = "Preset";
 
-	DISABLE_Callbacks = true;
+	bDISABLECALLBACKS = true;
 
 	setActive(true); // add key and mouse listeners
+
+	//-
+
+	// Customizable Key commands
+	// '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+	// 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+	// 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+	// 'z', 'x', 'c', 'v', 'b', 'n', 'm'
+
+	setKeyFirstChar('1');
 
 	//setup();
 }
@@ -60,7 +70,7 @@ ofxSurfingPresets::~ofxSurfingPresets()
 //--------------------------------------------------------------
 void ofxSurfingPresets::refreshToggleNotes()
 {
-	if (DISABLE_Callbacks) return;
+	if (bDISABLECALLBACKS) return;
 
 	// Sets to true the respective toggle for current index and set to false for the others.
 
@@ -102,12 +112,14 @@ void ofxSurfingPresets::setup()
 	bLoad.set("Load", false);
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
+
 	index.set("Preset Index", 0, 0, 0);
 
 	bMODE_Active.set("Active", true);
 	bDebug.set("Debug", true);
 	bKeys.set("Keys", true);
 	bKeySpace.set("Key Space", true);
+	bKeysArrows.set("Keys Arrows", true);
 	//bShowControl.set("Main Panel", true);
 	//bHelp.set("HELP", false);	
 	//MODE_App.set("APP MODE", 0, 0, NUM_MODES_APP - 1);
@@ -150,10 +162,10 @@ void ofxSurfingPresets::setup()
 	params_AppSettings.add(bAutoSaveTimer);
 	params_AppSettings.add(bCycled);
 	params_AppSettings.add(bKeys);
-	//params_AppSettings.add(bMinimize_Clicker);
 	params_AppSettings.add(bMinimize_Params);
 	params_AppSettings.add(bMODE_Active);
 	params_AppSettings.add(index);
+	//params_AppSettings.add(bMinimize_Clicker);
 	//params_AppSettings.add(bShowControl);
 	//params_AppSettings.add(guiManager.bAutoResize);
 	//params_AppSettings.add(guiManager.bExtra);
@@ -370,7 +382,7 @@ void ofxSurfingPresets::startup()
 
 	//-
 
-	DISABLE_Callbacks = false;
+	bDISABLECALLBACKS = false;
 
 	//-
 
@@ -418,11 +430,11 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 
 	if (bAutoSaveTimer && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave)
 	{
-		DISABLE_Callbacks = true;
+		bDISABLECALLBACKS = true;
 
 		ofxSurfingHelpers::saveGroup(params_AppSettings, path_Global + path_Params_Control);
 
-		DISABLE_Callbacks = false;
+		bDISABLECALLBACKS = false;
 
 		timerLast_Autosave = ofGetElapsedTimeMillis();
 		ofLogNotice(__FUNCTION__) << "Autosaved DONE";
@@ -601,7 +613,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					//-
 
 					guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-					//ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bMinimize);
+					if (!guiManager.bMinimize) guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 					if (!guiManager.bMinimize)
 					{
@@ -1004,9 +1016,6 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					}
 
 					//-
-
-					ImGui::Spacing();
-					if (!guiManager.bMinimize) guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 				}
 				guiManager.endWindow();
 			}
@@ -1040,6 +1049,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 		std::string n;
 		n = "PRESETS";
+		n += " " + params_Preset.getName();
 
 		ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 		{
@@ -1047,7 +1057,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 			guiManager.beginWindow(n.c_str(), (bool*)&bGui_FloatingClicker.get(), flagsw);
 			{
-				ImGui::Text(params_Preset.getName().c_str());
+				//ImGui::Text(params_Preset.getName().c_str());
 
 				//ImGui::Checkbox("Key Ctrl", &bKeyCtrl);
 
@@ -1062,6 +1072,9 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 				// Minimize
 				ofxImGuiSurfing::AddToggleRoundedButton(bMinimize_Clicker);
 
+				// Keys
+				if (!bMinimize_Clicker) guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+
 				// Play
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 				if (bMinimize_Clicker)
@@ -1075,7 +1088,11 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 				// Clicker Matrix
 				{
 					float sizey = ofxImGuiSurfing::getWidgetsHeightRelative() * 2;
-					ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
+
+					ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommands, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
+					//ofxImGuiSurfing::AddMatrixClickerLabels(index, (char *) keyCommands, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
+					
+					//ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
 				}
 
 				// Toggles to show Panels
@@ -1107,6 +1124,9 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 					// for Floating
 					guiManager.Add(bExtraFloatClicker, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 					//ofxImGuiSurfing::AddToggleRoundedButton(bExtraFloatClicker);
+
+					// Keys
+					//guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 				}
 
 				if (!bMinimize_Clicker)
@@ -1129,9 +1149,6 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 					}
 
 				//-
-
-				ImGui::Spacing();
-				if (!guiManager.bMinimize) guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 			}
 			guiManager.endWindow();
 		}
@@ -1152,14 +1169,15 @@ void ofxSurfingPresets::draw_ImGui_MiniClicker() {
 		guiManager.refreshLayout();
 		
 		// Index
-		guiManager.Add(index, OFX_IM_HSLIDER_SMALL_NO_NAME);
+		guiManager.Add(index, OFX_IM_HSLIDER_SMALL_NO_LABELS);
 		//ofxImGuiSurfing::AddParameter(index);
 		
 		ImGui::Spacing();
 
 		// Clicker
-		ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns, true, WIDGETS_HEIGHT / 2);
-		
+		//ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns, true, WIDGETS_HEIGHT / 2);
+		ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommands, respBtns, amntBtns, true, WIDGETS_HEIGHT / 2);
+
 		// Editor window
 		guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 		//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
@@ -1440,24 +1458,25 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 
 	if (0) {}
 
-	else if (key == 'g') {
+	else if (key == 'G') {
 		setGuiVisibleToggle();
 	}
+
 	else if (key == OF_KEY_LEFT) {
-		doLoadPrevious();
+		if(bKeysArrows) doLoadPrevious();
 	}
 	else if (key == OF_KEY_RIGHT) {
-		doLoadNext();
+		if (bKeysArrows) doLoadNext();
 	}
 	if (key == ' ') {
 		if(bKeySpace) doLoadNext();
 	}
-	else if (key == OF_KEY_RETURN) {
-		doSaveCurrent();
-	}
 	else if (key == OF_KEY_BACKSPACE) {
 		doRandomizeParams();
 	}
+	//else if (key == OF_KEY_RETURN) {
+	//	doSaveCurrent();
+	//}
 
 	// Player
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
@@ -1466,13 +1485,20 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
 
 	// Preset Index Selector by key numbers
 	else
-		for (int i = 0; i < NUM_KEY_COMMANDS; i++) {
+		for (int i = 0; i < keyCommands.size(); i++) {
 			if (key == keyCommands[i]) {
 				load(i);
 				//continue;
 				return;
 			}
 		}
+		//for (int i = 0; i < NUM_KEY_COMMANDS; i++) {
+		//	if (key == keyCommands[i]) {
+		//		load(i);
+		//		//continue;
+		//		return;
+		//	}
+		//}
 }
 
 //--------------------------------------------------------------
@@ -1529,7 +1555,7 @@ void ofxSurfingPresets::setGuiVisible(bool b)
 ////--------------------------------------------------------------
 //void ofxSurfingPresets::Changed_Params(ofAbstractParameter &e)
 //{
-//	if (DISABLE_Callbacks) return;
+//	if (bDISABLECALLBACKS) return;
 //
 //	{
 //		std::string name = e.getName();
@@ -1552,7 +1578,7 @@ void ofxSurfingPresets::setGuiVisible(bool b)
 //--------------------------------------------------------------
 void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 {
-	if (DISABLE_Callbacks) return;
+	if (bDISABLECALLBACKS) return;
 
 	{
 		std::string name = e.getName();
@@ -1693,7 +1719,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 //--------------------------------------------------------------
 void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 {
-	if (DISABLE_Callbacks) return;
+	if (bDISABLECALLBACKS) return;
 
 	std::string name = e.getName();
 
