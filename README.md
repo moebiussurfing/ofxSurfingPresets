@@ -46,8 +46,9 @@ void ofApp::setup()
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)  
 * [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui)
 * [ofxImGui](https://github.com/Daandelange/ofxImGui/)  [ _FORK from_ @**Daandelange** ]  
-* [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams)  [ _FORK Optional_ ]  
-* [ofxSurfingPlayer](https://github.com/moebiussurfing/ofxSurfingPlayer)  [ _Optional_ ]  
+**OPTIONAL**:  
+* [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams)  [ _FORK_ ]  
+* [ofxSurfingPlayer](https://github.com/moebiussurfing/ofxSurfingPlayer)  
 
 <details>
   <summary>A MORE POWERFUL ALTERNATIVE</summary>
@@ -56,12 +57,11 @@ void ofApp::setup()
 [ofxPresetsManager](https://github.com/moebiussurfing/ofxPresetsManager)  
       
     - Presets for multiple groups in parallel.
-    - Global Combinations of the groups.
+    - Global Combinations of the groups to presets.
     - BPM timed randomizers with probabilities to select presets.
     - Range randomizers to explore parameter settings.
     - Tweening or Smoothing of parameters with plotting.
-    - Drag and copy/paste between slots. 
-    - Standalone presets
+    - Standalone preset files.
    </p>
 </details>
 
