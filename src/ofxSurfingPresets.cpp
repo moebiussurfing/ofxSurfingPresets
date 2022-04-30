@@ -90,6 +90,8 @@ void ofxSurfingPresets::refreshToggleNotes()
 //--------------------------------------------------------------
 void ofxSurfingPresets::setup()
 {
+	// called after addGroup
+
 	// Log Mode
 	ofSetLogLevel("ofxSurfingPresets", OF_LOG_NOTICE);
 	//ofSetLogLevel("ofxSurfingPresets", OF_LOG_SILENT);
@@ -147,17 +149,22 @@ void ofxSurfingPresets::setup()
 
 	ofAddListener(params_Control.parameterChangedE(), this, &ofxSurfingPresets::Changed_Control);
 
-	//-
+	//--
 
 	// Params AppSettings
 
 	params_AppSettings.clear();
 	params_AppSettings.setName("ofxSurfingPresets_AppSettings");
-	params_AppSettings.add(bGui);
+
+	if (bEnableSettingsHandle)
+	{
+		params_AppSettings.add(bGui);
+		params_AppSettings.add(bGui_FloatingClicker);
+	}
+	
 	params_AppSettings.add(bGui_Editor);
 	params_AppSettings.add(bGui_Parameters);
 	params_AppSettings.add(bGui_InnerClicker);
-	params_AppSettings.add(bGui_FloatingClicker);
 	params_AppSettings.add(bAutoSave);
 	params_AppSettings.add(bAutoSaveTimer);
 	params_AppSettings.add(bCycled);
@@ -479,6 +486,8 @@ void ofxSurfingPresets::draw()
 	}
 }
 
+//--
+
 //TODO:
 #ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
 //--------------------------------------------------------------
@@ -525,7 +534,8 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 		ofParameter<float> pVal = ap.cast<float>();
 		ofParameter<float> pTar = params_Preset.getFloat(name); ;
 		float v = pVal.get();
-		ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
+		ofxKuValueSmooth(v, pTar.get(), sp);
+		//ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
 		pVal = v;
 	}
 	// Int
@@ -533,7 +543,8 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 		ofParameter<int> pVal = ap.cast<int>();
 		ofParameter<int> pTar = params_Preset.getInt(name); ;
 		int v = pVal.get();
-		ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
+		ofxKuValueSmooth(v, pTar.get(), sp);
+		//ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
 		pVal = v;
 	}
 
@@ -1141,7 +1152,8 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 							if (respBtnsFloatClicker)
 							{
-								guiManager.Add(amntBtnsFloatClicker, OFX_IM_STEPPER, 2);
+								guiManager.Add(amntBtnsFloatClicker, OFX_IM_STEPPER);
+								//guiManager.Add(amntBtnsFloatClicker, OFX_IM_STEPPER, 2);
 							}
 							ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
 							ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
@@ -1634,7 +1646,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					index_PRE = index;
 
 					//--
-					
+
 					// Load
 
 					ofLogNotice(__FUNCTION__) << index.getName() + " : " << ofToString(index);
@@ -1746,20 +1758,22 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		//{
 		//	setActive(bMODE_Active);
 		//}
-		if (name == bGui_Editor.getName())
-		{
-			if (bGui_Editor)
-			{
-				if (!bGui) bGui = true;
-			}
-		}
-		if (name == bGui.getName())
-		{
-			if (!bGui_Editor && !bGui_FloatingClicker)
-			{
-				bGui_Editor = true;
-			}
-		}
+
+		//if (name == bGui_Editor.getName())
+		//{
+		//	//TODO:
+		//	//if (bGui_Editor)
+		//	//{
+		//	//	if (!bGui) bGui = true;
+		//	//}
+		//}
+		//if (name == bGui.getName())
+		//{
+		//	if (!bGui_Editor && !bGui_FloatingClicker)
+		//	{
+		//		bGui_Editor = true;
+		//	}
+		//}
 	}
 }
 
@@ -1967,7 +1981,7 @@ void ofxSurfingPresets::doNewPreset()
 #endif
 
 		//doRecreateMidi();
-}
+	}
 #endif
 }
 

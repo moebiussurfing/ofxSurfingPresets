@@ -78,9 +78,9 @@ TODO:
 #include "ofxSurfingPlayer.h"
 #endif
 
-//#define _NUM_KEY_COMMANDS 19
 
 //----
+
 
 class ofxSurfingPresets
 {
@@ -93,22 +93,33 @@ public:
 	//--
 
 private:
+	bool bEnableSettingsHandle = true;
+
+public:
+	//--------------------------------------
+	void setEnableHandleSettingsFile(bool b) {
+		bEnableSettingsHandle = b;
+	}
+
+private:
 	// Default common amount presetsManager but can be resized
 #define AMOUNT_KIT_SIZE_DEFAULT_ 9
 	int AMOUNT_KIT_SIZE_DEFAULT = AMOUNT_KIT_SIZE_DEFAULT_;
 
 public:
+	//--------------------------------------
 	void setMaxPresetsAmount(int amt) {//must be called first! before adding groups (who calls setup)
 		AMOUNT_KIT_SIZE_DEFAULT = amt;
 	}
 
-	//--
+	//----
 
 	// Optional Stuff
 
 	// MIDI
-//private:
+
 public:
+
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 	ofxMidiParams surfingMIDI;
 #endif
@@ -166,6 +177,7 @@ public:
 	//----
 
 	// Server
+
 #ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 	ofxRemoteParameters::Server remoteServer;
 	ofParameterGroup params_Server;
@@ -175,6 +187,7 @@ public:
 	//----
 
 	// Player
+
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 	SurfingPlayer surfingPlayer;
 	ofEventListener listener_Beat;
@@ -256,7 +269,9 @@ private:
 
 	// Loaded / saved
 	// To get (from ofApp) when it happens
+
 public:
+
 	ofParameter<bool> DONE_load;// easy callback to know (in ofApp) that preset LOAD is done 
 	ofParameter<bool> DONE_save;// easy callback to know (in ofApp) that preset SAVE is done
 
@@ -473,7 +488,7 @@ public:
 	}
 
 	//--------------------------------------------------------------
-	void addGroup(ofParameterGroup &group) { // Main group add. WARNING! You must add only one group. Call this only once!
+	void addGroup(ofParameterGroup &group) { // Main group add. WARNING! You must add only one group. Call this only once! Setup wil be called here!
 		setup();
 
 		params_Preset = group;
@@ -495,8 +510,9 @@ public:
 		// Should modify to allow queue more groups.
 		// Now we can add one single group!
 
-		// Refresh
+		//-
 
+		// Refresh
 		startup();
 	}
 
@@ -611,6 +627,7 @@ public:
 
 	void setActive(bool b);
 	void setGuiVisible(bool b);
+	//--------------------------------------------------------------
 	void setGuiVisibleToggle() { bGui = !bGui; }
 	void setLogLevel(ofLogLevel level);
 
