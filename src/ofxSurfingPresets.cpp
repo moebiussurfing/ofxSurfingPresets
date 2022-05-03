@@ -1686,6 +1686,8 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					refreshToggleNotes();
 #endif
 					ofLogNotice(__FUNCTION__) << "PRESET COPY!";
+
+					index_PRE = index;
 				}
 
 				//--
@@ -1699,19 +1701,29 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 				else if (!bKeyCtrl && bKeyAlt)
 				{
-					// rename target to source
+					//dir.copyFromTo()
+
+					// Rename target to source
 					string _fFrom = getFilepathForIndexPreset(index_PRE);
 					string _fTo = getFilepathForIndexPreset(index);
 					ofFile f;
 
-					f.open(_fTo);
-					f.renameTo(_fFrom);
+					bool bf = f.open(_fTo);
+					bool bt = f.renameTo(_fFrom, true, true);
 
 					// Save current to
+					//save(_fFrom);
 					save(_fTo);
 
-					ofLogNotice(__FUNCTION__) << "PRESET SWAP!";
-					ofLogNotice(__FUNCTION__) << _fFrom << " > " << _fTo;
+					if (bf&&bt) {
+						ofLogNotice(__FUNCTION__) << "PRESET SWAP!";
+						ofLogNotice(__FUNCTION__) << _fFrom << " <-> " << _fTo;
+					}
+					else {
+						ofLogError(__FUNCTION__) << "WRONG SWAP!";
+					}
+
+					index_PRE = index;
 				}
 			}
 
