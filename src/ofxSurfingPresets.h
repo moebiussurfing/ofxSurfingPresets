@@ -8,11 +8,14 @@
 
 TODO:
 
-+	sorting: ctrl + click = copy, drag ?
-		get copy/drag preset sorting from ofxPresetsManager
++	add global pointer bGui to link to external parent gui.
+		+ that's useful when other add-ons that uses presets manager.
++	retrig should reload the preset too
+		+ now only updates local (ofApp) vars!
+		+ must check if autoSave is disabled...
++	add memory mode. not reading from files.
 +	add multi groups
-+	add kits/folders
-+	add undo engine here.
++	add undo engine.
 
 */
 
@@ -23,19 +26,21 @@ TODO:
 
 //--
 
-// 1. MIDI -> Optional. Two Alternatives. (Uncomment One or none)
+// 1. MIDI -> Optional. Two Alternatives. 
+// (Uncomment One or none)
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS // A -> Recommended
 //#define INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC // B -> WIP
 
 //--
 
 // 2. Smooth
+// (Smooth the params transitions between presets)
 #define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple core smoothing.
 
 //--
 
-// 3. Index Player
-//#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser add-on.
+// 3. Index Player (Is a timed player to auto browse presets index)
+#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser add-on.
 
 //--
 
@@ -43,7 +48,12 @@ TODO:
 // Server using ofxRemoteParameters
 // ->This will serve all the parameters to be controlled by a Flutter based remote app,
 // like on your mobile device.Powered by RemoteRemote and ofxRemoteParamaters tools by c-mendoza.
-//#define INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+//#define USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+
+//--
+
+// Create Preset Iindex Selector Toggles
+#define USE__OFX_SURFING_PRESETS__INDEX_SELECTOR_TOGGLES
 
 //--------------------------------------
 
@@ -52,19 +62,19 @@ TODO:
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 #include "ofxSurfingMidi.h"
-#define INCLUDE__OFX_SURFING_PRESET__MIDI__
+#define USE__OFX_SURFING_PRESET__MIDI__
 #endif
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 #include "ofxMidiParams.h"
-#define INCLUDE__OFX_SURFING_PRESET__MIDI__
+#define USE__OFX_SURFING_PRESET__MIDI__
 #endif
 
 //-
 
 // Remote Server
 
-#ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+#ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 #include "ofxRemoteParameters/Server.h"
 #endif
 
@@ -128,16 +138,19 @@ public:
 	ofxSurfingMidi surfingMIDI;
 #endif
 
-#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
+#ifdef USE__OFX_SURFING_PRESET__MIDI__
 	ofParameterGroup params_MIDI{ "ofxSurfingPresets MIDI" };
 	void doRecreateMidi();
 #endif
 
 	//--
 
-//#ifdef INCLUDE__OFX_SURFING_PRESET__MIDI__
-#if defined(INCLUDE__OFX_SURFING_PRESET__MIDI__) || defined(INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER)
+//#ifdef USE__OFX_SURFING_PRESET__MIDI__
+#if defined(USE__OFX_SURFING_PRESET__MIDI__) || defined(USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER) || defined(USE__OFX_SURFING_PRESETS__INDEX_SELECTOR_TOGGLES)
+#define USE_TOGGLE_TRIGGERS
+#endif
 
+#ifdef USE_TOGGLE_TRIGGERS
 public:
 
 	vector<ofParameter<bool>> notesIndex;
@@ -178,7 +191,7 @@ public:
 
 	// Server
 
-#ifdef INCLUDE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+#ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 	ofxRemoteParameters::Server remoteServer;
 	ofParameterGroup params_Server;
 	void Changed_Params_Preset(ofAbstractParameter &e);
@@ -620,12 +633,14 @@ private:
 	ofParameter<int> index;
 
 	bool bOpen0 = true;
-	bool bOpen1 = true;
-	bool bOpen2 = true;
+	bool bGui_OverlayControl = true;
+	bool bGui_OverlayMixer = true;
+
 
 public:
 
 	void setActive(bool b);
+	//void setName(string name);
 	void setGuiVisible(bool b);
 	//--------------------------------------------------------------
 	void setGuiVisibleToggle() { bGui = !bGui; }
