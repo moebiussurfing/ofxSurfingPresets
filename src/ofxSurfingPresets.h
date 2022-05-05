@@ -6,16 +6,15 @@
 
 /*
 
-TODO:
+	TODO:
 
-+	add global pointer bGui to link to external parent gui.
-		+ that's useful when other add-ons that uses presets manager.
-+	retrig should reload the preset too
-		+ now only updates local (ofApp) vars!
-		+ must check if autoSave is disabled...
-+	add memory mode. not reading from files.
-+	add multi groups
-+	add undo engine.
+	+	add multiple group as ofxPresetsManager does.
+	+	add mode to not set key commands, to avoid letters and be the same as the index.
+	+	retrig should reload the preset too.
+			+ now only updates local (ofApp) vars!
+			+ must check if autoSave is disabled...
+	+	add memory mode. not reading from files.
+	+	add undo engine workflow.
 
 */
 
@@ -427,7 +426,7 @@ public:
 
 private:
 
-	std::string nameRoot;
+	std::string nameRoot = "-1";
 
 private:
 
@@ -461,7 +460,7 @@ private:
 	ofParameterGroup params_InnerClicker;
 
 public:
-	ofParameter<bool> bMinimize_Clicker{ "Minimize", false };
+	ofParameter<bool> bMinimize_Clicker{ "Minimize", true };
 
 private:
 	ofParameter<bool> bMinimize_Params{ "Minimize", true };
@@ -506,7 +505,8 @@ public:
 
 		params_Preset = group;
 
-		nameRoot = params_Preset.getName();
+		if (nameRoot == "-1")
+			nameRoot = params_Preset.getName();
 
 		//-
 
@@ -570,9 +570,12 @@ public:
 	void doCopyPreset();
 	void doDeletePreset(int pos = -1);
 	void doClearPresets(bool createOne = true);
+
 	void doPopulatePresets();
 	void doPopulatePresetsRandomized();
+
 	void doResetParams();
+	void doSortParams(int i);
 	void doRandomizeParams();
 	void doRandomizeIndex();
 	bool doRefreshFiles();
@@ -630,12 +633,15 @@ private:
 	ofParameter<bool> bRefresh;
 	ofParameter<bool> bDebug;
 	//ofParameter<bool> bShowControl;
-	ofParameter<int> index;
+
 
 	bool bOpen0 = true;
 	bool bGui_OverlayControl = true;
 	bool bGui_OverlayMixer = true;
 
+public:
+
+	ofParameter<int> index;//current selected preset index
 
 public:
 
@@ -701,6 +707,7 @@ public:
 
 	// Exposed public to use on external Gui's
 	ofParameter<bool> bGui;
+	ofParameter<bool> bGui_Global;
 	ofParameter<bool> bGui_Editor;
 	ofParameter<bool> bGui_FloatingClicker;
 	ofParameter<bool> bGui_Parameters;
@@ -712,6 +719,7 @@ public:
 	}
 
 public:
+
 	ofParameter<bool> bKeys;//public to be shared to link with external keys toggles.
 	//that's useful when using many add-ons working together.
 
@@ -737,6 +745,14 @@ private:
 	//void Changed_Params(ofAbstractParameter &e);
 
 public:
+
+	//--------------------------------------------------------------
+	void setName(std::string s)//customize name to avoid collide with other preset manager instances
+	{
+		bGui.setName(s);
+		surfingPlayer.setName(s);
+		nameRoot = s;
+	}
 
 	void setPathGlobal(std::string s); // Must cal before setup.
 	void setPathPresets(std::string s); // Must call before addGroup/setup. Specially usefull when using multiple preset manager instances or different kits for the same instance.
@@ -1033,8 +1049,8 @@ public:
 			{
 				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
 				return -1;
-			}
 }
+		}
 	}
 #endif
 

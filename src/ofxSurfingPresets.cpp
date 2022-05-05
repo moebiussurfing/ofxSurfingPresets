@@ -98,11 +98,13 @@ void ofxSurfingPresets::setup()
 
 	// Params 
 
+	bGui_Global.set("_Gui Global_", true);
+	bGui_Global.setSerializable(false);
 	bGui.set("SURFING PRESETS", true);
-	bGui_Editor.set("Editor", true);
+	bGui_Editor.set("EDITOR", true);
 	bGui_InnerClicker.set("Inner Clicker", false);
-	bGui_FloatingClicker.set("Clicker", true);
-	bGui_Parameters.set("Parameters", false);
+	bGui_FloatingClicker.set("CLICKER", true);
+	bGui_Parameters.set("PARAMETERS", false);
 
 	bCycled.set("Cycled", true);
 	bAutoSave.set("AutoSave", true);
@@ -193,14 +195,15 @@ void ofxSurfingPresets::setup()
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-
 	surfingPlayer.setName(nameRoot);
-
 	params_AppSettings.add(surfingPlayer.params_AppSettings);
 
 	//TODO:
 	// Split change gui toggle too. add another label ?
 	surfingPlayer.setNameSubPanel("Presets");
+	surfingPlayer.bGui = false;
+
+	//-
 
 	//--------------------------------------------------------------
 	listener_Beat = surfingPlayer.bPlayerBeatBang.newListener([this](bool &b) {
@@ -468,6 +471,8 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw()
 {
+	if (!bGui_Global) return;
+
 	if (bGui)
 	{
 		//TODO: should be done manually to avoid some locking trouble when multiinstances
@@ -604,8 +609,12 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 			ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
-			n = "PRESETS EDITOR";
-			n += " " + nameRoot;
+			if (nameRoot == "-1")
+				n = "PRESETS EDITOR";
+			else {
+				n = nameRoot;
+				n += " EDITOR";
+			}
 
 			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
@@ -721,11 +730,11 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					//-
 
-					// Parameters
-					guiManager.Add(bGui_Parameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
 					// Clicker
 					guiManager.Add(bGui_FloatingClicker, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
+					// Parameters
+					guiManager.Add(bGui_Parameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
 					// Player
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
@@ -1061,8 +1070,11 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 		if (bAutoResizeFloatClicker) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 
 		std::string n;
-		n = "PRESETS";
-		n += " " + params_Preset.getName();
+		//n = "PRESETS";
+		//n += " " + params_Preset.getName();
+		//n = params_Preset.getName();
+		//n = " PRESETS";
+		n = bGui.getName();
 
 		ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 		{
@@ -1140,7 +1152,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 					// Keys
 					//guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-				}
+					}
 
 				if (!bMinimize_Clicker)
 					if (bExtraFloatClicker)
@@ -1163,12 +1175,12 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 					}
 
 				//-
-			}
+				}
 			guiManager.endWindow();
-		}
+			}
 		ImGui::PopID();
+		}
 	}
-}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_MiniClicker() {
@@ -1285,7 +1297,12 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 		if (params_Preset.getName() != "-1")
 		{
 			std::string n;
-			n = "PARAMETERS";
+			if (nameRoot == "-1")
+				n = "PARAMS";
+			else {
+				n = nameRoot;
+				n += " PARAMS";
+			}
 
 			ImGuiWindowFlags flagsw;
 			flagsw = ImGuiWindowFlags_None;
@@ -1301,7 +1318,7 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 					float _w100 = getWidgetsWidth(1);
 					float _w50 = getWidgetsWidth(2);
 
-					ImGui::Text(params_Preset.getName().c_str());
+					//ImGui::Text(params_Preset.getName().c_str());
 
 					//-
 
@@ -1387,6 +1404,8 @@ void ofxSurfingPresets::draw_ImGui_ToolsWidgets()
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui()
 {
+	if (!bGui_Global) return;
+
 	guiManager.begin();
 	{
 		draw_ImGui_Editor();
@@ -1695,7 +1714,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					ofLogNotice(__FUNCTION__) << "PRESET COPY!";
 
 					index_PRE = index;
-				}
+			}
 
 				//--
 
@@ -1732,7 +1751,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 					index_PRE = index;
 				}
-			}
+		}
 
 			//--
 
@@ -1742,7 +1761,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 			{
 				bIsRetrigged = true;
 			}
-		}
+	}
 
 		//--
 
@@ -1771,6 +1790,11 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 			setPath();
 		}
 
+
+		if (name == guiManager.bMinimize.getName())
+		{
+		}
+
 		// workflow
 
 		//if (name == bMODE_Active.getName())
@@ -1793,7 +1817,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		//		bGui_Editor = true;
 		//	}
 		//}
-	}
+}
 }
 
 #ifdef USE_TOGGLE_TRIGGERS
@@ -1844,7 +1868,7 @@ void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter &e)
 	//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 	//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 	//remoteServer.syncParameters();
-}
+	}
 #endif
 
 ////--------------------------------------------------------------
@@ -2065,8 +2089,8 @@ void ofxSurfingPresets::doPopulatePresets()
 	for (int i = 0; i < _max - 1; i++)
 	{
 		index = i;
-		//doSaveCurrent();
 		doNewPreset();
+		doSaveCurrent();
 	}
 
 	// workflow
@@ -2090,7 +2114,7 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 	{
 		index = i;
 		doNewPreset();
-		doRandomizeParams();
+		doSortParams(i);
 		doSaveCurrent();
 	}
 
@@ -2235,7 +2259,7 @@ bool ofxSurfingPresets::doRefreshFiles()
 	//#endif
 
 #endif
-}
+	}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRefreshFilesAndRename()
@@ -2351,6 +2375,45 @@ void ofxSurfingPresets::doRandomizeIndex() {
 	}
 	ofLogNotice(__FUNCTION__) << i;
 	load(i);
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doSortParams(int i) {
+	//TODO: this is a workaround to autopopulate presets on ofxSurfingPresets...
+
+	ofLogNotice(__FUNCTION__);
+
+	for (int i = 0; i < params_Preset.size(); i++)
+	{
+		//// apply only if enabled
+		//auto &pe = params_Preset[i];
+		//auto type = pe.type();
+		//bool isBool = type == typeid(ofParameter<bool>).name();
+		//if (isBool) {
+		//	ofParameter<bool> pb = pe.cast<bool>();
+		//	if (!pb.get()) continue;
+		//}
+
+		//-
+
+		auto &p = params_Preset[i];
+
+		//float v;
+		//if (p.type() == typeid(ofParameter<float>).name())
+		//{
+		//	ofParameter<float> pr = p.cast<float>();
+		//	pr = i;
+		//}
+		//else 
+		if (p.type() == typeid(ofParameter<int>).name())
+		{
+			ofParameter<int> pr = p.cast<int>();
+			pr = i;
+		}
+	}
+
+	//bMustTrig = true;
+	bIsRetrigged = true;
 }
 
 //--------------------------------------------------------------
