@@ -553,7 +553,7 @@ public:
 
 	void doSaveCurrent();
 	//--------------------------------------------------------------
-	void saveCurrentPreset(int i = -1) { // Legacy api
+	void saveCurrentPreset(int i = -1) { // Legacy api. TODO: not using index 
 		doSaveCurrent();
 	};
 
@@ -564,14 +564,29 @@ public:
 
 	void doLoadNext();
 	void doLoadPrevious();
-	void doStoreState();
-	void doRecallState();
+	void doStoreState();//is a cache state to compare with a new editing version
+	void doRecallState();//available to restore cache states to undo editing version
 	void doNewPreset();
 	void doCopyPreset();
 	void doDeletePreset(int pos = -1);
 	void doClearPresets(bool createOne = true);
+	//--
 
-	void doPopulatePresets();
+	// Tools Helpers
+
+	// set the index without calling callbacks. to "scripting purposes only". i.e. 
+	// populate presets with customized parameters.
+	//--------------------------------------------------------------
+	void doSavePresetIndexOffline(int i) 
+	{
+		index.setWithoutEventNotifications(i);
+		filePath = getFilepathForIndexPreset(index);
+		save(filePath);
+	}
+
+	//--
+
+	void doPopulatePresets(int amount = -1);
 	void doPopulatePresetsRandomized();
 
 	void doResetParams();
@@ -643,10 +658,12 @@ public:
 
 	ofParameter<int> index;//current selected preset index
 
+	//--
+
 public:
 
-	void setActive(bool b);
 	//void setName(string name);
+	void setActive(bool b);
 	void setGuiVisible(bool b);
 	//--------------------------------------------------------------
 	void setGuiVisibleToggle() { bGui = !bGui; }
@@ -1049,8 +1066,8 @@ public:
 			{
 				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
 				return -1;
+			}
 }
-		}
 	}
 #endif
 

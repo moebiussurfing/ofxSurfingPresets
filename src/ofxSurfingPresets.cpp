@@ -1152,7 +1152,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 					// Keys
 					//guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-					}
+				}
 
 				if (!bMinimize_Clicker)
 					if (bExtraFloatClicker)
@@ -1175,12 +1175,12 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 					}
 
 				//-
-				}
-			guiManager.endWindow();
 			}
-		ImGui::PopID();
+			guiManager.endWindow();
 		}
+		ImGui::PopID();
 	}
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_MiniClicker() {
@@ -1647,7 +1647,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 				{
 					ofLogNotice(__FUNCTION__) << "\n\n  Changed \n  Preset Index : "
 						<< ofToString(index_PRE) << " > " << ofToString(index)
-						<< "      " << ofToString(keyCommands[index_PRE]) << " > " << ofToString(keyCommands[index])
+						<< "      \t(" << ofToString(keyCommands[index_PRE]) << " > " << ofToString(keyCommands[index]) << ")"
 						<< "\n";
 				}
 
@@ -1714,7 +1714,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					ofLogNotice(__FUNCTION__) << "PRESET COPY!";
 
 					index_PRE = index;
-			}
+				}
 
 				//--
 
@@ -1751,7 +1751,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 					index_PRE = index;
 				}
-		}
+			}
 
 			//--
 
@@ -1761,7 +1761,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 			{
 				bIsRetrigged = true;
 			}
-	}
+		}
 
 		//--
 
@@ -1817,7 +1817,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		//		bGui_Editor = true;
 		//	}
 		//}
-}
+	}
 }
 
 #ifdef USE_TOGGLE_TRIGGERS
@@ -1868,7 +1868,7 @@ void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter &e)
 	//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 	//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 	//remoteServer.syncParameters();
-	}
+}
 #endif
 
 ////--------------------------------------------------------------
@@ -2077,14 +2077,19 @@ void ofxSurfingPresets::doDeletePreset(int pos)
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::doPopulatePresets()
+void ofxSurfingPresets::doPopulatePresets(int amount)
 {
 	ofLogNotice(__FUNCTION__);
 
-	doClearPresets(1);
+	doClearPresets(true);
 
-	const int _max = AMOUNT_KIT_SIZE_DEFAULT;
-	//const int _max = dir.size();
+	int _max;
+	if (amount == -1)
+	{
+		_max = AMOUNT_KIT_SIZE_DEFAULT;
+		//const int _max = dir.size();
+	}
+	else _max = amount;
 
 	for (int i = 0; i < _max - 1; i++)
 	{
@@ -2259,7 +2264,7 @@ bool ofxSurfingPresets::doRefreshFiles()
 	//#endif
 
 #endif
-	}
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRefreshFilesAndRename()
