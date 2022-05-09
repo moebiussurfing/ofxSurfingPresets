@@ -445,7 +445,7 @@ public:
 	void draw_ImGui_Parameters();
 
 	// Inner clicker layout
-	void draw_ImGui_ClickerMini(bool bMinimal = false);//inner clicker to fast integrate clicker to an external ImGui panel windows.
+	void draw_ImGui_ClickerMini(bool bHeader = true, bool bMinimal = false);//inner clicker to fast integrate clicker to an external ImGui panel windows.
 
 	// TODO: REMOVE. This is deprecated!
 	// Required to set to false when only one ImGui instance is created. 
