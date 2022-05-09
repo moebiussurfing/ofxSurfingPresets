@@ -8,13 +8,15 @@
 
 	TODO:
 
-	+	add multiple group as ofxPresetsManager does.
-	+	add mode to not set key commands, to avoid letters and be the same as the index.
-	+	retrig should reload the preset too.
-			+ now only updates local (ofApp) vars!
-			+ must check if autoSave is disabled...
-	+	add memory mode. not reading from files.
-	+	add undo engine workflow.
+	+ fix populate random
+	+ add multiple group as ofxPresetsManager does.
+	+ add mode to not set key commands, to avoid letters and be the same as the index.
+	+ retrig should reload the preset too.
+		+ now only updates local (ofApp) vars!
+		+ must check if autoSave is disabled...
+	+ add memory mode. not reading from files.
+		+ a vector of json or a json should be fine.
+	+ add undo engine workflow.
 
 */
 
@@ -366,7 +368,7 @@ private:
 
 	int keyFirstPos = -1;
 	char keyFirstChar = '0';
-	vector<char> keyCommands;
+	vector<char> keyCommandsChars;
 
 public:
 
@@ -384,10 +386,10 @@ public:
 
 			setKeyFirstPos(p);
 
-			keyCommands.clear();
+			keyCommandsChars.clear();
 			for (size_t i = p; i < NUM_KEY_COMMANDS; i++)
 			{
-				keyCommands.push_back(keysFullMap[i]);
+				keyCommandsChars.push_back(keysFullMap[i]);
 			}
 		}
 	}
@@ -440,12 +442,13 @@ public:
 
 	void draw();
 
-	void draw_ImGui_Minimal();
 	void draw_ImGui_ClickerFloating();
 	void draw_ImGui_Parameters();
 
+	// Minimal
+	void draw_ImGui_Minimal();
 	// Inner clicker layout
-	void draw_ImGui_ClickerMini(bool bHeader = true, bool bMinimal = false);//inner clicker to fast integrate clicker to an external ImGui panel windows.
+	void draw_ImGui_ClickerMiniInner(bool bHeader = true, bool bMinimal = false);//inner clicker to fast integrate clicker to an external ImGui panel windows.
 
 	// TODO: REMOVE. This is deprecated!
 	// Required to set to false when only one ImGui instance is created. 
@@ -631,7 +634,7 @@ public:
 	ofParameter<bool> bNewPreset;
 	ofParameter<bool> bSave;
 
-	ofParameter<bool> bGui_ClickerMini;
+	ofParameter<bool> bGui_ClickerMiniInner;
 
 private:
 

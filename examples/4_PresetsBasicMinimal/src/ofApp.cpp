@@ -13,6 +13,19 @@ void ofApp::setup() {
 	params.add(indexColor.set("indexColor", 0, 0, 2));
 
 	presets.addGroup(params);
+
+	setupImGui();
+}
+//--------------------------------------------------------------
+void ofApp::setupImGui()
+{
+	guiManager.setup();
+	//guiManager.setup(IM_GUI_MODE_INSTANTIATED_DOCKING);
+
+	guiManager.addWindowSpecial("Window1");
+	guiManager.addWindowSpecial("Window2");
+
+	guiManager.startup();
 }
 
 //--------------------------------------------------------------
@@ -25,13 +38,73 @@ void ofApp::draw()
 {
 	drawScene();
 
+	//----
+
+	guiManager.begin();
+	{
+		ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
+		if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
+
+		if (guiManager.beginWindow(bWindow1, flagsw))
+		{
+			presets.draw_ImGui_Minimal();
+
+			ofxImGuiSurfing::AddSpacingBigSeparated();
+
+			presets.draw_ImGui_ClickerMiniInner(false, false);
+		}
+		guiManager.endWindow();
+	
+		if (guiManager.beginWindow(bWindow2, flagsw))
+		{
+			ImGui::Text("Hello!");
+			guiManager.Add(presets.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_MINI);
+
+			guiManager.AddGroup(params);
+		}
+		guiManager.endWindow();
+
+		//--
+
+		//TODO:
+		// cascade
+
+		//if (ImGui::IsKeyReleased(ImGuiKey_Space))
+		//{
+		//	//ImGui
+		//	//auto &g = ImGui::GetImIO();
+		//	//auto g = guiManager.getGui();
+		//	//auto g2 = g.
+		//	//ImGui::GetMainViewport
+
+		//	ImVector<ImGuiWindow*> windows;
+		//	for (ImGuiWindow* window : g.WindowsFocusOrder)
+		//		if (window->WasActive)
+		//			windows.push_back(window);
+
+		//	if (windows.Size > 0)
+		//	{
+		//		ImVec2 base_pos = ImGui::GetMainViewport()->Pos;
+		//		ImVec2 step = ImFloor((ImGui::GetMainViewport()->Size * 0.7f) / (float)windows.Size);
+		//		//step.x = step.y = ImFloor(ImMin(step.x, step.y));
+		//		for (int n = 0; n < windows.Size; n++)
+		//			ImGui::SetWindowPos(windows[n], base_pos + step * ((float)n + 0.5f));
+		//	}
+		//}
+	}
+	guiManager.end();
+
+	//----
+
 	presets.draw();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	if (key == OF_KEY_F1) {
+	if (key == OF_KEY_F1) 
+	{
 		presets.setGuiVisibleToggle();
 	}
 }
@@ -74,7 +147,8 @@ void ofApp::drawScene()
 	//-
 
 	// Bg Color
-	ofColor _colorBg = 255;//white
+	ofColor _colorBg = 32;//dark
+	//ofColor _colorBg = 255;//white
 
 	// Shape Color
 	ofColor _color;
