@@ -102,16 +102,16 @@ void ofxSurfingPresets::setup()
 	bGui_Global.setSerializable(false);
 	bGui.set("SURFING PRESETS", true);
 	bGui_Editor.set("EDITOR", true);
-	bGui_InnerClicker.set("Inner Clicker", false);
-	bGui_FloatingClicker.set("CLICKER", true);
+	bGui_ClickerMini.set("Inner Clicker", false);
+	bGui_ClickerFloating.set("CLICKER", true);
 	bGui_Parameters.set("PARAMETERS", false);
 
 	bCycled.set("Cycled", true);
-	bAutoSave.set("AutoSave", true);
+	bSave.set("SAVE", false);
+	bLoad.set("LOAD", false);
+	bAutoSave.set("AUTOSAVE", true);
 	bAutoSaveTimer.set("AutoSave Timed", false);
-	bNewPreset.set("New", false);
-	bSave.set("Save", false);
-	bLoad.set("Load", false);
+	bNewPreset.set("NEW", false);
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 
@@ -140,9 +140,9 @@ void ofxSurfingPresets::setup()
 	params_Control.add(bSetPathPresets);
 	params_Control.add(bRefresh);
 	//params_Control.add(bGui_Parameters);
-	//params_Control.add(bGui_InnerClicker);
+	//params_Control.add(bGui_ClickerMini);
 	//params_Control.add(bShowControl);
-	//params_Control.add(bGui_FloatingClicker);
+	//params_Control.add(bGui_ClickerFloating);
 	//params_Control.add(bAutoSave);
 	//params_Control.add(bAutoSaveTimer);
 	//params_Control.add(bCycled);
@@ -159,12 +159,12 @@ void ofxSurfingPresets::setup()
 	if (bEnableSettingsHandle)
 	{
 		params_AppSettings.add(bGui);
-		params_AppSettings.add(bGui_FloatingClicker);
+		params_AppSettings.add(bGui_ClickerFloating);
 	}
 
 	params_AppSettings.add(bGui_Editor);
 	params_AppSettings.add(bGui_Parameters);
-	params_AppSettings.add(bGui_InnerClicker);
+	params_AppSettings.add(bGui_ClickerMini);
 	params_AppSettings.add(bAutoSave);
 	params_AppSettings.add(bAutoSaveTimer);
 	params_AppSettings.add(bCycled);
@@ -194,8 +194,8 @@ void ofxSurfingPresets::setup()
 
 	// Player
 
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-	surfingPlayer.setName(nameRoot);
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
+	if (name_Root != "-1") surfingPlayer.setName(name_Root);
 	params_AppSettings.add(surfingPlayer.params_AppSettings);
 
 	//TODO:
@@ -226,7 +226,7 @@ void ofxSurfingPresets::setup()
 
 	params_FloatClicker.clear();
 	params_FloatClicker.setName("FLOAT CLICKER");
-	params_FloatClicker.add(amntBtnsFloatClicker);
+	params_FloatClicker.add(amntBtnsPerRowClickerFloat);
 	params_FloatClicker.add(respBtnsFloatClicker);
 	params_FloatClicker.add(bExtraFloatClicker);
 	params_FloatClicker.add(bAutoResizeFloatClicker);
@@ -238,8 +238,8 @@ void ofxSurfingPresets::setup()
 
 	params_InnerClicker.clear();
 	params_InnerClicker.setName("INNER CLICKER");
-	params_InnerClicker.add(amntBtns);
-	params_InnerClicker.add(respBtns);
+	params_InnerClicker.add(amntBtnsPerRowClickerMini);
+	params_InnerClicker.add(bRespBtns);
 	params_AppSettings.add(params_InnerClicker);
 
 	// External extra or smooth params
@@ -534,35 +534,44 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 	bool isInt = type == typeid(ofParameter<int>).name();
 	bool isGroup = type == typeid(ofParameterGroup).name();
 
-	// Float
-	if (isFloat) {
-		ofParameter<float> pVal = ap.cast<float>();
-		ofParameter<float> pTar = params_Preset.getFloat(name); ;
-		float v = pVal.get();
-		ofxKuValueSmooth(v, pTar.get(), sp);
-		//ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
-		pVal = v;
-	}
-	// Int
-	else if (isInt) {
-		ofParameter<int> pVal = ap.cast<int>();
-		ofParameter<int> pTar = params_Preset.getInt(name); ;
-		int v = pVal.get();
-		ofxKuValueSmooth(v, pTar.get(), sp);
-		//ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
-		pVal = v;
-	}
-
 	//TODO:
 	// add more types
 
+	if (0) {}
+
+	// Float
+	else if (isFloat) 
+	{
+		ofParameter<float> pVal = ap.cast<float>();
+		ofParameter<float> pTar = params_Preset.getFloat(name); ;
+		float v = pVal.get();
+		ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
+		//ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
+		pVal = v;
+	}
+
+	// Int
+	else if (isInt)
+	{
+		ofParameter<int> pVal = ap.cast<int>();
+		ofParameter<int> pTar = params_Preset.getInt(name); ;
+		int v = pVal.get();
+		ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
+		//ofxSurfingHelpers::ofxKuValueSmooth(v, pTar.get(), sp);
+		pVal = v;
+	}
+
 	// Group
-	else if (isGroup) {
+	else if (isGroup)
+	{
 		auto &g = ap.castGroup();
-		for (int i = 0; i < g.size(); i++) { // ofAbstractParameters
+		// ofAbstractParameters
+		for (int i = 0; i < g.size(); i++) 
+		{ 
 			updateSmoothParam(g.get(i));
 		}
 	}
+
 	else
 	{
 		//ofLogError(__FUNCTION__) << "Not the expected type for ofParam: " << name;
@@ -609,10 +618,10 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			ImGui::SetNextWindowSize(ImVec2(ww, hh), flagsCond);
 			ImGui::SetNextWindowPos(ImVec2(xx, yy), flagsCond);
 
-			if (nameRoot == "-1")
-				n = "PRESETS EDITOR";
-			else {
-				n = nameRoot;
+			if (name_Root == "-1") n = "PRESETS EDITOR";
+			else
+			{
+				n = name_Root;
 				n += " EDITOR";
 			}
 
@@ -698,9 +707,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					// Inner (not floating) Clicker Matrix
 
-					if (bGui_InnerClicker)
+					if (bGui_ClickerMini)
 					{
-						draw_ImGui_MiniClicker();
+						draw_ImGui_ClickerMini(true);
 					}
 
 					//--
@@ -731,7 +740,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					//-
 
 					// Clicker
-					guiManager.Add(bGui_FloatingClicker, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+					guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
 					// Parameters
 					guiManager.Add(bGui_Parameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
@@ -743,7 +752,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					{
 						ImGui::Indent();
 						guiManager.Add(surfingPlayer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-						if (!guiManager.bMinimize) {
+						if (!guiManager.bMinimize)
+						{
 							ImGui::PushItemWidth(_w100 * 0.7);
 							ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
 							ImGui::PushItemWidth(_w100 * 0.7);
@@ -891,7 +901,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 											doPopulatePresets();
 										}
 
-										if (ImGui::Button("POPULATE RND", ImVec2(_w100, _h)))
+										if (ImGui::Button("POPU RND", ImVec2(_w100, _h)))
 										{
 											doPopulatePresetsRandomized();
 										}
@@ -942,18 +952,19 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 									}
 								}
 
-								ofxImGuiSurfing::AddToggleRoundedButton(bGui_InnerClicker);
-								if (bGui_InnerClicker)
+								ofxImGuiSurfing::AddToggleRoundedButton(bGui_ClickerMini);
+								if (bGui_ClickerMini)
 								{
 									ImGui::Indent();
 
-									ofxImGuiSurfing::AddToggleRoundedButton(respBtns);
-									if (respBtns)
+									ofxImGuiSurfing::AddToggleRoundedButton(bRespBtns);
+									if (bRespBtns)
 									{
 										//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-										//ofxImGuiSurfing::AddIntStepped(amntBtns);
+										//ofxImGuiSurfing::AddIntStepped(amntBtnsPerRowClickerMini);
 										//ImGui::PopItemWidth();
-										guiManager.Add(amntBtns, OFX_IM_STEPPER);
+										guiManager.Add(amntBtnsPerRowClickerMini, OFX_IM_DEFAULT);
+										//guiManager.Add(amntBtnsPerRowClickerMini, OFX_IM_STEPPER);
 									}
 
 									ImGui::Unindent();
@@ -997,7 +1008,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 											{
 												std::string si = ofToString(i);
 												if (i < 10) si = "0" + si;
-												std::string ss = nameRoot + "_" + si;
+												std::string ss = name_Root + "_" + si;
 												fileName = ss;
 
 												auto s0 = ofSplitString(nameSelected, "\\", true);
@@ -1046,9 +1057,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::draw_ImGui_FloatingClicker()
+void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 {
-	if (bGui_FloatingClicker)
+	if (bGui_ClickerFloating)
 	{
 		// Panels Sizes
 		float xx = 10;
@@ -1080,7 +1091,7 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 		{
 			IMGUI_SUGAR__WINDOWS_CONSTRAINTS;
 
-			guiManager.beginWindow(n.c_str(), (bool*)&bGui_FloatingClicker.get(), flagsw);
+			guiManager.beginWindow(n.c_str(), (bool*)&bGui_ClickerFloating.get(), flagsw);
 			{
 				//ImGui::Text(params_Preset.getName().c_str());
 
@@ -1114,10 +1125,10 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 				{
 					float sizey = ofxImGuiSurfing::getWidgetsHeightRelative() * 2;
 
-					ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommands, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
-					//ofxImGuiSurfing::AddMatrixClickerLabels(index, (char *) keyCommands, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
+					ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommands, respBtnsFloatClicker, amntBtnsPerRowClickerFloat, true, sizey);
+					//ofxImGuiSurfing::AddMatrixClickerLabels(index, (char *) keyCommands, respBtnsFloatClicker, amntBtnsPerRowClickerFloat, true, sizey);
 
-					//ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsFloatClicker, true, sizey);
+					//ofxImGuiSurfing::AddMatrixClicker(index, respBtnsFloatClicker, amntBtnsPerRowClickerFloat, true, sizey);
 				}
 
 				// Toggles to show Panels
@@ -1165,8 +1176,8 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 
 							if (respBtnsFloatClicker)
 							{
-								guiManager.Add(amntBtnsFloatClicker, OFX_IM_SLIDER);
-								//guiManager.Add(amntBtnsFloatClicker, OFX_IM_STEPPER);
+								guiManager.Add(amntBtnsPerRowClickerFloat, OFX_IM_SLIDER);
+								//guiManager.Add(amntBtnsPerRowClickerFloat, OFX_IM_STEPPER);
 							}
 							ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
 							ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
@@ -1183,8 +1194,8 @@ void ofxSurfingPresets::draw_ImGui_FloatingClicker()
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::draw_ImGui_MiniClicker() {
-	if (!bGui_InnerClicker) return;
+void ofxSurfingPresets::draw_ImGui_ClickerMini(bool bMinimal ) {
+	if (!bGui_ClickerMini) return;
 
 	static bool bOpen = true;
 	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
@@ -1201,12 +1212,14 @@ void ofxSurfingPresets::draw_ImGui_MiniClicker() {
 		ImGui::Spacing();
 
 		// Clicker
-		//ofxImGuiSurfing::AddMatrixClicker(index, respBtns, amntBtns, true, WIDGETS_HEIGHT / 2);
-		ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommands, respBtns, amntBtns, true, WIDGETS_HEIGHT / 2);
+		//ofxImGuiSurfing::AddMatrixClicker(index, bRespBtns, amntBtnsPerRowClickerMini, true, WIDGETS_HEIGHT / 2);
+		ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommands, bRespBtns, amntBtnsPerRowClickerMini, true, WIDGETS_HEIGHT / 2);
 
-		// Editor window
-		guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-		//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
+		if (!bMinimal) {
+			// Editor window
+			guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+			//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
+		}
 
 		ImGui::TreePop();
 	}
@@ -1297,10 +1310,10 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 		if (params_Preset.getName() != "-1")
 		{
 			std::string n;
-			if (nameRoot == "-1")
-				n = "PARAMS";
-			else {
-				n = nameRoot;
+			if (name_Root == "-1") n = "PARAMS";
+			else
+			{
+				n = name_Root;
 				n += " PARAMS";
 			}
 
@@ -1363,7 +1376,7 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 						//-
 
 						guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-						guiManager.Add(bGui_FloatingClicker, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 					}
 				}
 				guiManager.endWindow();
@@ -1380,22 +1393,22 @@ void ofxSurfingPresets::draw_ImGui_ToolsWidgets()
 	float _w50 = ofxImGuiSurfing::getWidgetsWidth(2);
 	float _h = getWidgetsHeightRelative();
 
-	if (ImGui::Button("Recall", ImVec2(_w50, _h)))
+	if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
 	{
 		doRecallState();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Store", ImVec2(_w50, _h)))
+	if (ImGui::Button("STORE", ImVec2(_w50, _h)))
 	{
 		doStoreState();
 	}
 
-	if (ImGui::Button("Reset", ImVec2(_w50, _h)))
+	if (ImGui::Button("RESET", ImVec2(_w50, _h)))
 	{
 		doResetParams();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Random", ImVec2(_w50, _h)))
+	if (ImGui::Button("RANDOM", ImVec2(_w50, _h)))
 	{
 		doRandomizeParams();
 	}
@@ -1412,7 +1425,7 @@ void ofxSurfingPresets::draw_ImGui()
 
 		//---
 
-		draw_ImGui_FloatingClicker();
+		draw_ImGui_ClickerFloating();
 
 		//----
 
@@ -1812,7 +1825,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		//}
 		//if (name == bGui.getName())
 		//{
-		//	if (!bGui_Editor && !bGui_FloatingClicker)
+		//	if (!bGui_Editor && !bGui_ClickerFloating)
 		//	{
 		//		bGui_Editor = true;
 		//	}
@@ -1979,7 +1992,7 @@ void ofxSurfingPresets::doNewPreset()
 	int _i = dir.size();
 	std::string s = ofToString(_i);
 	if (_i < 10) s = "0" + s;
-	std::string ss = nameRoot + "_" + s;
+	std::string ss = name_Root + "_" + s;
 	fileName = ss;
 	filePath = path_Presets + "/" + ss + _ext;
 	ofLogNotice(__FUNCTION__) << filePath;
@@ -2047,7 +2060,7 @@ void ofxSurfingPresets::doDeletePreset(int pos)
 		int i = index;
 		std::string si = ofToString(i);
 		if (i < 10) si = "0" + si;
-		std::string ss = nameRoot + "_" + si;
+		std::string ss = name_Root + "_" + si;
 		fileName = ss;
 		filePath = path_Presets + "/" + ss + _ext;
 		ofLogNotice(__FUNCTION__) << "Remove: " << filePath;
@@ -2099,10 +2112,10 @@ void ofxSurfingPresets::doPopulatePresets(int amount)
 	}
 
 	// workflow
-	amntBtnsFloatClicker.setMax(_max);
-	amntBtns.setMax(_max);
-	amntBtnsFloatClicker.set(_max / 3);
-	amntBtns.set(_max / 3);
+	amntBtnsPerRowClickerFloat.setMax(_max);
+	amntBtnsPerRowClickerMini.setMax(_max);
+	amntBtnsPerRowClickerFloat.set(_max / 3);
+	amntBtnsPerRowClickerMini.set(_max / 3);
 }
 
 //--------------------------------------------------------------
@@ -2124,10 +2137,10 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 	}
 
 	// workflow
-	amntBtnsFloatClicker.setMax(_max);
-	amntBtns.setMax(_max);
-	amntBtnsFloatClicker.set(_max / 3);
-	amntBtns.set(_max / 3);
+	amntBtnsPerRowClickerFloat.setMax(_max);
+	amntBtnsPerRowClickerMini.setMax(_max);
+	amntBtnsPerRowClickerFloat.set(_max / 3);
+	amntBtnsPerRowClickerMini.set(_max / 3);
 }
 
 //--------------------------------------------------------------
@@ -2217,8 +2230,8 @@ bool ofxSurfingPresets::doRefreshFiles()
 		index.setMax(dir.size() - 1);
 
 		// workflow
-		amntBtnsFloatClicker.setMax(dir.size());
-		amntBtns.setMax(dir.size());
+		amntBtnsPerRowClickerFloat.setMax(dir.size());
+		amntBtnsPerRowClickerMini.setMax(dir.size());
 	}
 
 	index = index;
@@ -2285,7 +2298,7 @@ void ofxSurfingPresets::doRefreshFilesAndRename()
 
 		std::string si = ofToString(i);
 		if (i < 10) si = "0" + si;
-		std::string ss = nameRoot + "_" + si;
+		std::string ss = name_Root + "_" + si;
 		fileName = ss;
 		filePath = path_Presets + "/" + ss + _ext;
 		ofLogNotice(__FUNCTION__) << "Remove: " << filePath;
@@ -2305,8 +2318,8 @@ void ofxSurfingPresets::doRefreshFilesAndRename()
 		index.setMax(dir.size() - 1);
 
 		//// workflow
-		//amntBtnsFloatClicker.setMax(dir.size());
-		//amntBtns.setMax(dir.size());
+		//amntBtnsPerRowClickerFloat.setMax(dir.size());
+		//amntBtnsPerRowClickerMini.setMax(dir.size());
 	}
 }
 

@@ -191,6 +191,7 @@ public:
 	// Server
 
 #ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+private:
 	ofxRemoteParameters::Server remoteServer;
 	ofParameterGroup params_Server;
 	void Changed_Params_Preset(ofAbstractParameter &e);
@@ -201,6 +202,7 @@ public:
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+private:
 	SurfingPlayer surfingPlayer;
 	ofEventListener listener_Beat;
 	ofParameter<bool> bRandomPlay{ "Random", false };
@@ -426,7 +428,7 @@ public:
 
 private:
 
-	std::string nameRoot = "-1";
+	std::string name_Root = "-1";
 
 private:
 
@@ -439,11 +441,11 @@ public:
 	void draw();
 
 	void draw_ImGui_Minimal();
-	void draw_ImGui_FloatingClicker();
+	void draw_ImGui_ClickerFloating();
 	void draw_ImGui_Parameters();
 
 	// Inner clicker layout
-	void draw_ImGui_MiniClicker();//inner clicker to fast integrate clicker to an external ImGui panel windows.
+	void draw_ImGui_ClickerMini(bool bMinimal = false);//inner clicker to fast integrate clicker to an external ImGui panel windows.
 
 	// TODO: REMOVE. This is deprecated!
 	// Required to set to false when only one ImGui instance is created. 
@@ -455,8 +457,8 @@ public:
 
 private:
 
-	ofParameter<int> amntBtns{ "Amt Buttons", 4, 1, 4 };
-	ofParameter<bool> respBtns{ "Responsive", true };
+	ofParameter<int> amntBtnsPerRowClickerMini{ "Amt Buttons", 4, 1, 4 };
+	ofParameter<bool> bRespBtns{ "Responsive", true };
 	ofParameterGroup params_InnerClicker;
 
 public:
@@ -505,8 +507,7 @@ public:
 
 		params_Preset = group;
 
-		if (nameRoot == "-1")
-			nameRoot = params_Preset.getName();
+		if (name_Root == "-1") name_Root = params_Preset.getName();
 
 		//-
 
@@ -577,7 +578,7 @@ public:
 	// set the index without calling callbacks. to "scripting purposes only". i.e. 
 	// populate presets with customized parameters.
 	//--------------------------------------------------------------
-	void doSavePresetIndexOffline(int i) 
+	void doSavePresetIndexOffline(int i)
 	{
 		index.setWithoutEventNotifications(i);
 		filePath = getFilepathForIndexPreset(index);
@@ -630,7 +631,7 @@ public:
 	ofParameter<bool> bNewPreset;
 	ofParameter<bool> bSave;
 
-	ofParameter<bool> bGui_InnerClicker;
+	ofParameter<bool> bGui_ClickerMini;
 
 private:
 
@@ -726,13 +727,13 @@ public:
 	ofParameter<bool> bGui;
 	ofParameter<bool> bGui_Global;
 	ofParameter<bool> bGui_Editor;
-	ofParameter<bool> bGui_FloatingClicker;
+	ofParameter<bool> bGui_ClickerFloating;
 	ofParameter<bool> bGui_Parameters;
 
 	//--------------------------------------------------------------
 	void setClickerAmount(int num) {//amount of preset buttons per row
-		amntBtnsFloatClicker = num;
-		amntBtns = num;
+		amntBtnsPerRowClickerFloat = num;
+		amntBtnsPerRowClickerMini = num;
 	}
 
 public:
@@ -752,7 +753,7 @@ private:
 	//ofParameter<std::string> MODE_App_Name;
 
 	// Floating Clicker Layout
-	ofParameter<int> amntBtnsFloatClicker{ "MaxBut", 1, 1, 1 };
+	ofParameter<int> amntBtnsPerRowClickerFloat{ "MaxBut", 1, 1, 1 };
 	ofParameter<bool> respBtnsFloatClicker{ "Responsive", true };
 	ofParameter<bool> bExtraFloatClicker{ "Extra", false };
 	ofParameter<bool> bAutoResizeFloatClicker{ "Auto Resize", true };
@@ -763,12 +764,39 @@ private:
 
 public:
 
+	// customize amount of presets per row on the preset clicker
+	//--------------------------------------------------------------
+	void setMaxPresetsAmountPerRowClickerFloat(int amount)
+	{
+		amntBtnsPerRowClickerFloat = amount;
+	}
+	//--------------------------------------------------------------
+	void setMaxPresetsAmountPerRowClickerMini(int amount)
+	{
+		amntBtnsPerRowClickerMini = amount;
+	}
+
+public:
+
+	//--------------------------------------------------------------
+	void setPlayerPlay(bool b)
+	{
+		surfingPlayer.bPlay = b;
+	}
+
 	//--------------------------------------------------------------
 	void setName(std::string s)//customize name to avoid collide with other preset manager instances
 	{
+		//if (s == "-1") s = "PRESETS EDITOR";
+		//else
+		//{
+		//	n = name_Root;
+		//	n += " EDITOR";
+		//}
+
 		bGui.setName(s);
 		surfingPlayer.setName(s);
-		nameRoot = s;
+		name_Root = s;
 	}
 
 	void setPathGlobal(std::string s); // Must cal before setup.
@@ -788,7 +816,7 @@ private:
 	std::string getFilepathForIndexPreset(int _index) {
 		std::string _si = ofToString(_index);
 		if (_index < 10) _si = "0" + _si;
-		std::string _ss = nameRoot + "_" + _si;
+		std::string _ss = name_Root + "_" + _si;
 		std::string _fileName = _ss;
 		std::string _filePath = path_Presets + "/" + _ss + _ext;
 		ofLogNotice(__FUNCTION__) << _filePath;
@@ -1067,7 +1095,7 @@ public:
 				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
 				return -1;
 			}
-}
+		}
 	}
 #endif
 
