@@ -43,7 +43,7 @@ public:
 	void setupImGui();
 
 	ofParameter<bool> bWindow{ "Window", true };
-	ofParameter<bool> bClickerMinimal{ "Clicker Minimal", true };
-	ofParameter<bool> bParameters{ "Parameters", true };
+	ofParameter<bool> bClickerMinimal{ "Clicker Minimal", false };
+	ofParameter<bool> bParameters{ "Parameters", false };
 
 };

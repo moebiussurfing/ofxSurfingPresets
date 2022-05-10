@@ -20,7 +20,7 @@ void ofApp::setup() {
 void ofApp::setupImGui()
 {
 	guiManager.setup();
-	guiManager.addWindowSpecial(bWindow);
+	//guiManager.addWindowSpecial(bWindow);
 	guiManager.startup();
 }
 
@@ -38,46 +38,41 @@ void ofApp::draw()
 
 	guiManager.begin();
 	{
-		ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
-		if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
+		//if (bWindow)
+			if (guiManager.beginWindow(bWindow))
+			{
+				guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
-		//--
-
-		//if(bWindow)
-		if (guiManager.beginWindow(bWindow))
-		{
-			guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-			guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-
-			ofxImGuiSurfing::AddSpacingBigSeparated();
-
-			guiManager.Add(presets.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
-			ofxImGuiSurfing::AddSpacingBig();
-
-			guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			guiManager.Add(presets.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			
-			ofxImGuiSurfing::AddSpacingBig();
-
-			guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
-			ofxImGuiSurfing::AddSpacingBigSeparated();
-
-			if (bClickerMinimal) {
-				presets.draw_ImGui_ClickerMinimal();
 				ofxImGuiSurfing::AddSpacingBigSeparated();
-			}
 
-			if (presets.bGui_ClickerSimple) {
-				presets.draw_ImGui_ClickerSimple(false, false);
+				guiManager.Add(presets.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
+				ofxImGuiSurfing::AddSpacingBig();
+
+				guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+				guiManager.Add(presets.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
+				ofxImGuiSurfing::AddSpacingBig();
+
+				guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
 				ofxImGuiSurfing::AddSpacingBigSeparated();
+
+				if (bClickerMinimal) {
+					presets.draw_ImGui_ClickerMinimal();
+					ofxImGuiSurfing::AddSpacingBigSeparated();
+				}
+
+				if (presets.bGui_ClickerSimple) {
+					presets.draw_ImGui_ClickerSimple(false, false);
+					ofxImGuiSurfing::AddSpacingBigSeparated();
+				}
+
+				if (bParameters) guiManager.AddGroup(params);
+
+				guiManager.endWindow();
 			}
-
-			if(bParameters) guiManager.AddGroup(params);
-
-		guiManager.endWindow();
-		}
 	}
 	guiManager.end();
 
