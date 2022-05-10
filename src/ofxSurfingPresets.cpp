@@ -527,6 +527,7 @@ void ofxSurfingPresets::updateSmoother()
 }
 
 //TODO: fix crash!
+//crashes sometimes maybe depending on scope "types" of the classess that is adding params...
 //--------------------------------------------------------------
 void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 {
@@ -548,7 +549,7 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 	else if (isFloat)
 	{
 		auto pVal = ap.cast<float>();
-		auto pTar = params_Preset.getFloat(name);
+		auto pTar = params_Preset.getFloat(name);//crashes here
 
 		//ofParameter<float> pVal = ap.cast<float>();
 		//ofParameter<float> pTar = params_Preset.getFloat(name);
