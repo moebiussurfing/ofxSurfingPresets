@@ -115,7 +115,7 @@ void ofxSurfingPresets::setup()
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
 
-	index.set("Preset Index", 0, 0, 0);
+	index.set("Index", 0, 0, 0);
 
 	bDebug.set("Debug", true);
 	bKeys.set("Keys", true);
@@ -683,11 +683,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					}
 
 					// Index
-					ImGui::PushItemWidth(_w50);
 					guiManager.Add(index);
-					//ofxImGuiSurfing::AddParameter(index);
-					ImGui::PopItemWidth();
-					//guiManager.Add(index, OFX_IM_SLIDER, 2);
 					//ofxImGuiSurfing::AddParameter(index);
 
 					// Browse
@@ -758,17 +754,13 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					guiManager.Add(surfingPlayer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 					if (surfingPlayer.bGui)
 					{
-						ImGui::Indent();
-						guiManager.refreshLayout();
+						guiManager.Indent();
 						guiManager.Add(surfingPlayer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 						if (!guiManager.bMinimize)
 						{
-							ImGui::PushItemWidth(_w100 * 0.7);
 							ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
-							ImGui::PushItemWidth(_w100 * 0.7);
 						}
-						ImGui::Unindent();
-						guiManager.refreshLayout();
+						guiManager.Unindent();
 					}
 #endif
 					//-
@@ -901,7 +893,6 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 											ImGui::EndPopup();
 										}
 
-
 										if (ImGui::Button("RECREATE", ImVec2(_w100, _h)))
 										{
 											doRefreshFilesAndRename();
@@ -941,8 +932,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 						if (guiManager.bExtra)
 						{
-							ImGui::Indent();
-							guiManager.refreshLayout();
+							guiManager.Indent();
 							{
 								// Keys
 								//ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
@@ -958,40 +948,30 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 									ofxImGuiSurfing::AddToggleRoundedButton(b);
 									if (b)
 									{
-										ImGui::Indent();
-										ImGui::PushItemWidth(_w50);
+										guiManager.Indent();
 										ofxImGuiSurfing::AddParameter(v, "%.1f");
-										ImGui::PopItemWidth();
 										//guiManager.Add(v, OFX_IM_HSLIDER_SMALL_NO_LABELS, 2);
-										ImGui::Unindent();
+										guiManager.Unindent();
 									}
 								}
 
 								ofxImGuiSurfing::AddToggleRoundedButton(bGui_ClickerSimple);
 								if (bGui_ClickerSimple)
 								{
-									ImGui::Indent();
-									guiManager.refreshLayout();
+									guiManager.Indent();
 
 									ofxImGuiSurfing::AddToggleRoundedButton(bRespBtns);
 									if (bRespBtns)
 									{
-										ImGui::PushItemWidth(_w50);
 										ofxImGuiSurfing::AddParameter(amntBtnsPerRowClickerMini);
-										ImGui::PopItemWidth();
-
-										//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
 										//ofxImGuiSurfing::AddIntStepped(amntBtnsPerRowClickerMini);
-										//ImGui::PopItemWidth();
-
 										//guiManager.Add(amntBtnsPerRowClickerMini, OFX_IM_SLIDER);
 										//guiManager.Add(amntBtnsPerRowClickerMini, OFX_IM_HSLIDER_SMALL);
 										//guiManager.Add(amntBtnsPerRowClickerMini, OFX_IM_DEFAULT);
 										//guiManager.Add(amntBtnsPerRowClickerMini, OFX_IM_STEPPER);
 									}
 
-									ImGui::Unindent();
-									guiManager.refreshLayout();
+									guiManager.Unindent();
 								}
 								ofxImGuiSurfing::AddToggleRoundedButton(bCycled);
 								ofxImGuiSurfing::AddToggleRoundedButton(bAutoSaveTimer);
@@ -1003,8 +983,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 								ofxImGuiSurfing::AddToggleRoundedButton(bFiles);
 								if (bFiles)
 								{
-									ImGui::Indent();
-									guiManager.refreshLayout();
+									guiManager.Indent();
 									{
 										// Paths
 										{
@@ -1051,14 +1030,13 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 											ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
 										}
 									}
-									ImGui::Unindent();
-									guiManager.refreshLayout();
+									guiManager.Unindent();
 								}
 
 								ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
 							}
-							ImGui::Unindent();
-							guiManager.refreshLayout();
+							guiManager.Unindent();
+
 						}
 					}
 
@@ -1172,11 +1150,9 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 					guiManager.Add(surfingPlayer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 					if (surfingPlayer.bGui)
 					{
-						ImGui::Indent();
-						guiManager.refreshLayout();
+						guiManager.Indent();
 						guiManager.Add(surfingPlayer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-						ImGui::Unindent();
-						guiManager.refreshLayout();
+						guiManager.Unindent();
 					}
 #endif
 					// MIDI
@@ -1197,12 +1173,8 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 				if (!bMinimize_Clicker)
 					if (bExtraFloatClicker)
 					{
-						ImGui::Indent();
+						guiManager.Indent();
 						{
-							guiManager.refreshLayout();
-
-							//----
-
 							if (respBtnsFloatClicker)
 							{
 								guiManager.Add(amntBtnsPerRowClickerFloat, OFX_IM_SLIDER);
@@ -1211,8 +1183,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 							ofxImGuiSurfing::AddToggleRoundedButton(respBtnsFloatClicker);
 							ofxImGuiSurfing::AddToggleRoundedButton(bAutoResizeFloatClicker);
 						}
-						ImGui::Unindent();
-						guiManager.refreshLayout();
+						guiManager.Unindent();
 					}
 
 				//-
@@ -1278,17 +1249,14 @@ void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 		float _w2 = ofxImGuiSurfing::getWidgetsWidth(2);
 		float _h = getWidgetsHeightRelative();
 
-		//ImGui::Dummy(ImVec2(0, 2));
-
 		guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 		// Scrollable list
+
 		if (!fileNames.empty())
 		{
 			int _i = index;
 
-			//ImGui::PushItemWidth(WIDGET_PARAM_PADDING);
-			//ImGui::PushItemWidth(_w1);
 			if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
 			{
 				ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
@@ -1307,15 +1275,13 @@ void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 					//}
 				}
 			}
-			//ImGui::PopItemWidth();
 		}
 
 		if (!guiManager.bMinimize)
 		{
 			// Index
-			ImGui::PushItemWidth(_w2);
+
 			ofxImGuiSurfing::AddParameter(index);
-			ImGui::PopItemWidth();
 		}
 
 		if (!guiManager.bMinimize)
@@ -2175,7 +2141,7 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 {
 	ofLogNotice(__FUNCTION__);
 
-	doClearPresets(1);
+	doClearPresets(true);
 
 	const int _max = amountKitOfPresetsSize;
 	//const int _max = dir.size();
@@ -2184,7 +2150,7 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 	{
 		index = i;
 		doNewPreset();
-		doRandomizeParams(true);
+		doRandomizeParams(true);//silent
 		doSaveCurrent();
 	}
 
@@ -2213,40 +2179,40 @@ void ofxSurfingPresets::doClearPresets(bool createOne)
 	index = 0;
 }
 
-//--------------------------------------------------------------
-void ofxSurfingPresets::doCopyPreset()
-{
-	//TODO:
-
-	//std::string ss = fileNames[index];
-	//ss += "_";
-	//ss += ofToString(dir.size());
-	////ss += ofToString(index);
-
-	//fileName = ss;
-	//filePath = path_Presets + "/" + fileName + _ext;
-	//ofLogNotice(__FUNCTION__) << filePath;
-
-	//ofxSurfingHelpers::saveGroup(params_Preset, filePath);
-
-	//doRefreshFiles();
-
-	////TODO: fix name extension
-	////TODO: set index to new one
-	//
-	//for (int i = 0; i < fileNames.size(); i++)
-	//{
-	//	auto _ss = ofSplitString(fileNames[i], ".");
-	//	std::string _filename = "NoName";
-	//	if (_ss.size() > 0) _filename = _ss[0];
-
-	//	if (fileNames[i] == _filename)
-	//	{
-	//		ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
-	//		index = i;
-	//	}
-	//}
-}
+////--------------------------------------------------------------
+//void ofxSurfingPresets::doCopyPreset()
+//{
+//	//TODO:
+//
+//	//std::string ss = fileNames[index];
+//	//ss += "_";
+//	//ss += ofToString(dir.size());
+//	////ss += ofToString(index);
+//
+//	//fileName = ss;
+//	//filePath = path_Presets + "/" + fileName + _ext;
+//	//ofLogNotice(__FUNCTION__) << filePath;
+//
+//	//ofxSurfingHelpers::saveGroup(params_Preset, filePath);
+//
+//	//doRefreshFiles();
+//
+//	////TODO: fix name extension
+//	////TODO: set index to new one
+//	//
+//	//for (int i = 0; i < fileNames.size(); i++)
+//	//{
+//	//	auto _ss = ofSplitString(fileNames[i], ".");
+//	//	std::string _filename = "NoName";
+//	//	if (_ss.size() > 0) _filename = _ss[0];
+//
+//	//	if (fileNames[i] == _filename)
+//	//	{
+//	//		ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
+//	//		index = i;
+//	//	}
+//	//}
+//}
 
 //--------------------------------------------------------------
 bool ofxSurfingPresets::doRefreshFiles()

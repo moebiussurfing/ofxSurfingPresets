@@ -546,7 +546,7 @@ public:
 	void doStoreState();//is a cache state to compare with a new editing version
 	void doRecallState();//available to restore cache states to undo editing version
 	void doNewPreset();
-	void doCopyPreset();
+	//void doCopyPreset();
 	void doDeletePreset(int pos = -1);
 	void doClearPresets(bool createOne = true);
 

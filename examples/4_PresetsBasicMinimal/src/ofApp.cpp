@@ -43,6 +43,7 @@ void ofApp::draw()
 
 		//--
 
+		//if(bWindow)
 		if (guiManager.beginWindow(bWindow))
 		{
 			guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
@@ -74,8 +75,9 @@ void ofApp::draw()
 			}
 
 			if(bParameters) guiManager.AddGroup(params);
-		}
+
 		guiManager.endWindow();
+		}
 	}
 	guiManager.end();
 
