@@ -210,6 +210,8 @@ private:
 	ofParameter<bool> bRandomPlay{ "Random", false };
 	std::vector<std::string> randomTypesPlayNames = { "Next Index", "Random Index", "Random Params" };
 	ofParameter<int> randomTypePlayIndex{ "Type", 0, 0, 2 };
+public:
+	ofParameter<bool> bGui_Player{ "Player", true };
 #endif
 
 	//--
@@ -423,7 +425,7 @@ public:
 	// Minimal
 	void draw_ImGui_ClickerMinimal();
 	// Clicker Simple (Inner )
-	void draw_ImGui_ClickerSimple(bool bHeader = true, bool bMinimal = false, bool bShowMinimize=true);//inner clicker to fast integrate clicker to an external ImGui panel windows.
+	void draw_ImGui_ClickerSimple(bool bHeader = true, bool bMinimal = false, bool bShowMinimize = true);//inner clicker to fast integrate clicker to an external ImGui panel windows.
 
 	// TODO: REMOVE. This is deprecated!
 	// Required to set to false when only one ImGui instance is created. 
@@ -895,11 +897,13 @@ private:
 			ofParameter<float> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
 			params_Preset_Smoothed.add(_p);
 		}
+
 		else if (isInt) {
 			ofParameter<int> p = aparam.cast<int>();
 			ofParameter<int> _p{ _name + suffix, p.get(), p.getMin(), p.getMax() };
 			params_Preset_Smoothed.add(_p);
 		}
+
 		//else if (isBool) {
 		//	ofParameter<bool> p = aparam.cast<bool>();
 		//	ofParameter<bool> _p{ _name + suffix, p.get() };
@@ -1078,7 +1082,7 @@ public:
 				return -1;
 			}
 		}
-	}
+}
 #endif
 
 };

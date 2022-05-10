@@ -200,10 +200,12 @@ void ofxSurfingPresets::setup()
 	//TODO:
 	// Split change gui toggle too. add another label ?
 	surfingPlayer.setNameSubPanel("Presets");
-	surfingPlayer.bGui = false;
+	//surfingPlayer.bGui = false;
+	bGui_Player.makeReferenceTo(surfingPlayer.bGui);
 
 	//-
 
+	// Define the behaviors to trig when player trigs the callback!
 	//--------------------------------------------------------------
 	listener_Beat = surfingPlayer.bPlayerBeatBang.newListener([this](bool &b) {
 		ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
@@ -215,6 +217,7 @@ void ofxSurfingPresets::setup()
 			case 0: doLoadNext(); break;
 			case 1: doRandomizeIndex(); break;
 			case 2: doRandomizeParams(); break;
+
 			default:break;
 			}
 		}
