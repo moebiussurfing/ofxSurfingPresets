@@ -2,12 +2,14 @@
 
 #include "ofMain.h"
 
+
 /*
 
 	This example shows and example with the minimal expression of a preset selector.
 	Kind of a player when you don't need deep edition in first plain.
 
 */
+
 
 #include "ofxSurfingPresets.h"
 #include "ofxSurfingImGui.h"
@@ -17,7 +19,6 @@ class ofApp : public ofBaseApp {
 public:
 
 	void setup();
-	void update();
 	void draw();
 	void drawScene();
 	void keyPressed(int key);
@@ -40,8 +41,6 @@ public:
 
 	ofxSurfing_ImGui_Manager guiManager; // -> The ImGui Manager !
 	
-	void setupImGui();
-
 	ofParameter<bool> bWindow{ "Window", true };
 	ofParameter<bool> bClickerMinimal{ "Clicker Minimal", false };
 	ofParameter<bool> bParameters{ "Parameters", false };

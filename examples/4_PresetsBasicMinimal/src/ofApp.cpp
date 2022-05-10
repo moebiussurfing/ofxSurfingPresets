@@ -14,19 +14,7 @@ void ofApp::setup() {
 
 	presets.addGroup(params);
 
-	setupImGui();
-}
-//--------------------------------------------------------------
-void ofApp::setupImGui()
-{
 	guiManager.setup();
-	//guiManager.addWindowSpecial(bWindow);
-	guiManager.startup();
-}
-
-//--------------------------------------------------------------
-void ofApp::update()
-{
 }
 
 //--------------------------------------------------------------
@@ -38,41 +26,30 @@ void ofApp::draw()
 
 	guiManager.begin();
 	{
-		//if (bWindow)
-			if (guiManager.beginWindow(bWindow))
-			{
-				guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-				guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-
-				ofxImGuiSurfing::AddSpacingBigSeparated();
-
-				guiManager.Add(presets.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
-				ofxImGuiSurfing::AddSpacingBig();
-
-				guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-				guiManager.Add(presets.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
-				ofxImGuiSurfing::AddSpacingBig();
-
-				guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
-				ofxImGuiSurfing::AddSpacingBigSeparated();
-
-				if (bClickerMinimal) {
-					presets.draw_ImGui_ClickerMinimal();
-					ofxImGuiSurfing::AddSpacingBigSeparated();
-				}
-
-				if (presets.bGui_ClickerSimple) {
-					presets.draw_ImGui_ClickerSimple(false, false);
-					ofxImGuiSurfing::AddSpacingBigSeparated();
-				}
-
-				if (bParameters) guiManager.AddGroup(params);
-
-				guiManager.endWindow();
+		if (guiManager.beginWindow(bWindow))
+		{
+			guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+			guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+			guiManager.AddSpacingBigSeparated();
+			guiManager.Add(presets.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			guiManager.AddSpacingBig();
+			guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			guiManager.Add(presets.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			guiManager.AddSpacingBig();
+			guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			guiManager.AddSpacingBigSeparated();
+			if (bClickerMinimal) {
+				presets.draw_ImGui_ClickerMinimal();
+				guiManager.AddSpacingBigSeparated();
 			}
+			if (presets.bGui_ClickerSimple) {
+				presets.draw_ImGui_ClickerSimple(false, false);
+				guiManager.AddSpacingBigSeparated();
+			}
+			if (bParameters) guiManager.AddGroup(params);
+
+			guiManager.endWindow();
+		}
 	}
 	guiManager.end();
 
@@ -90,6 +67,12 @@ void ofApp::keyPressed(int key)
 //--------------------------------------------------------------
 void ofApp::drawScene()
 {
+	// Bg Color
+	ofColor _colorBg = 64;//dark
+	//ofColor _colorBg = 255;//white
+
+	//--
+
 	// The final variables to apply to draw the below Scene.
 	// Notice that: 
 	// If declared here, they must be static to mantain the previous frame setted values!
@@ -114,7 +97,7 @@ void ofApp::drawScene()
 
 	//-
 
-	// Preprocess
+	// Pre process
 	_size1 += 0.2;
 	float _scale2 = _size1 / 5.f;
 	int _rSz = _size2 + (ofGetHeight() * _scale2);
@@ -123,10 +106,6 @@ void ofApp::drawScene()
 	float _rag = ofMap(_size1, 0, 1, 0, -30);
 
 	//-
-
-	// Bg Color
-	ofColor _colorBg = 32;//dark
-	//ofColor _colorBg = 255;//white
 
 	// Shape Color
 	ofColor _color;

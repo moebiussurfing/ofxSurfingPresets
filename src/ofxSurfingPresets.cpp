@@ -666,6 +666,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 						if (guiManager.bMinimize) ImGui::Text(fileName.data()); // -> using text input below
 						//if (guiManager.bExtra) ImGui::Text(path_Presets.data()); // -> show path
+
+						guiManager.AddSpacing();
 					}
 
 					//--
@@ -1233,6 +1235,9 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 				guiManager.Add(surfingPlayer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				guiManager.Indent();
+				guiManager.Add(surfingPlayer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				guiManager.Unindent();
 #endif
 			}
 
@@ -1259,32 +1264,31 @@ void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 
 		if (!fileNames.empty())
 		{
-			int _i = index;
+			guiManager.AddCombo(index, fileNames);
 
-			if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
-			{
-				ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
-
-				if (_i < fileNames.size())
-				{
-					index = _i;
-
-					//fileName = dir.getName(index);
-					//ofLogNotice(__FUNCTION__) << "Combo select: " << _i;
-
-					//if (dir.size() > 0 && index < dir.size())
-					//{
-					//	fileName = dir.getName(index);
-					//	filePath = dir.getPath(index);
-					//}
-				}
-			}
+			//int _i = index;
+			//if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
+			//{
+			//	ofLogNotice(__FUNCTION__) << "Index: " << ofToString(index);
+			//	ofLogNotice(__FUNCTION__) << "Index: " << ofToString(_i);
+			//	if (_i < fileNames.size())
+			//	{
+			//		index = _i;
+			//		//fileName = dir.getName(index);
+			//		//ofLogNotice(__FUNCTION__) << "Combo select: " << _i;
+			//		//if (dir.size() > 0 && index < dir.size())
+			//		//{
+			//		//	fileName = dir.getName(index);
+			//		//	filePath = dir.getPath(index);
+			//		//}
+			//	}
+			//}
 		}
+
+		// Index
 
 		if (!guiManager.bMinimize)
 		{
-			// Index
-
 			ofxImGuiSurfing::AddParameter(index);
 		}
 
@@ -1728,7 +1732,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					{
 						ofLogError(__FUNCTION__) << "File out of range";
 					}
-				}
+					}
 
 				//--
 
@@ -1786,7 +1790,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 					index_PRE = index;
 				}
-			}
+				}
 
 			//--
 
@@ -1796,7 +1800,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 			{
 				bIsRetrigged = true;
 			}
-		}
+			}
 
 		//--
 
@@ -1852,8 +1856,8 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		//		bGui_Editor = true;
 		//	}
 		//}
+		}
 	}
-}
 
 #ifdef USE_TOGGLE_TRIGGERS
 //--------------------------------------------------------------
