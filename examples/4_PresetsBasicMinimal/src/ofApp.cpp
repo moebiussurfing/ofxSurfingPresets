@@ -5,7 +5,7 @@ void ofApp::setup() {
 	ofSetCircleResolution(200);
 
 	// Group
-	params.setName("paramsGroup");
+	params.setName("myParamsGroup");
 	params.add(size1.set("size1", 0.5, 0, 1));
 	params.add(size2.set("size2", ofGetHeight() * 0.5, 0, ofGetHeight() * 0.25));
 	params.add(rotation1.set("rotation1", 1, 0, 2));
@@ -20,11 +20,7 @@ void ofApp::setup() {
 void ofApp::setupImGui()
 {
 	guiManager.setup();
-	//guiManager.setup(IM_GUI_MODE_INSTANTIATED_DOCKING);
-
-	guiManager.addWindowSpecial("Window1");
-	guiManager.addWindowSpecial("Window2");
-
+	guiManager.addWindowSpecial(bWindow);
 	guiManager.startup();
 }
 
@@ -45,53 +41,41 @@ void ofApp::draw()
 		ImGuiWindowFlags flagsw = ImGuiWindowFlags_None;
 		if (guiManager.bAutoResize) flagsw |= ImGuiWindowFlags_AlwaysAutoResize;
 
-		if (guiManager.beginWindow(bWindow1, flagsw))
+		//--
+
+		if (guiManager.beginWindow(bWindow))
 		{
-			presets.draw_ImGui_Minimal();
+			guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+			guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 			ofxImGuiSurfing::AddSpacingBigSeparated();
 
-			presets.draw_ImGui_ClickerMiniInner(false, false);
-		}
-		guiManager.endWindow();
-	
-		if (guiManager.beginWindow(bWindow2, flagsw))
-		{
-			ImGui::Text("Hello!");
 			guiManager.Add(presets.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_MINI);
 
-			guiManager.AddGroup(params);
+			ofxImGuiSurfing::AddSpacingBig();
+
+			guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			guiManager.Add(presets.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			
+			ofxImGuiSurfing::AddSpacingBig();
+
+			guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
+			ofxImGuiSurfing::AddSpacingBigSeparated();
+
+			if (bClickerMinimal) {
+				presets.draw_ImGui_ClickerMinimal();
+				ofxImGuiSurfing::AddSpacingBigSeparated();
+			}
+
+			if (presets.bGui_ClickerSimple) {
+				presets.draw_ImGui_ClickerSimple(false, false);
+				ofxImGuiSurfing::AddSpacingBigSeparated();
+			}
+
+			if(bParameters) guiManager.AddGroup(params);
 		}
 		guiManager.endWindow();
-
-		//--
-
-		//TODO:
-		// cascade
-
-		//if (ImGui::IsKeyReleased(ImGuiKey_Space))
-		//{
-		//	//ImGui
-		//	//auto &g = ImGui::GetImIO();
-		//	//auto g = guiManager.getGui();
-		//	//auto g2 = g.
-		//	//ImGui::GetMainViewport
-
-		//	ImVector<ImGuiWindow*> windows;
-		//	for (ImGuiWindow* window : g.WindowsFocusOrder)
-		//		if (window->WasActive)
-		//			windows.push_back(window);
-
-		//	if (windows.Size > 0)
-		//	{
-		//		ImVec2 base_pos = ImGui::GetMainViewport()->Pos;
-		//		ImVec2 step = ImFloor((ImGui::GetMainViewport()->Size * 0.7f) / (float)windows.Size);
-		//		//step.x = step.y = ImFloor(ImMin(step.x, step.y));
-		//		for (int n = 0; n < windows.Size; n++)
-		//			ImGui::SetWindowPos(windows[n], base_pos + step * ((float)n + 0.5f));
-		//	}
-		//}
 	}
 	guiManager.end();
 
@@ -103,10 +87,7 @@ void ofApp::draw()
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	if (key == OF_KEY_F1) 
-	{
-		presets.setGuiVisibleToggle();
-	}
+	if (key == OF_KEY_F1) bWindow = !bWindow;
 }
 
 //--------------------------------------------------------------

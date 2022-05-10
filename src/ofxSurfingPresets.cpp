@@ -102,7 +102,7 @@ void ofxSurfingPresets::setup()
 	bGui_Global.setSerializable(false);
 	bGui.set("SURFING PRESETS", true);
 	bGui_Editor.set("EDITOR", true);
-	bGui_ClickerMiniInner.set("Inner Clicker", false);
+	bGui_ClickerSimple.set("Clicker Simple", false);
 	bGui_ClickerFloating.set("CLICKER", true);
 	bGui_Parameters.set("PARAMETERS", false);
 
@@ -140,7 +140,7 @@ void ofxSurfingPresets::setup()
 	params_Control.add(bSetPathPresets);
 	params_Control.add(bRefresh);
 	//params_Control.add(bGui_Parameters);
-	//params_Control.add(bGui_ClickerMiniInner);
+	//params_Control.add(bGui_ClickerSimple);
 	//params_Control.add(bShowControl);
 	//params_Control.add(bGui_ClickerFloating);
 	//params_Control.add(bAutoSave);
@@ -164,7 +164,7 @@ void ofxSurfingPresets::setup()
 
 	params_AppSettings.add(bGui_Editor);
 	params_AppSettings.add(bGui_Parameters);
-	params_AppSettings.add(bGui_ClickerMiniInner);
+	params_AppSettings.add(bGui_ClickerSimple);
 	params_AppSettings.add(bAutoSave);
 	params_AppSettings.add(bAutoSaveTimer);
 	params_AppSettings.add(bCycled);
@@ -235,11 +235,11 @@ void ofxSurfingPresets::setup()
 
 	//-
 
-	params_InnerClicker.clear();
-	params_InnerClicker.setName("INNER CLICKER");
-	params_InnerClicker.add(amntBtnsPerRowClickerMini);
-	params_InnerClicker.add(bRespBtns);
-	params_AppSettings.add(params_InnerClicker);
+	params_ClickerSimple.clear();
+	params_ClickerSimple.setName("CLICKER SIMPLE");
+	params_ClickerSimple.add(amntBtnsPerRowClickerMini);
+	params_ClickerSimple.add(bRespBtns);
+	params_AppSettings.add(params_ClickerSimple);
 
 	// External extra or smooth params
 	if (params_AppExtra.getName() != "-1") params_AppSettings.add(params_AppExtra);
@@ -710,11 +710,11 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					//--
 
-					// Inner (not floating) Clicker Matrix
+					// Simple Clicker (Inner. not floating) Clicker Matrix
 
-					if (bGui_ClickerMiniInner)
+					if (bGui_ClickerSimple)
 					{
-						draw_ImGui_ClickerMiniInner(true);
+						draw_ImGui_ClickerSimple(false, true, false);
 					}
 
 					//--
@@ -935,6 +935,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					if (!guiManager.bMinimize)
 					{
 						ImGui::Spacing();
+						ImGui::Spacing();
 
 						guiManager.Add(guiManager.bExtra, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
@@ -966,8 +967,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 									}
 								}
 
-								ofxImGuiSurfing::AddToggleRoundedButton(bGui_ClickerMiniInner);
-								if (bGui_ClickerMiniInner)
+								ofxImGuiSurfing::AddToggleRoundedButton(bGui_ClickerSimple);
+								if (bGui_ClickerSimple)
 								{
 									ImGui::Indent();
 									guiManager.refreshLayout();
@@ -1222,9 +1223,9 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 	}
 }
 
-//--------------------------------------------------------------
-void ofxSurfingPresets::draw_ImGui_ClickerMiniInner(bool bHeader, bool bMinimal) {
-	if (!bGui_ClickerMiniInner) return;
+//-----------------------------------------i---------------------
+void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bool bShowMinimize) {
+	if (!bGui_ClickerSimple) return;
 
 	static bool bOpen = true;
 	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
@@ -1238,8 +1239,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerMiniInner(bool bHeader, bool bMinimal)
 	if (b)
 	{
 		guiManager.refreshLayout();
-
-		guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_MINI);
+		if (bShowMinimize) guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 		// Index
 		guiManager.Add(index, OFX_IM_HSLIDER_SMALL_NO_LABELS);
@@ -1266,7 +1266,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerMiniInner(bool bHeader, bool bMinimal)
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::draw_ImGui_Minimal()
+void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 {
 	bool bOpen = false;
 	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
@@ -1274,21 +1274,13 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 
 	if (ImGui::TreeNodeEx("PRESETS", _flagt))
 	{
-		float _w100 = ofxImGuiSurfing::getWidgetsWidth(1);
-		float _w50 = ofxImGuiSurfing::getWidgetsWidth(2);
+		float _w1 = ofxImGuiSurfing::getWidgetsWidth(1);
+		float _w2 = ofxImGuiSurfing::getWidgetsWidth(2);
 		float _h = getWidgetsHeightRelative();
 
 		//ImGui::Dummy(ImVec2(0, 2));
 
-		guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_MINI);
-
-		if (!guiManager.bMinimize)
-		{
-			// Index
-			//ImGui::PushItemWidth(_w1 - 20);
-			ofxImGuiSurfing::AddParameter(index);
-			//ImGui::PopItemWidth();
-		}
+		guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 		// Scrollable list
 		if (!fileNames.empty())
@@ -1320,14 +1312,22 @@ void ofxSurfingPresets::draw_ImGui_Minimal()
 
 		if (!guiManager.bMinimize)
 		{
+			// Index
+			ImGui::PushItemWidth(_w2);
+			ofxImGuiSurfing::AddParameter(index);
+			ImGui::PopItemWidth();
+		}
+
+		if (!guiManager.bMinimize)
+		{
 			ImGui::PushButtonRepeat(true);
 			{
-				if (ImGui::Button("<", ImVec2(_w50, _h)))
+				if (ImGui::Button("<", ImVec2(_w2, _h)))
 				{
 					doLoadPrevious();
 				}
 				ImGui::SameLine();
-				if (ImGui::Button(">", ImVec2(_w50, _h)))
+				if (ImGui::Button(">", ImVec2(_w2, _h)))
 				{
 					doLoadNext();
 				}
@@ -1779,7 +1779,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					ofLogNotice(__FUNCTION__) << "PRESET COPY!";
 
 					index_PRE = index;
-			}
+				}
 
 				//--
 
@@ -1816,7 +1816,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 					index_PRE = index;
 				}
-		}
+			}
 
 			//--
 
@@ -1826,7 +1826,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 			{
 				bIsRetrigged = true;
 			}
-	}
+		}
 
 		//--
 
@@ -1882,7 +1882,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		//		bGui_Editor = true;
 		//	}
 		//}
-}
+	}
 }
 
 #ifdef USE_TOGGLE_TRIGGERS
@@ -1933,7 +1933,7 @@ void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter &e)
 	//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 	//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 	//remoteServer.syncParameters();
-	}
+}
 #endif
 
 ////--------------------------------------------------------------
@@ -2067,7 +2067,7 @@ void ofxSurfingPresets::doNewPreset()
 
 	//TODO:
 	// Must fix!
-
+	// Should be a method 
 	// Autocreate notes for each index preset
 #ifdef USE_TOGGLE_TRIGGERS
 	int diff = index.getMax() - (notesIndex.size() - 1);
@@ -2151,8 +2151,8 @@ void ofxSurfingPresets::doPopulatePresets(int amount)
 	int _max;
 	if (amount == -1)
 	{
-		_max = AMOUNT_KIT_SIZE_DEFAULT;
-		//const int _max = dir.size();
+		_max = amountKitOfPresetsSize;
+		//const int _max = dir.size();//same amount that files on folder
 	}
 	else _max = amount;
 
@@ -2163,11 +2163,11 @@ void ofxSurfingPresets::doPopulatePresets(int amount)
 		doSaveCurrent();
 	}
 
-	// workflow
-	amntBtnsPerRowClickerFloat.setMax(_max);
-	amntBtnsPerRowClickerMini.setMax(_max);
-	amntBtnsPerRowClickerFloat.set(_max / 3);
-	amntBtnsPerRowClickerMini.set(_max / 3);
+	//// workflow
+	//amntBtnsPerRowClickerFloat.setMax(_max);
+	//amntBtnsPerRowClickerMini.setMax(_max);
+	//amntBtnsPerRowClickerFloat.set(_max / 3);
+	//amntBtnsPerRowClickerMini.set(_max / 3);
 }
 
 //--------------------------------------------------------------
@@ -2177,22 +2177,22 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 
 	doClearPresets(1);
 
-	const int _max = AMOUNT_KIT_SIZE_DEFAULT;
+	const int _max = amountKitOfPresetsSize;
 	//const int _max = dir.size();
 
 	for (int i = 0; i < _max - 1; i++)
 	{
 		index = i;
 		doNewPreset();
-		doSortParams(i);
+		doRandomizeParams(true);
 		doSaveCurrent();
 	}
 
-	// workflow
-	amntBtnsPerRowClickerFloat.setMax(_max);
-	amntBtnsPerRowClickerMini.setMax(_max);
-	amntBtnsPerRowClickerFloat.set(_max / 3);
-	amntBtnsPerRowClickerMini.set(_max / 3);
+	//// workflow
+	//amntBtnsPerRowClickerFloat.setMax(_max);
+	//amntBtnsPerRowClickerMini.setMax(_max);
+	//amntBtnsPerRowClickerFloat.set(_max / 3);
+	//amntBtnsPerRowClickerMini.set(_max / 3);
 }
 
 //--------------------------------------------------------------
@@ -2329,7 +2329,7 @@ bool ofxSurfingPresets::doRefreshFiles()
 	//#endif
 
 #endif
-	}
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRefreshFilesAndRename()
@@ -2447,47 +2447,48 @@ void ofxSurfingPresets::doRandomizeIndex() {
 	load(i);
 }
 
+////TODO:
+//// should think a better use..
+////--------------------------------------------------------------
+//void ofxSurfingPresets::doSortParams(int i) {
+//	//TODO: this is a workaround to autopopulate presets on ofxSurfingPresets...
+//
+//	ofLogNotice(__FUNCTION__);
+//
+//	for (int i = 0; i < params_Preset.size(); i++)
+//	{
+//		//// apply only if enabled
+//		//auto &pe = params_Preset[i];
+//		//auto type = pe.type();
+//		//bool isBool = type == typeid(ofParameter<bool>).name();
+//		//if (isBool) {
+//		//	ofParameter<bool> pb = pe.cast<bool>();
+//		//	if (!pb.get()) continue;
+//		//}
+//
+//		//-
+//
+//		auto &p = params_Preset[i];
+//
+//		//float v;
+//		//if (p.type() == typeid(ofParameter<float>).name())
+//		//{
+//		//	ofParameter<float> pr = p.cast<float>();
+//		//	pr = i;
+//		//}
+//		//else 
+//		if (p.type() == typeid(ofParameter<int>).name())
+//		{
+//			ofParameter<int> pr = p.cast<int>();
+//			pr = i;
+//		}
+//	}
+//
+//	bIsRetrigged = true;
+//}
+
 //--------------------------------------------------------------
-void ofxSurfingPresets::doSortParams(int i) {
-	//TODO: this is a workaround to autopopulate presets on ofxSurfingPresets...
-
-	ofLogNotice(__FUNCTION__);
-
-	for (int i = 0; i < params_Preset.size(); i++)
-	{
-		//// apply only if enabled
-		//auto &pe = params_Preset[i];
-		//auto type = pe.type();
-		//bool isBool = type == typeid(ofParameter<bool>).name();
-		//if (isBool) {
-		//	ofParameter<bool> pb = pe.cast<bool>();
-		//	if (!pb.get()) continue;
-		//}
-
-		//-
-
-		auto &p = params_Preset[i];
-
-		//float v;
-		//if (p.type() == typeid(ofParameter<float>).name())
-		//{
-		//	ofParameter<float> pr = p.cast<float>();
-		//	pr = i;
-		//}
-		//else 
-		if (p.type() == typeid(ofParameter<int>).name())
-		{
-			ofParameter<int> pr = p.cast<int>();
-			pr = i;
-		}
-	}
-
-	//bMustTrig = true;
-	bIsRetrigged = true;
-}
-
-//--------------------------------------------------------------
-void ofxSurfingPresets::doRandomizeParams() {
+void ofxSurfingPresets::doRandomizeParams(bool bNoTrig) {
 	ofLogNotice(__FUNCTION__);
 
 	for (int i = 0; i < params_Preset.size(); i++)
@@ -2510,17 +2511,18 @@ void ofxSurfingPresets::doRandomizeParams() {
 		if (p.type() == typeid(ofParameter<float>).name())
 		{
 			ofParameter<float> pr = p.cast<float>();
-			pr = ofRandom(pr.getMin(), pr.getMax());
+			if (bNoTrig) pr.setWithoutEventNotifications(ofRandom(pr.getMin(), pr.getMax()));
+			else pr = ofRandom(pr.getMin(), pr.getMax());
 		}
 		else if (p.type() == typeid(ofParameter<int>).name())
 		{
 			ofParameter<int> pr = p.cast<int>();
-			pr = ofRandom(pr.getMin(), pr.getMax() + 1);
+			if (bNoTrig) pr.setWithoutEventNotifications(ofRandom(pr.getMin(), pr.getMax() + 1));
+			else pr = ofRandom(pr.getMin(), pr.getMax() + 1);
 		}
 	}
 
-	//bMustTrig = true;
-	bIsRetrigged = true;
+	if (!bNoTrig) bIsRetrigged = true;
 }
 
 //--------------------------------------------------------------
@@ -2545,6 +2547,5 @@ void ofxSurfingPresets::doResetParams() {
 		}
 	}
 
-	//bMustTrig = true;
 	bIsRetrigged = true;
 }

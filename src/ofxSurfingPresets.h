@@ -115,12 +115,12 @@ public:
 private:
 	// Default common amount presetsManager but can be resized
 #define AMOUNT_KIT_SIZE_DEFAULT_ 9
-	int AMOUNT_KIT_SIZE_DEFAULT = AMOUNT_KIT_SIZE_DEFAULT_;
+	int amountKitOfPresetsSize = AMOUNT_KIT_SIZE_DEFAULT_;
 
 public:
 	//--------------------------------------
 	void setMaxPresetsAmount(int amt) {//must be called first! before adding groups (who calls setup)
-		AMOUNT_KIT_SIZE_DEFAULT = amt;
+		amountKitOfPresetsSize = amt;
 	}
 
 	//----
@@ -302,34 +302,6 @@ public:
 	// 3. No need to reload the file settings
 	// 4. But we want to use the user box click to trig something
 
-//private:
-//
-//	bool bMustTrig = false;
-//
-//public:
-//
-//	//--------------------------------------------------------------
-//
-//	// Trig on select preset or not. 
-//	// this is useful when preset selected not changed, 
-//	// but we want to retrig current preset settings
-//	bool isMustTrig()
-//	{
-//		if (bMustTrig)
-//		{
-//			bMustTrig = false;
-//			return true;
-//		}
-//		else
-//		{
-//			return false;
-//		}
-//	}
-
-	// To retrig when preset index not changed but is clicked again.
-	// In some scenarios we will want to trig again some method,
-	// ie: when trigging video loops that are currently playing but we want to restart from the begining.
-
 public:
 
 	//--------------------------------------------------------------
@@ -369,6 +341,9 @@ private:
 	int keyFirstPos = -1;
 	char keyFirstChar = '0';
 	vector<char> keyCommandsChars;
+
+	//TODO:
+	// add mode without triggers and using just numbers
 
 public:
 
@@ -446,9 +421,9 @@ public:
 	void draw_ImGui_Parameters();
 
 	// Minimal
-	void draw_ImGui_Minimal();
-	// Inner clicker layout
-	void draw_ImGui_ClickerMiniInner(bool bHeader = true, bool bMinimal = false);//inner clicker to fast integrate clicker to an external ImGui panel windows.
+	void draw_ImGui_ClickerMinimal();
+	// Clicker Simple (Inner )
+	void draw_ImGui_ClickerSimple(bool bHeader = true, bool bMinimal = false, bool bShowMinimize=true);//inner clicker to fast integrate clicker to an external ImGui panel windows.
 
 	// TODO: REMOVE. This is deprecated!
 	// Required to set to false when only one ImGui instance is created. 
@@ -462,7 +437,7 @@ private:
 
 	ofParameter<int> amntBtnsPerRowClickerMini{ "Amt Buttons", 4, 1, 4 };
 	ofParameter<bool> bRespBtns{ "Responsive", true };
-	ofParameterGroup params_InnerClicker;
+	ofParameterGroup params_ClickerSimple;
 
 public:
 	ofParameter<bool> bMinimize_Clicker{ "Minimize", true };
@@ -574,12 +549,15 @@ public:
 	void doCopyPreset();
 	void doDeletePreset(int pos = -1);
 	void doClearPresets(bool createOne = true);
+
 	//--
 
 	// Tools Helpers
 
-	// set the index without calling callbacks. to "scripting purposes only". i.e. 
-	// populate presets with customized parameters.
+	// set the index without calling callbacks. 
+	// to "scripting purposes only". 
+	// i.e. 
+	// populate presets with customized parameters values!
 	//--------------------------------------------------------------
 	void doSavePresetIndexOffline(int i)
 	{
@@ -594,9 +572,10 @@ public:
 	void doPopulatePresetsRandomized();
 
 	void doResetParams();
-	void doSortParams(int i);
-	void doRandomizeParams();
+	void doRandomizeParams(bool bNoTrig = false);//true for silent mode for "scripting" purposes
 	void doRandomizeIndex();
+	//void doSortParams(int i);//TODO:? useful when params are kind of index selectors?
+
 	bool doRefreshFiles();
 	void doRefreshFilesAndRename();
 
@@ -634,7 +613,7 @@ public:
 	ofParameter<bool> bNewPreset;
 	ofParameter<bool> bSave;
 
-	ofParameter<bool> bGui_ClickerMiniInner;
+	ofParameter<bool> bGui_ClickerSimple;
 
 private:
 
