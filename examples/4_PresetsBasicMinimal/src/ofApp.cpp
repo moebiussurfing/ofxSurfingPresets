@@ -5,15 +5,17 @@ void ofApp::setup() {
 	ofSetCircleResolution(200);
 
 	// Group
-	params.setName("myParamsGroup");
+	params.setName("myParams");
 	params.add(size1.set("size1", 0.5, 0, 1));
 	params.add(size2.set("size2", ofGetHeight() * 0.5, 0, ofGetHeight() * 0.25));
 	params.add(rotation1.set("rotation1", 1, 0, 2));
 	params.add(rotation2.set("rotation2", 180, 0, 360));
 	params.add(indexColor.set("indexColor", 0, 0, 2));
 
+	// Set the Presets Manager
 	presets.addGroup(params);
 
+	// Gui init
 	guiManager.setup();
 }
 
@@ -28,21 +30,33 @@ void ofApp::draw()
 	{
 		if (guiManager.beginWindow(bWindow))
 		{
+			guiManager.AddLabelBig("Gui Manager", true);
 			guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 			guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 			guiManager.AddSpacingBigSeparated();
+
+			//--
+
+			guiManager.AddLabelBig("Presets Manager", true);
 			guiManager.Add(presets.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 			guiManager.AddSpacingBig();
+
 			guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 			guiManager.Add(presets.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 			guiManager.AddSpacingBig();
+
 			guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 			guiManager.AddSpacingBigSeparated();
-			if (bClickerMinimal) {
+			
+			if (bClickerMinimal)
+			{
+				guiManager.AddLabel("Clicker Minimal", true);
 				presets.draw_ImGui_ClickerMinimal();
 				guiManager.AddSpacingBigSeparated();
 			}
-			if (presets.bGui_ClickerSimple) {
+			if (presets.bGui_ClickerSimple) 
+			{
+				guiManager.AddLabel("Clicker Simple", true);
 				presets.draw_ImGui_ClickerSimple(false, false);
 				guiManager.AddSpacingBigSeparated();
 			}
@@ -67,7 +81,7 @@ void ofApp::keyPressed(int key)
 //--------------------------------------------------------------
 void ofApp::drawScene()
 {
-	// Bg Color
+	// bg Color
 	ofColor _colorBg = 64;//dark
 	//ofColor _colorBg = 255;//white
 
@@ -75,7 +89,7 @@ void ofApp::drawScene()
 
 	// The final variables to apply to draw the below Scene.
 	// Notice that: 
-	// If declared here, they must be static to mantain the previous frame setted values!
+	// If declared here, they must be static to maintain the previous frame setted values!
 	static float _size1;
 	static int _size2;
 	static float _rotation1;

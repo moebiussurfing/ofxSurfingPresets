@@ -424,7 +424,8 @@ public:
 
 	// Minimal
 	void draw_ImGui_ClickerMinimal();
-	// Clicker Simple (Inner )
+
+	// Clicker Simple (Inner)
 	void draw_ImGui_ClickerSimple(bool bHeader = true, bool bMinimal = false, bool bShowMinimize = true);//inner clicker to fast integrate clicker to an external ImGui panel windows.
 
 	// TODO: REMOVE. This is deprecated!
@@ -437,8 +438,8 @@ public:
 
 private:
 
-	ofParameter<int> amntBtnsPerRowClickerMini{ "Amt Buttons", 4, 1, 4 };
-	ofParameter<bool> bRespBtns{ "Responsive", true };
+	ofParameter<int> amountButtonsPerRowClickerMini{ "Amt Buttons", -1, 1, 4 };
+	ofParameter<bool> bResponsiveButtons{ "Responsive", true };
 	ofParameterGroup params_ClickerSimple;
 
 public:
@@ -714,16 +715,10 @@ public:
 	ofParameter<bool> bGui_ClickerFloating;
 	ofParameter<bool> bGui_Parameters;
 
-	//--------------------------------------------------------------
-	void setClickerAmount(int num) {//amount of preset buttons per row
-		amntBtnsPerRowClickerFloat = num;
-		amntBtnsPerRowClickerMini = num;
-	}
-
 public:
 
-	ofParameter<bool> bKeys;//public to be shared to link with external keys toggles.
-	//that's useful when using many add-ons working together.
+	ofParameter<bool> bKeys; // public to be shared to link with external keys toggles.
+	// that's useful when using many add-ons working together.
 
 private:
 
@@ -737,11 +732,21 @@ private:
 	//ofParameter<std::string> MODE_App_Name;
 
 	// Floating Clicker Layout
-	ofParameter<int> amntBtnsPerRowClickerFloat{ "MaxBut", 1, 1, 1 };
+	ofParameter<int> amountButtonsPerRowClickerFloat{ "MaxBut", -1, 1, 1 };
 	ofParameter<bool> respBtnsFloatClicker{ "Responsive", true };
 	ofParameter<bool> bExtraFloatClicker{ "Extra", false };
 	ofParameter<bool> bAutoResizeFloatClicker{ "Auto Resize", true };
 	ofParameterGroup params_FloatClicker;
+
+public:
+
+	//--------------------------------------------------------------
+	void setClickersAmountButtonsPerRow(int num) // amount of preset buttons per row on matrix clickers
+	{
+		num = MIN(num, index.getMax() - index.getMin());
+		amountButtonsPerRowClickerFloat = num;
+		amountButtonsPerRowClickerMini = num;
+	}
 
 	//void Changed_AppSettings(ofAbstractParameter &e);
 	//void Changed_Params(ofAbstractParameter &e);
@@ -752,12 +757,12 @@ public:
 	//--------------------------------------------------------------
 	void setMaxPresetsAmountPerRowClickerFloat(int amount)
 	{
-		amntBtnsPerRowClickerFloat = amount;
+		amountButtonsPerRowClickerFloat = amount;
 	}
 	//--------------------------------------------------------------
 	void setMaxPresetsAmountPerRowClickerMini(int amount)
 	{
-		amntBtnsPerRowClickerMini = amount;
+		amountButtonsPerRowClickerMini = amount;
 	}
 
 public:
@@ -1082,7 +1087,7 @@ public:
 				return -1;
 			}
 		}
-}
+	}
 #endif
 
 };
