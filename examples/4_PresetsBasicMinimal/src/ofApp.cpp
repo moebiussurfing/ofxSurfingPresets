@@ -6,14 +6,14 @@ void ofApp::setup() {
 
 	// Group
 	params.setName("myParams");
-	params.add(size1.set("size1", 0.5, 0, 1));
-	params.add(size2.set("size2", ofGetHeight() * 0.5, 0, ofGetHeight() * 0.25));
+	params.add(size1.set("size1", 0.5f, 0.f, 0.1f));
+	params.add(size2.set("size2", ofGetHeight() * 0.5f, 0, ofGetHeight() * 0.25f));
 	params.add(rotation1.set("rotation1", 1, 0, 2));
 	params.add(rotation2.set("rotation2", 180, 0, 360));
 	params.add(indexColor.set("indexColor", 0, 0, 2));
 
 	// Set the Presets Manager
-	presets.addGroup(params);
+	presetsManager.addGroup(params);
 
 	// Gui init
 	guiManager.setup();
@@ -28,38 +28,42 @@ void ofApp::draw()
 
 	guiManager.begin();
 	{
+		ImGuiCond flag = ImGuiCond_FirstUseEver;
+		ImGui::SetNextWindowPos(ImVec2(ofGetWidth() - 200, 20), flag);
+
 		if (guiManager.beginWindow(bWindow))
 		{
-			guiManager.AddLabelBig("Gui Manager", true);
+			guiManager.AddLabelBig("Gui Manager");//uppercased
 			guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 			guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-			guiManager.AddSpacingBigSeparated();
+			guiManager.AddSeparator();
 
-			//--
-
-			guiManager.AddLabelBig("Presets Manager", true);
-			guiManager.Add(presets.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			guiManager.AddSpacingBig();
-
+			guiManager.AddLabelBig("Presets Manager");
+			guiManager.Add(presetsManager.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			guiManager.Indent();
+			guiManager.Add(presetsManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+			guiManager.Add(presetsManager.bAlignWindows, OFX_IM_BUTTON_SMALL);
+			guiManager.AddSpacing();
 			guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			guiManager.Add(presets.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			guiManager.AddSpacingBig();
-
+			guiManager.Add(presetsManager.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			guiManager.AddSpacing();
+			guiManager.Unindent();
 			guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			guiManager.AddSpacingBigSeparated();
-			
+			guiManager.AddSeparator();
+
 			if (bClickerMinimal)
 			{
-				guiManager.AddLabel("Clicker Minimal", true);
-				presets.draw_ImGui_ClickerMinimal();
-				guiManager.AddSpacingBigSeparated();
+				guiManager.AddLabel("Clicker Minimal");
+				presetsManager.draw_ImGui_ClickerMinimal();
+				guiManager.AddSeparator();
 			}
-			if (presets.bGui_ClickerSimple) 
+			if (presetsManager.bGui_ClickerSimple)
 			{
-				guiManager.AddLabel("Clicker Simple", true);
-				presets.draw_ImGui_ClickerSimple(false, false);
-				guiManager.AddSpacingBigSeparated();
+				guiManager.AddLabel("Clicker Simple");
+				presetsManager.draw_ImGui_ClickerSimple(false, false);
+				guiManager.AddSeparator();
 			}
+
 			if (bParameters) guiManager.AddGroup(params);
 
 			guiManager.endWindow();
@@ -69,13 +73,16 @@ void ofApp::draw()
 
 	//----
 
-	presets.draw();
+	presetsManager.draw();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
 	if (key == OF_KEY_F1) bWindow = !bWindow;
+
+	//if (key == OF_KEY_F2) guiManager.doAlignWindows();
+	if (key == OF_KEY_F11) presetsManager.doAlignWindows();
 }
 
 //--------------------------------------------------------------
@@ -104,14 +111,15 @@ void ofApp::drawScene()
 	//_rotation2 = rotation2;
 
 	// B. Addon Smoother
-	_size1 = presets.get(size1);
-	_size2 = presets.get(size2);
-	_rotation1 = presets.get(rotation1);
-	_rotation2 = presets.get(rotation2);
+	_size1 = presetsManager.get(size1);
+	_size2 = presetsManager.get(size2);
+	_rotation1 = presetsManager.get(rotation1);
+	_rotation2 = presetsManager.get(rotation2);
 
 	//-
 
-	// Pre process
+	// Process
+
 	_size1 += 0.2;
 	float _scale2 = _size1 / 5.f;
 	int _rSz = _size2 + (ofGetHeight() * _scale2);
@@ -122,6 +130,7 @@ void ofApp::drawScene()
 	//-
 
 	// Shape Color
+
 	ofColor _color;
 	switch (indexColor)
 	{
@@ -139,7 +148,6 @@ void ofApp::drawScene()
 	// Draw
 
 	ofClear(_colorBg);
-
 	ofPushStyle();
 	ofPushMatrix();
 	{

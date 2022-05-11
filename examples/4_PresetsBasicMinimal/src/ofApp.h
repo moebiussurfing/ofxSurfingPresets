@@ -13,6 +13,7 @@
 
 #include "ofxSurfingPresets.h"
 #include "ofxSurfingImGui.h"
+#include "ofxWindowApp.h"
 
 class ofApp : public ofBaseApp {
 
@@ -23,7 +24,7 @@ public:
 	void drawScene();
 	void keyPressed(int key);
 
-	ofxSurfingPresets presets;
+	ofxSurfingPresets presetsManager;
 
 	//--
 
@@ -45,4 +46,7 @@ public:
 	ofParameter<bool> bClickerMinimal{ "Clicker Minimal", false };
 	ofParameter<bool> bParameters{ "Parameters", false };
 
+	//--
+
+	ofxWindowApp windowApp;
 };

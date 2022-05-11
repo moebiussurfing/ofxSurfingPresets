@@ -98,12 +98,14 @@ class ofxSurfingPresets
 	//----
 
 public:
+
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
 
 	//--
 
 private:
+
 	bool bEnableSettingsHandle = true;
 
 public:
@@ -113,11 +115,13 @@ public:
 	}
 
 private:
+
 	// Default common amount presetsManager but can be resized
 #define AMOUNT_KIT_SIZE_DEFAULT_ 9
 	int amountKitOfPresetsSize = AMOUNT_KIT_SIZE_DEFAULT_;
 
 public:
+
 	//--------------------------------------
 	void setMaxPresetsAmount(int amt) {//must be called first! before adding groups (who calls setup)
 		amountKitOfPresetsSize = amt;
@@ -152,6 +156,7 @@ public:
 #endif
 
 #ifdef USE_TOGGLE_TRIGGERS
+
 public:
 
 	vector<ofParameter<bool>> notesIndex;
@@ -186,6 +191,7 @@ public:
 
 		return params_PresetToggles;
 	}
+
 #endif
 
 	//----
@@ -193,10 +199,13 @@ public:
 	// Server
 
 #ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+
 private:
+
 	ofxRemoteParameters::Server remoteServer;
 	ofParameterGroup params_Server;
 	void Changed_Params_Preset(ofAbstractParameter &e);
+
 #endif
 
 	//----
@@ -204,14 +213,15 @@ private:
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+
 private:
-	SurfingPlayer surfingPlayer;
+
+	SurfingPlayer playerSurfer;
 	ofEventListener listener_Beat;
 	ofParameter<bool> bRandomPlay{ "Random", false };
 	std::vector<std::string> randomTypesPlayNames = { "Next Index", "Random Index", "Random Params" };
 	ofParameter<int> randomTypePlayIndex{ "Type", 0, 0, 2 };
-public:
-	ofParameter<bool> bGui_Player{ "Player", true };
+
 #endif
 
 	//--
@@ -420,7 +430,7 @@ public:
 	void draw();
 
 	void draw_ImGui_ClickerFloating();
-	void draw_ImGui_Parameters();
+	void draw_ImGui_Parameters();//will be the main or most used window
 
 	// Minimal
 	void draw_ImGui_ClickerMinimal();
@@ -443,7 +453,7 @@ private:
 	ofParameterGroup params_ClickerSimple;
 
 public:
-	ofParameter<bool> bMinimize_Clicker{ "Minimize", true };
+	ofParameter<bool> bMinimize_Editor{ "Minimize", true };
 
 private:
 	ofParameter<bool> bMinimize_Params{ "Minimize", true };
@@ -469,6 +479,7 @@ private:
 	ofParameterGroup params_Preset{ "-1" }; //-> The params that we are storing into each preset file.
 
 public:
+
 	ofParameter<bool> bMinimize{ "Minimize", true }; // to to mirror the gui manager internal bool and made it public.
 
 	//----
@@ -633,8 +644,6 @@ private:
 	ofParameter<bool> bSetPathPresets;
 	ofParameter<bool> bRefresh;
 	ofParameter<bool> bDebug;
-	//ofParameter<bool> bShowControl;
-
 
 	bool bOpen0 = true;
 	bool bGui_OverlayControl = true;
@@ -689,7 +698,7 @@ private:
 	//int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
 
 	// Autosave
-	ofParameter<bool> bAutoSaveTimer;
+	ofParameter<bool> bAutoSaveTimed;
 	uint64_t timerLast_Autosave = 0;
 	int timeToAutosave = 5000;
 
@@ -733,15 +742,15 @@ private:
 
 	// Floating Clicker Layout
 	ofParameter<int> amountButtonsPerRowClickerFloat{ "MaxBut", -1, 1, 1 };
-	ofParameter<bool> respBtnsFloatClicker{ "Responsive", true };
-	ofParameter<bool> bExtraFloatClicker{ "Extra", false };
-	ofParameter<bool> bAutoResizeFloatClicker{ "Auto Resize", true };
+	ofParameter<bool> bResponsiveButtons_ClickerFloating{ "Responsive", true };
+	ofParameter<bool> bExtra_ClickerFloating{ "Extra", false };
+	ofParameter<bool> bAutoResize_ClickerFloating{ "Auto Resize", true };
 	ofParameterGroup params_FloatClicker;
 
 public:
 
 	//--------------------------------------------------------------
-	void setClickersAmountButtonsPerRow(int num) // amount of preset buttons per row on matrix clickers
+	void setAmountButtonsPerRowClickers(int num) // amount of preset buttons per row on matrix clickers
 	{
 		num = MIN(num, index.getMax() - index.getMin());
 		amountButtonsPerRowClickerFloat = num;
@@ -767,14 +776,16 @@ public:
 
 public:
 
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 	//--------------------------------------------------------------
 	void setPlayerPlay(bool b)
 	{
-		surfingPlayer.bPlay = b;
+		playerSurfer.bPlay = b;
 	}
+#endif
 
 	//--------------------------------------------------------------
-	void setName(std::string s)//customize name to avoid collide with other preset manager instances
+	void setName(std::string s)// Customize global name to avoid collide with other preset manager instances
 	{
 		//if (s == "-1") s = "PRESETS EDITOR";
 		//else
@@ -783,13 +794,19 @@ public:
 		//	n += " EDITOR";
 		//}
 
-		bGui.setName(s);
-		surfingPlayer.setName(s);
 		name_Root = s;
+
+		bGui.setName(s);
+
+		//#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+		//		playerSurfer.setName(s);
+		//#endif
 	}
 
+	//--
+
 	void setPathGlobal(std::string s); // Must cal before setup.
-	void setPathPresets(std::string s); // Must call before addGroup/setup. Specially usefull when using multiple preset manager instances or different kits for the same instance.
+	void setPathPresets(std::string s); // Must call before addGroup/setup. Specially useful when using multiple preset manager instances or different kits for the same instance.
 	//TODO: Add a kit selector
 
 private:
@@ -839,6 +856,7 @@ private:
 	float sp;
 
 private:
+
 	ofParameterGroup params_Preset_Smoothed{ "params_Tweened" };
 
 	std::string suffix = "";//to append to the soomthed copied params
@@ -1090,4 +1108,44 @@ public:
 	}
 #endif
 
+	//----
+
+	// Align windows
+
+private:
+	string name_Window_ClickerFloating;
+	string name_Window_Editor;
+	string name_Window_Parameters;
+	string name_Window_Player;
+
+	bool bNoSettingsFileFound = false;
+
+public:
+	ofParameter <bool> bAlignWindows{ "Align Windows", false };
+
+	// Define the names that we will use on populate each window.
+	// Usually we use the name of the bool bGui. But we can rename too the window.
+	//--------------------------------------------------------------
+	void refreshWindowsNames()
+	{
+		name_Window_ClickerFloating = name_Root + " PRESETS";
+		name_Window_Editor = name_Root + " EDITOR";
+		name_Window_Parameters = name_Root + " PARAMS";
+
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
+		name_Window_Player = name_Root + " PLAYER";
+		playerSurfer.setNameWindow(name_Window_Player);
+#endif
+	}
+
+	bool bGui_Changed = true;
+	int countTimes;
+#define countTimes_MAX 2
+	
+	//--
+
+	//TODO:
+	//https://github.com/ocornut/imgui/issues/5287
+
+	void doAlignWindows();
 };
