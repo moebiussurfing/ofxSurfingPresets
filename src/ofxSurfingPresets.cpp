@@ -209,6 +209,10 @@ void ofxSurfingPresets::setup()
 	playerSurfer.setPathGlobal(path_Global);
 	//playerSurfer.setNameGuiToggle(name_Root);
 
+	bLinkWindows.makeReferenceTo(guiManager.bLinkWindows);
+
+	bAutoResize.makeReferenceTo(guiManager.bAutoResize);
+
 	//TODO:
 	// Split change gui toggle too. add another label ?
 	//playerSurfer.setNameSubPanel("Presets");
@@ -465,22 +469,29 @@ void ofxSurfingPresets::startup()
 //--------------------------------------------------------------
 void ofxSurfingPresets::update(ofEventArgs & args)
 {
-	if (ofGetFrameNum() == 2)
-	{
-		if (bNoSettingsFileFound) doAlignWindows();
-		// First time opening! We align windows.
-	}
+	//--
 
-	// Workflow
-	if (bGui_Changed)
-	{
-		// works weird..
-		// Workaround
-		// Repeat 4 frames bc ImGui must be refreshed...
-		countTimes++;
-		if (countTimes == (int)countTimes_MAX) bGui_Changed = false;
+	// Align Windows engine
 
-		doAlignWindows();
+	if (guiManager.bLinkWindows)
+	{
+		if (ofGetFrameNum() == 2)
+		{
+			if (bNoSettingsFileFound) doAlignWindowsOnce();
+			// First time opening! We align windows.
+		}
+
+		// Workflow
+		if (bGui_Changed)
+		{
+			doAlignWindowsOnce();
+
+			// works weird..
+			// Workaround
+			// Repeat x frames bc ImGui must be refreshed...
+			countTimes--;
+			if (countTimes == 0) bGui_Changed = false;
+		}
 	}
 
 	//--
@@ -737,11 +748,11 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					// Simple Clicker 
 					// (Inner. not floating) 
-
-					if (bGui_ClickerSimple)
-					{
-						draw_ImGui_ClickerSimple(false, true, false);
-					}
+					if (!bMinimize_Editor)
+						if (bGui_ClickerSimple)
+						{
+							draw_ImGui_ClickerSimple(false, true, false);
+						}
 
 					//--
 
@@ -768,31 +779,35 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 						guiManager.Add(bAutoSave, OFX_IM_TOGGLE_SMALL_BORDER_BLINK, 2, false);
 					}
 
-					//-
+					//--
 
-					// Clicker
+					if (!bMinimize_Editor)
+					{
+						// Clicker
 
-					guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
-					// Parameters
+						// Parameters
 
-					guiManager.Add(bGui_Parameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						guiManager.Add(bGui_Parameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
-					// Player
+						// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-					guiManager.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-					if (playerSurfer.bGui)
-					{
-						guiManager.Indent();
-						guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-						if (!bMinimize_Editor)
+						guiManager.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						if (playerSurfer.bGui)
 						{
-							ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
+							guiManager.Indent();
+							guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+							if (!bMinimize_Editor)
+							{
+								ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
+							}
+							guiManager.Unindent();
 						}
-						guiManager.Unindent();
-					}
 #endif
+					}
+
 					//-
 
 					// MIDI
@@ -804,35 +819,98 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					if (!bMinimize_Editor)
 					{
+						bool bOpen = false;
+						ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+						_flagt |= ImGuiTreeNodeFlags_Framed;
+
+						if (ImGui::TreeNodeEx("TOOLS", _flagt))
 						{
-							bool bOpen = false;
-							ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-							_flagt |= ImGuiTreeNodeFlags_Framed;
+							// 1. Preset
 
-							if (ImGui::TreeNodeEx("TOOLS", _flagt))
+							if (ImGui::TreeNodeEx("PRESET", _flagt))
 							{
-								// 1. Preset
+								guiManager.refreshLayout();
+								_w100 = getWidgetsWidth(1);
+								_w50 = getWidgetsWidth(2);
+								_w33 = getWidgetsWidth(3);
+								_w25 = getWidgetsWidth(4);
+								_h = getWidgetsHeightUnit();
 
-								if (ImGui::TreeNodeEx("PRESET", _flagt))
+								if (ImGui::Button("NEW", ImVec2(_w50, _h)))
 								{
-									guiManager.refreshLayout();
-									_w100 = getWidgetsWidth(1);
-									_w50 = getWidgetsWidth(2);
-									_w33 = getWidgetsWidth(3);
-									_w25 = getWidgetsWidth(4);
-									_h = getWidgetsHeightUnit();
+									doNewPreset();
+								}
+								ImGui::SameLine();
 
-									if (ImGui::Button("NEW", ImVec2(_w50, _h)))
-									{
-										doNewPreset();
+								if (ImGui::Button("DELETE", ImVec2(_w50, _h))) ImGui::OpenPopup("DELETE?");
+
+								if (ImGui::BeginPopupModal("DELETE?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+								{
+									ImGui::Text("Current Preset will be deleted.\nThis operation cannot be undone!\n\n");
+									ImGui::Separator();
+
+									static bool dont_ask_me_next_time = false;
+									ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+									ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+									ImGui::PopStyleVar();
+
+									if (!dont_ask_me_next_time) {
+										if (ImGui::Button("OK", ImVec2(120, 0))) {
+											ofLogNotice(__FUNCTION__) << "DELETE";
+											doDeletePreset(index);
+											ImGui::CloseCurrentPopup();
+										}
+										ImGui::SetItemDefaultFocus();
+										ImGui::SameLine();
+										if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
 									}
-									ImGui::SameLine();
+									else {
+										ofLogNotice(__FUNCTION__) << "DELETE";
+										doDeletePreset(index);
+										ImGui::CloseCurrentPopup();
+									}
 
-									if (ImGui::Button("DELETE", ImVec2(_w50, _h))) ImGui::OpenPopup("DELETE?");
+									ImGui::EndPopup();
+								}
 
-									if (ImGui::BeginPopupModal("DELETE?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+								draw_ImGui_ToolsWidgets();
+
+								ImGui::TreePop();
+							}
+
+							//--
+
+							// 2. Kit
+
+							if (ImGui::TreeNodeEx("KIT", _flagt))
+							{
+								guiManager.refreshLayout();
+								_w100 = getWidgetsWidth(1);
+								_w50 = getWidgetsWidth(2);
+								_w33 = getWidgetsWidth(3);
+								_w25 = getWidgetsWidth(4);
+								_h = getWidgetsHeightUnit();
+
+								guiManager.Add(bRefresh, OFX_IM_BUTTON_SMALL, 2, true);
+								guiManager.Add(bSetPathPresets, OFX_IM_BUTTON_SMALL, 2, false);
+
+								//TODO:
+								//if (ImGui::Button("COPY", ImVec2(_w2, _h)))
+								//{
+								//	doCopyPreset();
+								//}
+
+								//TODO: show only on last preset
+								//if (index == index.getMax())
+								{
+									if (ImGui::Button("CLEAR KIT", ImVec2(_w100, _h)))
 									{
-										ImGui::Text("Current Preset will be deleted.\nThis operation cannot be undone!\n\n");
+										ImGui::OpenPopup("CLEAR KIT?");
+									}
+
+									if (ImGui::BeginPopupModal("CLEAR KIT?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+									{
+										ImGui::Text("User Kit will be erased.\nThis operation cannot be undone!\n\n");
 										ImGui::Separator();
 
 										static bool dont_ask_me_next_time = false;
@@ -842,8 +920,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 										if (!dont_ask_me_next_time) {
 											if (ImGui::Button("OK", ImVec2(120, 0))) {
-												ofLogNotice(__FUNCTION__) << "DELETE";
-												doDeletePreset(index);
+												ofLogNotice(__FUNCTION__) << "CLEAR";
+												doClearPresets();
 												ImGui::CloseCurrentPopup();
 											}
 											ImGui::SetItemDefaultFocus();
@@ -851,99 +929,34 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 											if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
 										}
 										else {
-											ofLogNotice(__FUNCTION__) << "DELETE";
-											doDeletePreset(index);
+											ofLogNotice(__FUNCTION__) << "CLEAR";
+											doClearPresets();
 											ImGui::CloseCurrentPopup();
 										}
 
 										ImGui::EndPopup();
 									}
 
-									draw_ImGui_ToolsWidgets();
-
-									ImGui::TreePop();
-								}
-
-								//--
-
-								// 2. Kit
-
-								if (ImGui::TreeNodeEx("KIT", _flagt))
-								{
-									guiManager.refreshLayout();
-									_w100 = getWidgetsWidth(1);
-									_w50 = getWidgetsWidth(2);
-									_w33 = getWidgetsWidth(3);
-									_w25 = getWidgetsWidth(4);
-									_h = getWidgetsHeightUnit();
-
-									guiManager.Add(bRefresh, OFX_IM_BUTTON_SMALL, 2, true);
-									guiManager.Add(bSetPathPresets, OFX_IM_BUTTON_SMALL, 2, false);
-
-									//TODO:
-									//if (ImGui::Button("COPY", ImVec2(_w2, _h)))
-									//{
-									//	doCopyPreset();
-									//}
-
-									//TODO: show only on last preset
-									//if (index == index.getMax())
+									if (ImGui::Button("RECREATE", ImVec2(_w100, _h)))
 									{
-										if (ImGui::Button("CLEAR KIT", ImVec2(_w100, _h)))
-										{
-											ImGui::OpenPopup("CLEAR KIT?");
-										}
-
-										if (ImGui::BeginPopupModal("CLEAR KIT?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-										{
-											ImGui::Text("User Kit will be erased.\nThis operation cannot be undone!\n\n");
-											ImGui::Separator();
-
-											static bool dont_ask_me_next_time = false;
-											ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-											ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
-											ImGui::PopStyleVar();
-
-											if (!dont_ask_me_next_time) {
-												if (ImGui::Button("OK", ImVec2(120, 0))) {
-													ofLogNotice(__FUNCTION__) << "CLEAR";
-													doClearPresets();
-													ImGui::CloseCurrentPopup();
-												}
-												ImGui::SetItemDefaultFocus();
-												ImGui::SameLine();
-												if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-											}
-											else {
-												ofLogNotice(__FUNCTION__) << "CLEAR";
-												doClearPresets();
-												ImGui::CloseCurrentPopup();
-											}
-
-											ImGui::EndPopup();
-										}
-
-										if (ImGui::Button("RECREATE", ImVec2(_w100, _h)))
-										{
-											doRefreshFilesAndRename();
-										}
-
-										if (ImGui::Button("POPULATE", ImVec2(_w100, _h)))
-										{
-											doPopulatePresets();
-										}
-
-										if (ImGui::Button("POPU RND", ImVec2(_w100, _h)))
-										{
-											doPopulatePresetsRandomized();
-										}
+										doRefreshFilesAndRename();
 									}
 
-									ImGui::TreePop();
+									if (ImGui::Button("POPULATE", ImVec2(_w100, _h)))
+									{
+										doPopulatePresets();
+									}
+
+									if (ImGui::Button("POPU RND", ImVec2(_w100, _h)))
+									{
+										doPopulatePresetsRandomized();
+									}
 								}
 
 								ImGui::TreePop();
 							}
+
+							ImGui::TreePop();
 						}
 					}
 
@@ -1110,8 +1123,45 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 
 		ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 		{
-			guiManager.beginWindow(n.c_str(), bGui_ClickerFloating);
+			ImGuiWindowFlags flag = ImGuiWindowFlags_None;
+			if (bAutoResize_ClickerFloating) flag |= ImGuiWindowFlags_AlwaysAutoResize;
+
+			guiManager.beginWindow(n.c_str(), bGui_ClickerFloating, flag);
 			{
+				//--
+
+				// Align Windows engine
+
+				if (guiManager.bLinkWindows)
+				{
+					static ImVec2 pos;
+					static ImVec2 pos_PRE;
+					pos = ImGui::GetWindowPos();
+
+					static ImVec2 sz;
+					static ImVec2 sz_PRE;
+					sz = ImGui::GetWindowSize();
+
+					if ((sz.x != sz_PRE.x) && (sz.y != sz_PRE.y))
+					{
+						//cout << "Changed GetWindowSize" << endl;
+						sz_PRE = sz;
+
+						//doAlignWindowsOnce();
+						doAlignWindowsRefresh();
+					}
+					if ((pos.x != pos_PRE.x) && (pos.y != pos_PRE.y))
+					{
+						//cout << "Changed GetWindowPos" << endl;
+						pos_PRE = pos;
+
+						//doAlignWindowsOnce();
+						doAlignWindowsRefresh();
+					}
+				}
+
+				//--
+
 				_w1 = getWidgetsWidth(1);
 				_w2 = getWidgetsWidth(2);
 				_w3 = getWidgetsWidth(3);
@@ -1120,18 +1170,14 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 				//-
 
 				// Minimize
-				ofxImGuiSurfing::AddToggleRoundedButton(bMinimize);
+				guiManager.Add(bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+
+				// Align Windows
+				if (!bMinimize) guiManager.Add(guiManager.bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 				// Keys
 				if (!bMinimize) guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
-				// Play
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-				if (bMinimize)
-				{
-					guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-				}
-#endif
 				//----
 
 				// Clicker Matrix
@@ -1145,9 +1191,21 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 					//ofxImGuiSurfing::AddMatrixClickerLabels(index, (char *) keyCommandsChars, bResponsiveButtons_ClickerFloating, amountButtonsPerRowClickerFloat, true, sizey);
 				}
 
+
+				// Play
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+				if (bMinimize)
+				{
+					guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				}
+#endif
+
+				//guiManager.AddSpacing();
+
 				// Align Windows
-				if (!bMinimize)
-					guiManager.Add(bAlignWindows, OFX_IM_BUTTON_SMALL);
+				if (!bMinimize) guiManager.Add(bAlignWindows, OFX_IM_BUTTON_SMALL);
+
+				guiManager.AddSpacing();
 
 				// Toggles to show Panels
 				if (!bMinimize)
@@ -1233,7 +1291,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 		// Index
 		guiManager.Add(index, OFX_IM_HSLIDER_SMALL_NO_LABELS);
 
-		guiManager.AddSpacing();
+		//guiManager.AddSpacing();
 
 		// Clicker
 		ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtons, amountButtonsPerRowClickerMini, true, WIDGETS_HEIGHT / 2);
@@ -1646,23 +1704,31 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 		// Grouped callbacks to centralize and simplify
 
+		//--
+
 		//TODO:
 		// Workflow
 
-		if ((name == bGui.getName()) ||
-			(name == bGui_ClickerFloating.getName()) ||
-			(name == bGui_Editor.getName()) ||
-			(name == bGui_Parameters.getName())
-			//(name == bGui_Global.getName()) ||
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-			||
-			(name == playerSurfer.bGui.getName())
-#endif
-			)
+		// Align Windows engine
+
+		if (guiManager.bLinkWindows)
 		{
-			bGui_Changed = true;
-			countTimes = 0;
+			if ((name == bGui.getName()) ||
+				(name == bGui_ClickerFloating.getName()) ||
+				(name == bGui_Editor.getName()) ||
+				(name == bGui_Parameters.getName())
+				//(name == bGui_Global.getName()) ||
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
+				||
+				(name == playerSurfer.bGui.getName())
+#endif
+				)
+			{
+				doAlignWindowsRefresh();
+			}
 		}
+
+		//--
 
 		if (0) {}
 
@@ -1847,8 +1913,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 		else if (name == bAlignWindows.getName() && bAlignWindows)
 		{
-			bAlignWindows = false;
-			doAlignWindows();
+			doAlignWindowsRefresh();
 		}
 
 		//else if (name == bMODE_Active.getName())
@@ -2545,7 +2610,16 @@ void ofxSurfingPresets::doResetParams() {
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::doAlignWindows()
+void ofxSurfingPresets::doAlignWindowsRefresh(int ntimes)
+{
+	ofLogNotice(__FUNCTION__) << " amount " << ntimes;
+
+	bGui_Changed = true;
+	countTimes = ntimes;
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::doAlignWindowsOnce()
 {
 	ofLogNotice(__FUNCTION__) << " #" << countTimes;
 
@@ -2564,29 +2638,6 @@ void ofxSurfingPresets::doAlignWindows()
 		}
 	}
 	//cout << endl;
-
-	//if (windows.Size > 0)
-	//{
-	//	ImVec2 base_pos = ImGui::GetMainViewport()->Pos;
-	//	ImVec2 v1 = ImVec2(0.7f, 0.7f);
-	//	ImVec2 step = ImFloor((ImGui::GetMainViewport()->Size * v1) / (float)windows.Size);
-	//	step.x = step.y = ImFloor(ImMin(step.x, step.y));
-	//	for (int n = 0; n < windows.Size; n++)
-	//	{
-	//		ImVec2 v2 = ImVec2(((float)n + 0.5f), ((float)n + 0.5f));
-	//		ImGui::SetWindowPos(windows[n], base_pos + step * v2);
-	//	}
-	//	--
-	//	ImVec2 pos = windows[0]->Pos;
-	//	ImVec2 sz = windows[0]->Size;
-	//	ImVec2 gap = ImVec2(5.f, 0.f);
-	//	for (int n = 1; n < windows.Size; n++)
-	//	{
-	//		cout << windows[n]->Name << endl;
-	//		pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
-	//		ImGui::SetWindowPos(windows[n], pos);
-	//	}
-	//}
 
 	//--
 
@@ -2661,4 +2712,29 @@ void ofxSurfingPresets::doAlignWindows()
 		}
 #endif
 	}
+
+	//---
+
+	//if (windows.Size > 0)
+	//{
+	//	ImVec2 base_pos = ImGui::GetMainViewport()->Pos;
+	//	ImVec2 v1 = ImVec2(0.7f, 0.7f);
+	//	ImVec2 step = ImFloor((ImGui::GetMainViewport()->Size * v1) / (float)windows.Size);
+	//	step.x = step.y = ImFloor(ImMin(step.x, step.y));
+	//	for (int n = 0; n < windows.Size; n++)
+	//	{
+	//		ImVec2 v2 = ImVec2(((float)n + 0.5f), ((float)n + 0.5f));
+	//		ImGui::SetWindowPos(windows[n], base_pos + step * v2);
+	//	}
+	//	--
+	//	ImVec2 pos = windows[0]->Pos;
+	//	ImVec2 sz = windows[0]->Size;
+	//	ImVec2 gap = ImVec2(5.f, 0.f);
+	//	for (int n = 1; n < windows.Size; n++)
+	//	{
+	//		cout << windows[n]->Name << endl;
+	//		pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
+	//		ImGui::SetWindowPos(windows[n], pos);
+	//	}
+	//}
 }

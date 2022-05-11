@@ -33,22 +33,22 @@ void ofApp::draw()
 
 		if (guiManager.beginWindow(bWindow))
 		{
-			guiManager.AddLabelBig("Gui Manager");//uppercased
-			guiManager.Add(guiManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-			guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-			guiManager.AddSeparator();
-
-			guiManager.AddLabelBig("Presets Manager");
+			guiManager.AddLabelBig("Presets Manager");//uppercased
 			guiManager.Add(presetsManager.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 			guiManager.Indent();
-			guiManager.Add(presetsManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-			guiManager.Add(presetsManager.bAlignWindows, OFX_IM_BUTTON_SMALL);
-			guiManager.AddSpacing();
-			guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			guiManager.Add(presetsManager.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			guiManager.AddSpacing();
+			{
+				guiManager.Add(presetsManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				guiManager.Add(presetsManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				guiManager.Add(presetsManager.bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				guiManager.Add(presetsManager.bAlignWindows, OFX_IM_BUTTON_SMALL);
+				guiManager.AddSpacing();
+				guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+				guiManager.Add(presetsManager.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+				guiManager.AddSpacing();
+				guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			}
 			guiManager.Unindent();
-			guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
 			guiManager.AddSeparator();
 
 			if (bClickerMinimal)
@@ -79,10 +79,8 @@ void ofApp::draw()
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	if (key == OF_KEY_F1) bWindow = !bWindow;
-
-	//if (key == OF_KEY_F2) guiManager.doAlignWindows();
-	if (key == OF_KEY_F11) presetsManager.doAlignWindows();
+	if (key == OF_KEY_F10) bWindow = !bWindow;
+	if (key == OF_KEY_F11) presetsManager.doAlignWindowsOnce();
 }
 
 //--------------------------------------------------------------

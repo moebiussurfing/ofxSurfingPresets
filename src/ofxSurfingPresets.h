@@ -629,6 +629,12 @@ public:
 
 	ofParameter<bool> bGui_ClickerSimple;
 
+public:
+
+	ofParameter <bool> bAutoResize{ "-1", false };//align windows engine
+
+	//--
+
 private:
 
 	// Gui Params
@@ -744,7 +750,7 @@ private:
 	ofParameter<int> amountButtonsPerRowClickerFloat{ "MaxBut", -1, 1, 1 };
 	ofParameter<bool> bResponsiveButtons_ClickerFloating{ "Responsive", true };
 	ofParameter<bool> bExtra_ClickerFloating{ "Extra", false };
-	ofParameter<bool> bAutoResize_ClickerFloating{ "Auto Resize", true };
+	ofParameter<bool> bAutoResize_ClickerFloating{ "Auto Resize Clicker", true };
 	ofParameterGroup params_FloatClicker;
 
 public:
@@ -1110,7 +1116,7 @@ public:
 
 	//----
 
-	// Align windows
+	// Align Windows Engine
 
 private:
 	string name_Window_ClickerFloating;
@@ -1122,6 +1128,7 @@ private:
 
 public:
 	ofParameter <bool> bAlignWindows{ "Align Windows", false };
+	ofParameter <bool> bLinkWindows{ "-1", false};//align windows engine
 
 	// Define the names that we will use on populate each window.
 	// Usually we use the name of the bool bGui. But we can rename too the window.
@@ -1138,14 +1145,16 @@ public:
 #endif
 	}
 
-	bool bGui_Changed = true;
+	bool bGui_Changed = false;
 	int countTimes;
-#define countTimes_MAX 2
+#define countTimes_MAX 4
 	
 	//--
 
 	//TODO:
 	//https://github.com/ocornut/imgui/issues/5287
 
-	void doAlignWindows();
+	void doAlignWindowsOnce(); // run once
+	void doAlignWindowsRefresh(int ntimes = countTimes_MAX); // run many times
+	// that's to run during some frames.
 };
