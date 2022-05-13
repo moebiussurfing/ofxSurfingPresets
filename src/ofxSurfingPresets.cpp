@@ -523,7 +523,7 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 		remoteServer.syncParameters();
-}
+	}
 #endif
 
 	//--
@@ -675,7 +675,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
-				guiManager.beginWindow(n.c_str(), bGui_Editor);
+				if (guiManager.beginWindow(n.c_str(), bGui_Editor))
 				{
 					//ImGui::Text(params_Preset.getName().c_str());
 
@@ -1098,8 +1098,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					}
 
 					//-
+
+					guiManager.endWindow();
 				}
-				guiManager.endWindow();
 			}
 			ImGui::PopID();
 		}
@@ -1204,7 +1205,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 				//--
 
 				// Align Windows Engine
-				
+
 				//if (!bMinimize)
 				guiManager.AddSpacing();
 				guiManager.Add(bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
@@ -1459,8 +1460,8 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 						guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 						guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 					}
+					guiManager.endWindow();
 				}
-				guiManager.endWindow();
 			}
 			ImGui::PopID();
 		}
@@ -2658,8 +2659,8 @@ void ofxSurfingPresets::doAlignWindowsOnce()
 
 	if (windows.Size > 0)
 	{
-		const int gapx = 2;
-		const int gapy = 2;
+		const int gapx = 0;
+		const int gapy = 0;
 
 		ImVec2 pos;
 		ImVec2 sz;
