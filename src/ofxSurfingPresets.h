@@ -1126,8 +1126,16 @@ private:
 
 	bool bNoSettingsFileFound = false;
 
+	enum surfingAlignMode
+	{
+		SURFING_ALIGN_HORIZONTAL = 0,
+		SURFING_ALIGN_VERTICAL 
+	};
+	surfingAlignMode modeAlignWindows = SURFING_ALIGN_HORIZONTAL;
+
 public:
-	ofParameter <bool> bAlignWindows{ "Align Windows", false };
+	ofParameter <bool> bAlignWindowsX{ "AlignX", false };
+	ofParameter <bool> bAlignWindowsY{ "AlignY", false };
 	ofParameter <bool> bLinkWindows{ "-1", false};//align windows engine
 
 	// Define the names that we will use on populate each window.

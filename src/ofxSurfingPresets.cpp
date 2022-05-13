@@ -122,7 +122,9 @@ void ofxSurfingPresets::setup()
 	bKeys.set("Keys", true);
 	bKeySpace.set("Key Space", true);
 	bKeysArrows.set("Keys Arrows", true);
-	//bHelp.set("HELP", false);	
+	//bHelp.set("HELP", false);
+
+	//bAlignWindowsX.makeReferenceTo(guiManager.bAlign)
 
 	//-
 
@@ -136,7 +138,8 @@ void ofxSurfingPresets::setup()
 	params_Control.add(bLoad);
 	params_Control.add(bSetPathPresets);
 	params_Control.add(bRefresh);
-	params_Control.add(bAlignWindows);
+	params_Control.add(bAlignWindowsX);
+	params_Control.add(bAlignWindowsY);
 	params_Control.add(bMinimize);
 
 	//params_Control.add(bGui_Global);
@@ -471,7 +474,7 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 {
 	//--
 
-	// Align Windows engine
+	// Align Windows Engine
 
 	if (guiManager.bLinkWindows)
 	{
@@ -480,18 +483,17 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 			if (bNoSettingsFileFound) doAlignWindowsOnce();
 			// First time opening! We align windows.
 		}
+	}
+	// Workflow
+	if (bGui_Changed)
+	{
+		doAlignWindowsOnce();
 
-		// Workflow
-		if (bGui_Changed)
-		{
-			doAlignWindowsOnce();
-
-			// works weird..
-			// Workaround
-			// Repeat x frames bc ImGui must be refreshed...
-			countTimes--;
-			if (countTimes == 0) bGui_Changed = false;
-		}
+		// works weird..
+		// Workaround
+		// Repeat x frames bc ImGui must be refreshed...
+		countTimes--;
+		if (countTimes == 0) bGui_Changed = false;
 	}
 
 	//--
@@ -521,7 +523,7 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 		remoteServer.syncParameters();
-	}
+}
 #endif
 
 	//--
@@ -1126,11 +1128,12 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 			ImGuiWindowFlags flag = ImGuiWindowFlags_None;
 			if (bAutoResize_ClickerFloating) flag |= ImGuiWindowFlags_AlwaysAutoResize;
 
-			guiManager.beginWindow(n.c_str(), bGui_ClickerFloating, flag);
+			//guiManager.beginWindow(n.c_str(), bGui_ClickerFloating, flag);
+			if (guiManager.beginWindow(n.c_str(), bGui_ClickerFloating, flag))
 			{
 				//--
 
-				// Align Windows engine
+				// Align Windows Engine
 
 				if (guiManager.bLinkWindows)
 				{
@@ -1144,18 +1147,14 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 
 					if ((sz.x != sz_PRE.x) && (sz.y != sz_PRE.y))
 					{
-						//cout << "Changed GetWindowSize" << endl;
 						sz_PRE = sz;
 
-						//doAlignWindowsOnce();
 						doAlignWindowsRefresh();
 					}
 					if ((pos.x != pos_PRE.x) && (pos.y != pos_PRE.y))
 					{
-						//cout << "Changed GetWindowPos" << endl;
 						pos_PRE = pos;
 
-						//doAlignWindowsOnce();
 						doAlignWindowsRefresh();
 					}
 				}
@@ -1202,8 +1201,15 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 
 				//guiManager.AddSpacing();
 
-				// Align Windows
-				if (!bMinimize) guiManager.Add(bAlignWindows, OFX_IM_BUTTON_SMALL);
+				//--
+
+				// Align Windows Engine
+				
+				//if (!bMinimize)
+				guiManager.AddSpacing();
+				guiManager.Add(bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				guiManager.Add(bAlignWindowsX, OFX_IM_BUTTON_SMALL, 2, true);
+				guiManager.Add(bAlignWindowsY, OFX_IM_BUTTON_SMALL, 2, false);
 
 				guiManager.AddSpacing();
 
@@ -1251,7 +1257,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 							_w1 = getWidgetsWidth(1);
 							_w2 = getWidgetsWidth(2);
 
-							//guiManager.Add(bAlignWindows, OFX_IM_BUTTON_SMALL);
+							//guiManager.Add(bAlignWindowsX, OFX_IM_BUTTON_SMALL);
 
 							if (bResponsiveButtons_ClickerFloating)
 							{
@@ -1264,8 +1270,9 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 						}
 						guiManager.Unindent();
 					}
+
+				guiManager.endWindow();
 			}
-			guiManager.endWindow();
 		}
 		ImGui::PopID();
 	}
@@ -1709,15 +1716,28 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 		//TODO:
 		// Workflow
 
-		// Align Windows engine
+		// Align Windows Engine
 
-		if (guiManager.bLinkWindows)
+		if (name == bAlignWindowsX.getName() && bAlignWindowsX.get())
+		{
+			bAlignWindowsX = false;
+			modeAlignWindows = SURFING_ALIGN_HORIZONTAL;//set as default mode
+			doAlignWindowsRefresh();
+		}
+
+		else if (name == bAlignWindowsY.getName() && bAlignWindowsY.get())
+		{
+			bAlignWindowsY = false;
+			modeAlignWindows = SURFING_ALIGN_VERTICAL;//set as default mode
+			doAlignWindowsRefresh();
+		}
+
+		else if (guiManager.bLinkWindows)
 		{
 			if ((name == bGui.getName()) ||
 				(name == bGui_ClickerFloating.getName()) ||
 				(name == bGui_Editor.getName()) ||
 				(name == bGui_Parameters.getName())
-				//(name == bGui_Global.getName()) ||
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
 				||
 				(name == playerSurfer.bGui.getName())
@@ -1909,11 +1929,6 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 #endif
 
 			bDISABLECALLBACKS = false;
-		}
-
-		else if (name == bAlignWindows.getName() && bAlignWindows)
-		{
-			doAlignWindowsRefresh();
 		}
 
 		//else if (name == bMODE_Active.getName())
@@ -2644,15 +2659,18 @@ void ofxSurfingPresets::doAlignWindowsOnce()
 	if (windows.Size > 0)
 	{
 		const int gapx = 2;
+		const int gapy = 2;
 
 		ImVec2 pos;
 		ImVec2 sz;
 		ImVec2 gap;
 
-		gap = ImVec2(gapx, 0.f);
+		if (modeAlignWindows == SURFING_ALIGN_HORIZONTAL) gap = ImVec2(gapx, 0.f);
+		else if (modeAlignWindows == SURFING_ALIGN_VERTICAL) gap = ImVec2(0.f, gapy);
+
 		string namew;
 
-		// window clicker
+		// 0. window clicker (main and anchor window!)
 		bool b = false;
 		for (int n = 0; n < windows.Size; n++)
 		{
@@ -2668,44 +2686,47 @@ void ofxSurfingPresets::doAlignWindowsOnce()
 		}
 		if (!b) return;//main window must be visible or we will skip all below and return.
 
-		//  window edit
+		// 1. window edit
 		for (int n = 0; n < windows.Size; n++)
 		{
 			namew = windows[n]->Name;
 			if ((namew == name_Window_Editor) /*&& bGui_Editor*/)
 			{
-				pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
+				if (modeAlignWindows == SURFING_ALIGN_HORIZONTAL) pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
+				else if (modeAlignWindows == SURFING_ALIGN_VERTICAL) pos = ImVec2(pos + ImVec2(0, sz.y) + gap);
+
 				sz = windows[n]->Size;
-				//cout << name_Window_Editor << endl;
 				ImGui::SetWindowPos(windows[n], pos);
 				break;
 			}
 		}
 
-		// window parameters 
+		// 2. window parameters 
 		for (int n = 0; n < windows.Size; n++)
 		{
 			namew = windows[n]->Name;
 			if ((namew == name_Window_Parameters) /*&& bGui_Parameters*/)
 			{
-				pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
+				if (modeAlignWindows == SURFING_ALIGN_HORIZONTAL) pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
+				else if (modeAlignWindows == SURFING_ALIGN_VERTICAL) pos = ImVec2(pos + ImVec2(0, sz.y) + gap);
+
 				sz = windows[n]->Size;
-				//cout << name_Window_Parameters << endl;
 				ImGui::SetWindowPos(windows[n], pos);
 				break;
 			}
 		}
 
-		// window player 
+		// 3. window player 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
 		for (int n = 0; n < windows.Size; n++)
 		{
 			namew = windows[n]->Name;
 			if ((namew == name_Window_Player) /*&& playerSurfer.bGui*/)
 			{
-				pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
+				if (modeAlignWindows == SURFING_ALIGN_HORIZONTAL) pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
+				else if (modeAlignWindows == SURFING_ALIGN_VERTICAL) pos = ImVec2(pos + ImVec2(0, sz.y) + gap);
+
 				sz = windows[n]->Size;
-				//cout << name_Window_Player << endl;
 				ImGui::SetWindowPos(windows[n], pos);
 				break;
 			}

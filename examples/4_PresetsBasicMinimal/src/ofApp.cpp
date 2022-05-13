@@ -4,7 +4,7 @@
 void ofApp::setup() {
 	ofSetCircleResolution(200);
 
-	// Group
+	// Params Group
 	params.setName("myParams");
 	params.add(size1.set("size1", 0.5f, 0.f, 0.1f));
 	params.add(size2.set("size2", ofGetHeight() * 0.5f, 0, ofGetHeight() * 0.25f));
@@ -33,23 +33,33 @@ void ofApp::draw()
 
 		if (guiManager.beginWindow(bWindow))
 		{
-			guiManager.AddLabelBig("Presets Manager");//uppercased
+			guiManager.AddLabelBig("Parameters");//uppercased
+			guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			if (bParameters) {
+				guiManager.Indent();//refreshes layout size checks
+				guiManager.AddGroup(params);
+				guiManager.AddSeparator();
+				guiManager.Unindent();//refreshes layout size checks
+			}
+
+			guiManager.AddLabelBig("Presets Manager");
 			guiManager.Add(presetsManager.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 			guiManager.Indent();
 			{
 				guiManager.Add(presetsManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 				guiManager.Add(presetsManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+				guiManager.AddSeparator();
 				guiManager.Add(presetsManager.bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-				guiManager.Add(presetsManager.bAlignWindows, OFX_IM_BUTTON_SMALL);
-				guiManager.AddSpacing();
+				guiManager.Add(presetsManager.bAlignWindowsX, OFX_IM_BUTTON_SMALL, 2, true);
+				guiManager.Add(presetsManager.bAlignWindowsY, OFX_IM_BUTTON_SMALL, 2, false);
+				guiManager.AddSeparator();
+
+				guiManager.AddLabelBig("Inner Selectors");
 				guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 				guiManager.Add(presetsManager.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-				guiManager.AddSpacing();
-				guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+				guiManager.AddSeparator();
 			}
 			guiManager.Unindent();
-
-			guiManager.AddSeparator();
 
 			if (bClickerMinimal)
 			{
@@ -61,10 +71,7 @@ void ofApp::draw()
 			{
 				guiManager.AddLabel("Clicker Simple");
 				presetsManager.draw_ImGui_ClickerSimple(false, false);
-				guiManager.AddSeparator();
 			}
-
-			if (bParameters) guiManager.AddGroup(params);
 
 			guiManager.endWindow();
 		}
