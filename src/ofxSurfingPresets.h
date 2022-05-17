@@ -8,15 +8,12 @@
 
 	TODO:
 
-	+ fix populate random
+	+ fix startup grow amount presets!
 	+ add multiple group as ofxPresetsManager does.
 	+ add mode to not set key commands, to avoid letters and be the same as the index.
-	+ retrig should reload the preset too.
-		+ now only updates local (ofApp) vars!
-		+ must check if autoSave is disabled...
 	+ add memory mode. not reading from files.
 		+ a vector of json or a json should be fine.
-	+ add undo engine workflow.
+	+ add/check undo engine workflow.
 
 */
 
@@ -213,10 +210,12 @@ private:
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+public:
+
+	SurfingPlayer playerSurfer;
 
 private:
 
-	SurfingPlayer playerSurfer;
 	ofEventListener listener_Beat;
 	ofParameter<bool> bRandomPlay{ "Random", false };
 	std::vector<std::string> randomTypesPlayNames = { "Next Index", "Random Index", "Random Params" };
@@ -313,6 +312,12 @@ public:
 	// 2. But to the same current loaded preset
 	// 3. No need to reload the file settings
 	// 4. But we want to use the user box click to trig something
+
+	//--
+
+private:
+
+	bool bAutoTrigMode = true;
 
 public:
 
@@ -436,7 +441,8 @@ public:
 	void draw_ImGui_ClickerMinimal();
 
 	// Clicker Simple (Inner)
-	void draw_ImGui_ClickerSimple(bool bHeader = true, bool bMinimal = false, bool bShowMinimize = true);//inner clicker to fast integrate clicker to an external ImGui panel windows.
+	void draw_ImGui_ClickerSimple(bool bHeader/* = true*/, bool bMinimal = false, bool bShowMinimize = true, bool bExtras = false);//inner clicker to fast integrate clicker to an external ImGui panel windows.
+	void draw_ImGui_ClickerSimple();//forced simple clicker!
 
 	// TODO: REMOVE. This is deprecated!
 	// Required to set to false when only one ImGui instance is created. 
@@ -553,6 +559,13 @@ public:
 	//--------------------------------------------------------------
 	void doLoad(int _index) {
 		load(_index);
+	};
+
+	//--------------------------------------------------------------
+	void doReload() {
+		//load(index);
+		filePath = getFilepathForIndexPreset(index);
+		load(filePath);
 	};
 
 	void doLoadNext();
@@ -678,6 +691,12 @@ public:
 	//--------------------------------------------------------------
 	void setEnableKeysArrows(bool b) {
 		bKeysArrows = b;
+	};
+
+	//--------------------------------------------------------------
+	void setEnableKeys(bool b) {
+		bKeys = b;
+		setActive(bKeys);
 	};
 
 	//--------------------------------------------------------------
@@ -1110,7 +1129,7 @@ public:
 				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
 				return -1;
 			}
-		}
+}
 	}
 #endif
 
@@ -1129,14 +1148,14 @@ private:
 	enum surfingAlignMode
 	{
 		SURFING_ALIGN_HORIZONTAL = 0,
-		SURFING_ALIGN_VERTICAL 
+		SURFING_ALIGN_VERTICAL
 	};
 	surfingAlignMode modeAlignWindows = SURFING_ALIGN_HORIZONTAL;
 
 public:
 	ofParameter <bool> bAlignWindowsX{ "AlignX", false };
 	ofParameter <bool> bAlignWindowsY{ "AlignY", false };
-	ofParameter <bool> bLinkWindows{ "-1", false};//align windows engine
+	ofParameter <bool> bLinkWindows{ "-1", false };//align windows engine
 
 	// Define the names that we will use on populate each window.
 	// Usually we use the name of the bool bGui. But we can rename too the window.
@@ -1156,7 +1175,7 @@ public:
 	bool bGui_Changed = false;
 	int countTimes;
 #define countTimes_MAX 4
-	
+
 	//--
 
 	//TODO:

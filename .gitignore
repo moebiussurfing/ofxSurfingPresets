@@ -583,3 +583,5 @@ examples/2_PresetsMidi/bin/imgui.ini
 examples/3_PresetsRemote/bin/imgui.ini
 examples/3_PresetsRemote/bin/imgui.ini
 examples/4_PresetsBasicMinimal/bin/imgui.ini
+examples/1_PresetsBasic/bin/imgui.ini
+examples/4_PresetsBasicMinimal/bin/imgui.ini

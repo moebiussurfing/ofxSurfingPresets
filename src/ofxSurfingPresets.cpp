@@ -91,7 +91,7 @@ void ofxSurfingPresets::setup()
 	// It's auto called after addGroup!
 
 	// Log Mode
-	ofSetLogLevel("ofxSurfingPresets", OF_LOG_NOTICE);
+	//ofSetLogLevel("ofxSurfingPresets", OF_LOG_NOTICE);
 	//ofSetLogLevel("ofxSurfingPresets", OF_LOG_SILENT);
 
 	//--
@@ -182,6 +182,7 @@ void ofxSurfingPresets::setup()
 	params_AppSettings.add(bAutoSaveTimed);
 	params_AppSettings.add(bCycled);
 	params_AppSettings.add(bKeys);
+	params_AppSettings.add(randomTypePlayIndex);
 
 	params_AppSettings.add(bMinimize);
 	//params_AppSettings.add(guiManager.bMinimize);
@@ -472,6 +473,13 @@ void ofxSurfingPresets::startup()
 //--------------------------------------------------------------
 void ofxSurfingPresets::update(ofEventArgs & args)
 {
+	// auto reload preset when clicked. that's to undo current editing!
+	if (bAutoTrigMode)
+		if (isRetrigged())
+		{
+			doReload();
+		}
+
 	//--
 
 	// Align Windows Engine
@@ -523,7 +531,7 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 		remoteServer.syncParameters();
-	}
+}
 #endif
 
 	//--
@@ -1009,7 +1017,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 									if (bResponsiveButtons)
 									{
 										ofxImGuiSurfing::AddParameter(amountButtonsPerRowClickerMini);
-										//ofxImGuiSurfing::AddIntStepped(amountButtonsPerRowClickerMini);
+										//ofxImGuiSurfing::AddStepperInt(amountButtonsPerRowClickerMini);
 										//guiManager.Add(amountButtonsPerRowClickerMini, OFX_IM_SLIDER);
 										//guiManager.Add(amountButtonsPerRowClickerMini, OFX_IM_HSLIDER_SMALL);
 										//guiManager.Add(amountButtonsPerRowClickerMini, OFX_IM_DEFAULT);
@@ -1206,12 +1214,23 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 
 				// Align Windows Engine
 
-				//if (!bMinimize)
-				guiManager.AddSpacing();
-				guiManager.Add(bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-				guiManager.Add(bAlignWindowsX, OFX_IM_BUTTON_SMALL, 2, true);
-				guiManager.Add(bAlignWindowsY, OFX_IM_BUTTON_SMALL, 2, false);
+				if (!bMinimize)
+				{
+					static bool bOpen = false;
+					ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+					_flagt |= ImGuiTreeNodeFlags_Framed;
+					if (ImGui::TreeNodeEx("Align Windows", _flagt))
+					{
+						guiManager.refreshLayout();
+						guiManager.AddSpacing();
+						guiManager.Add(bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+						guiManager.Add(bAlignWindowsX, OFX_IM_BUTTON_SMALL, 2, true);
+						guiManager.Add(bAlignWindowsY, OFX_IM_BUTTON_SMALL, 2, false);
+					}
+					ImGui::TreePop();
 
+					guiManager.AddSpacing();
+				}
 				guiManager.AddSpacing();
 
 				// Toggles to show Panels
@@ -1280,7 +1299,15 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 }
 
 //-----------------------------------------i---------------------
-void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bool bShowMinimize) {
+void ofxSurfingPresets::draw_ImGui_ClickerSimple()
+{
+	if (!bGui_ClickerSimple) bGui_ClickerSimple = true;
+	draw_ImGui_ClickerSimple(false, false, false, true);
+}
+
+//-----------------------------------------i---------------------
+void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bool bShowMinimize, bool bNoExtras)
+{
 	if (!bGui_ClickerSimple) return;
 
 	static bool bOpen = true;
@@ -1297,7 +1324,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 		guiManager.refreshLayout();
 
 		// Index
-		guiManager.Add(index, OFX_IM_HSLIDER_SMALL_NO_LABELS);
+		if (!bNoExtras)guiManager.Add(index, OFX_IM_HSLIDER_SMALL_NO_LABELS);
 
 		//guiManager.AddSpacing();
 
@@ -1305,27 +1332,30 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 		ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtons, amountButtonsPerRowClickerMini, true, WIDGETS_HEIGHT / 2);
 		//ofxImGuiSurfing::AddMatrixClicker(index, bResponsiveButtons, amountButtonsPerRowClickerMini, true, WIDGETS_HEIGHT / 2);
 
-		if (bShowMinimize) guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+		if (!bNoExtras)
+		{
+			if (bShowMinimize) guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
-		if (!guiManager.bMinimize)
-			if (!bMinimal)
-			{
-				//guiManager.Indent();
+			if (!guiManager.bMinimize)
+				if (!bMinimal)
+				{
+					//guiManager.Indent();
 
-				// Editor window
-				guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+					// Editor window
+					guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-				guiManager.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-				//if (playerSurfer.bGui) 
-				{
-					guiManager.Indent();
-					guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-					guiManager.Unindent();
-				}
+					guiManager.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+					//if (playerSurfer.bGui) 
+					{
+						guiManager.Indent();
+						guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+						guiManager.Unindent();
+					}
 #endif
-				//guiManager.Unindent();
-			}
+					//guiManager.Unindent();
+				}
+		}
 
 		if (bHeader) ImGui::TreePop();
 	}
