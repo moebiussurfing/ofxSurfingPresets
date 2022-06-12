@@ -4,6 +4,9 @@
 void ofApp::setup() {
 	ofSetCircleResolution(200);
 
+	ofSetWindowPosition(-1920, 25);
+	ofSetWindowShape(1920, 1080 - 25);
+
 	// Group
 	params.setName("paramsGroup");
 	params.add(size1.set("size1", 0.5, 0, 1));
@@ -49,7 +52,7 @@ void ofApp::drawScene()
 	static float _rotation2;
 
 	//-
-	
+
 	// These above variables are kind of aux variables 
 	// and they are not required if you are not using the smoothing feature!
 	// You can use the params variables (the ones added to the preset manager) directly:
@@ -108,7 +111,7 @@ void ofApp::drawScene()
 	ofPushStyle();
 	ofPushMatrix();
 	{
-		ofTranslate(ofGetWidth()*.5f, ofGetHeight()*.5f);
+		ofTranslate(ofGetWidth() * .5f, ofGetHeight() * .5f);
 		ofRotateDeg(ofGetElapsedTimef() * TWO_PI);
 		ofRotateZDeg(_rotation1 * 45);
 		ofScale(1.3f);

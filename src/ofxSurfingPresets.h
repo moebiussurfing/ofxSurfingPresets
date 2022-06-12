@@ -31,14 +31,17 @@
 
 //--
 
+//TODO:
 // 2. Smooth
 // (Smooth the params transitions between presets)
-#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER // -> Optional. Can be commented to disable simple core smoothing.
+// -> Optional. Can be commented to disable simple core smoothing.
+//#define USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER 
 
 //--
 
 // 3. Index Player (Is a timed player to auto browse presets index)
-#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER // -> Optional. Can be commented to disable player browser add-on.
+// -> Optional. Can be commented to disable player browser add-on.
+//#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 
 //--
 
@@ -158,12 +161,12 @@ public:
 
 	vector<ofParameter<bool>> notesIndex;
 	ofParameterGroup params_PresetToggles{ "Presets" };
-	void Changed_Params_PresetToggles(ofAbstractParameter &e);
+	void Changed_Params_PresetToggles(ofAbstractParameter& e);
 	void refreshToggleNotes();
 	bool bSyncRemote;
 
 	//--------------------------------------------------------------
-	ofParameterGroup & getParametersSelectorToggles() { // To select index preset using bool toggle parameters triggers!
+	ofParameterGroup& getParametersSelectorToggles() { // To select index preset using bool toggle parameters triggers!
 
 //#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 //	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
@@ -201,7 +204,7 @@ private:
 
 	ofxRemoteParameters::Server remoteServer;
 	ofParameterGroup params_Server;
-	void Changed_Params_Preset(ofAbstractParameter &e);
+	void Changed_Params_Preset(ofAbstractParameter& e);
 
 #endif
 
@@ -426,7 +429,7 @@ private:
 
 private:
 
-	void update(ofEventArgs & args);
+	void update(ofEventArgs& args);
 	void exit();
 	void startup();
 
@@ -495,12 +498,12 @@ public:
 public:
 
 	//--------------------------------------------------------------
-	void setup(ofParameterGroup &group) { // Main group add
+	void setup(ofParameterGroup& group) { // Main group add
 		addGroup(group);
 	}
 
 	//--------------------------------------------------------------
-	void addGroup(ofParameterGroup &group) { // Main group add. WARNING! You must add only one group. Call this only once! Setup wil be called here!
+	void addGroup(ofParameterGroup& group) { // Main group add. WARNING! You must add only one group. Call this only once! Setup wil be called here!
 		setup();
 
 		params_Preset = group;
@@ -538,7 +541,7 @@ private:
 public:
 
 	//--------------------------------------------------------------
-	void addParamsAppExtra(ofParameterGroup &groupExtra) {
+	void addParamsAppExtra(ofParameterGroup& groupExtra) {
 		params_AppExtra = groupExtra;
 	}
 
@@ -606,10 +609,11 @@ public:
 	bool doRefreshFiles();
 	void doRefreshFilesAndRename();
 
-	void setPath();
+private:
+	void setPath();//open dialog to select a path manually.
 
 	bool bResetDefined = false;
-
+public:
 	//--------------------------------------------------------------
 	void setRandomizerBpm(float bpm) {
 
@@ -628,7 +632,7 @@ private:
 	//TODO: we could use a memory state save/load(reset) that we will use as "Reset State"
 public:
 	//--------------------------------------------------------------
-	void setResetPtr(ofParameter<bool> &b) {
+	void setResetPtr(ofParameter<bool>& b) {
 		bReset.makeReferenceTo(b);
 	}
 
@@ -644,7 +648,7 @@ public:
 
 public:
 
-	ofParameter <bool> bAutoResize{ "-1", false };//align windows engine
+	ofParameter <bool> bAutoResize{ "-1", false };
 
 	//--
 
@@ -730,11 +734,11 @@ private:
 	// Updating some params before save will trigs also the group callbacks
 	// So we disable this callbacks just in case params updatings are required
 	// In this case we will need to update gui position param
-	bool bDISABLECALLBACKS = false;
+	bool bDISABLE_CALLBACKS = false;
 
 	//-
 
-	void Changed_Control(ofAbstractParameter &e);
+	void Changed_Control(ofAbstractParameter& e);
 
 	//-
 
@@ -858,8 +862,8 @@ private:
 private:
 
 	// Keys
-	void keyPressed(ofKeyEventArgs &eventArgs);
-	void keyReleased(ofKeyEventArgs &eventArgs);
+	void keyPressed(ofKeyEventArgs& eventArgs);
+	void keyReleased(ofKeyEventArgs& eventArgs);
 	void addKeysListeners();
 	void removeKeysListeners();
 
@@ -915,7 +919,7 @@ private:
 		// Do it recursively..
 		if (isGroup)
 		{
-			auto &g = aparam.castGroup();
+			auto& g = aparam.castGroup();
 
 			for (int i = 0; i < g.size(); i++) { // ofAbstractParameters
 				addSmoothParam(g.get(i));
@@ -1029,11 +1033,11 @@ public:
 	//inline bool AddVSlider(ofParameter<ParameterType>& parameter, ImVec2 sz = ImVec2(-1.f, -1.f), bool bNoName = false, bool bNoNumber = false)
 
 	//--------------------------------------------------------------
-	float get(ofParameter<float> &e) { // Gets smoothed value for passed param. Will use his name and search into param group.
+	float get(ofParameter<float>& e) { // Gets smoothed value for passed param. Will use his name and search into param group.
 		std::string name = e.getName();
 
 		if (bSmooth) {
-			auto &p = params_Preset_Smoothed.get(name); // Smoothed
+			auto& p = params_Preset_Smoothed.get(name); // Smoothed
 			if (p.type() == typeid(ofParameter<float>).name())
 			{
 				return p.cast<float>().get();
@@ -1045,7 +1049,7 @@ public:
 			}
 		}
 		else {
-			auto &p = params_Preset.get(name); // Raw
+			auto& p = params_Preset.get(name); // Raw
 			if (p.type() == typeid(ofParameter<float>).name())
 			{
 				return p.cast<float>().get();
@@ -1059,11 +1063,11 @@ public:
 	}
 
 	//--------------------------------------------------------------
-	int get(ofParameter<int> &e) { // Gets smoothed value for passed param. Will use his name and search into param group.
+	int get(ofParameter<int>& e) { // Gets smoothed value for passed param. Will use his name and search into param group.
 		std::string name = e.getName();
 
 		if (bSmooth) {
-			auto &p = params_Preset_Smoothed.get(name); // Smoothed
+			auto& p = params_Preset_Smoothed.get(name); // Smoothed
 			if (p.type() == typeid(ofParameter<int>).name())
 			{
 				return p.cast<int>().get();
@@ -1075,7 +1079,7 @@ public:
 			}
 		}
 		else {
-			auto &p = params_Preset.get(name); // Raw
+			auto& p = params_Preset.get(name); // Raw
 			if (p.type() == typeid(ofParameter<int>).name())
 			{
 				return p.cast<int>().get();
@@ -1098,11 +1102,11 @@ public:
 
 public:
 	//--------------------------------------------------------------
-	float get(ofParameter<float> &e) { // Gets raw value for passed param. Will use his name and search into param group.
+	float get(ofParameter<float>& e) { // Gets raw value for passed param. Will use his name and search into param group.
 		std::string name = e.getName();
 
 		{
-			auto &p = params_Preset.get(name); // Raw
+			auto& p = params_Preset.get(name); // Raw
 			if (p.type() == typeid(ofParameter<float>).name())
 			{
 				return p.cast<float>().get();
@@ -1116,10 +1120,10 @@ public:
 	}
 
 	//--------------------------------------------------------------
-	int get(ofParameter<int> &e) { // Gets raw value for passed param. Will use his name and search into param group.
+	int get(ofParameter<int>& e) { // Gets raw value for passed param. Will use his name and search into param group.
 		std::string name = e.getName();
 		{
-			auto &p = params_Preset.get(name); // Raw
+			auto& p = params_Preset.get(name); // Raw
 			if (p.type() == typeid(ofParameter<int>).name())
 			{
 				return p.cast<int>().get();
@@ -1129,7 +1133,7 @@ public:
 				ofLogError(__FUNCTION__) << "Not the expected type: " << name;
 				return -1;
 			}
-}
+		}
 	}
 #endif
 
@@ -1145,17 +1149,18 @@ private:
 
 	bool bNoSettingsFileFound = false;
 
-	enum surfingAlignMode
-	{
-		SURFING_ALIGN_HORIZONTAL = 0,
-		SURFING_ALIGN_VERTICAL
-	};
-	surfingAlignMode modeAlignWindows = SURFING_ALIGN_HORIZONTAL;
+	//enum surfingAlignMode
+	//{
+	//	SURFING_ALIGN_HORIZONTAL = 0,
+	//	SURFING_ALIGN_VERTICAL
+	//};
+	//surfingAlignMode modeAlignWindows = SURFING_ALIGN_HORIZONTAL;
 
 public:
-	ofParameter <bool> bAlignWindowsX{ "AlignX", false };
-	ofParameter <bool> bAlignWindowsY{ "AlignY", false };
-	ofParameter <bool> bLinkWindows{ "-1", false };//align windows engine
+
+	//ofParameter <bool> bAlignWindowsX{ "AlignX", false };
+	//ofParameter <bool> bAlignWindowsY{ "AlignY", false };
+	//ofParameter <bool> bLinkWindows{ "-1", false };//align windows engine
 
 	// Define the names that we will use on populate each window.
 	// Usually we use the name of the bool bGui. But we can rename too the window.
@@ -1171,7 +1176,7 @@ public:
 		playerSurfer.setNameWindow(name_Window_Player);
 #endif
 	}
-
+	private:
 	bool bGui_Changed = false;
 	int countTimes;
 #define countTimes_MAX 4
@@ -1180,7 +1185,7 @@ public:
 
 	//TODO:
 	//https://github.com/ocornut/imgui/issues/5287
-
+public:
 	void doAlignWindowsOnce(); // run once
 	void doAlignWindowsRefresh(int ntimes = countTimes_MAX); // run many times
 	// that's to run during some frames.
