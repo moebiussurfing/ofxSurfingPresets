@@ -422,6 +422,7 @@ private:
 public:
 
 	void setup();
+	void setupGui();
 
 private:
 
@@ -773,7 +774,7 @@ private:
 	ofParameter<int> amountButtonsPerRowClickerFloat{ "MaxBut", -1, 1, 1 };
 	ofParameter<bool> bResponsiveButtons_ClickerFloating{ "Responsive", true };
 	ofParameter<bool> bExtra_ClickerFloating{ "Extra", false };
-	ofParameter<bool> bAutoResize_ClickerFloating{ "Auto Resize Clicker", true };
+	ofParameter<bool> bAutoResize_ClickerFloating{ "Auto Resize ", true };
 	ofParameterGroup params_FloatClicker;
 
 public:

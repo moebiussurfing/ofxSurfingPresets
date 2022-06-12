@@ -214,7 +214,7 @@ void ofxSurfingPresets::setup()
 	bAutoResize.makeReferenceTo(guiManager.bAutoResize);
 
 	//--
-	 
+
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
@@ -233,7 +233,7 @@ void ofxSurfingPresets::setup()
 
 	// Define the behaviors to trig when player trigs the callback!
 	//--------------------------------------------------------------
-	listener_Beat = playerSurfer.bPlayerBeatBang.newListener([this](bool &b) {
+	listener_Beat = playerSurfer.bPlayerBeatBang.newListener([this](bool& b) {
 		ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
 
 		//if (playerSurfer.bPlay) // gui bangs are bypassed if not..
@@ -245,7 +245,7 @@ void ofxSurfingPresets::setup()
 			case 2: doRandomizeParams(); break;
 			}
 		}
-	});
+		});
 
 #endif
 
@@ -290,17 +290,7 @@ void ofxSurfingPresets::setup()
 
 	//--
 
-	// Gui
-
-	guiManager.setSettingsPathLabel("ofxSurfingPresets");
-
-	guiManager.setup(IM_GUI_MODE_INSTANTIATED);
-
-	//TODO:
-	// linked to be exposed public. 
-	// could be useful in some scenarios.
-	guiManager.bMinimize.makeReferenceTo(bMinimize);
-	//bMinimize.makeReferenceTo(guiManager.bMinimize);
+	setupGui();
 
 	//--
 
@@ -310,6 +300,33 @@ void ofxSurfingPresets::setup()
 	//--
 
 	//startup(); // called from AddGroup
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::setupGui()
+{
+	guiManager.setSettingsPathLabel("ofxSurfingPresets");
+
+	//guiManager.setup(IM_GUI_MODE_INSTANTIATED);
+
+	//--
+
+	guiManager.setWindowsMode(IM_GUI_MODE_WINDOWS_SPECIAL_ORGANIZER);
+	guiManager.setup();
+
+	guiManager.addWindowSpecial(bGui_ClickerFloating);
+	guiManager.addWindowSpecial(bGui_Parameters);
+	guiManager.addWindowSpecial(bGui_Editor);
+
+	guiManager.startup();
+
+	//--
+
+	//TODO:
+	// linked to be exposed public. 
+	// could be useful in some scenarios.
+	guiManager.bMinimize.makeReferenceTo(bMinimize);
+	//bMinimize.makeReferenceTo(guiManager.bMinimize);
 }
 
 #ifdef USE__OFX_SURFING_PRESET__MIDI__
@@ -476,7 +493,7 @@ void ofxSurfingPresets::startup()
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::update(ofEventArgs & args)
+void ofxSurfingPresets::update(ofEventArgs& args)
 {
 	// auto reload preset when clicked. that's to undo current editing!
 	if (bAutoTrigMode)
@@ -535,7 +552,7 @@ void ofxSurfingPresets::update(ofEventArgs & args)
 		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 		remoteServer.syncParameters();
-}
+	}
 #endif
 
 	//--
@@ -590,11 +607,11 @@ void ofxSurfingPresets::updateSmoother()
 
 		//-
 
-		auto &g = params_Preset_Smoothed.castGroup();
+		auto& g = params_Preset_Smoothed.castGroup();
 
 		for (int i = 0; i < g.size(); i++)
 		{
-			auto &ap = g[i]; // ofAbstractParameter
+			auto& ap = g[i]; // ofAbstractParameter
 
 			updateSmoothParam(ap);
 		}
@@ -647,7 +664,7 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 	// Group
 	else if (isGroup)
 	{
-		auto &g = ap.castGroup();
+		auto& g = ap.castGroup();
 
 		// ofAbstractParameters
 		for (int i = 0; i < g.size(); i++)
@@ -687,7 +704,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
-				if (guiManager.beginWindow(n.c_str(), bGui_Editor))
+				//if (guiManager.beginWindow(n.c_str(), bGui_Editor))
+				//if (guiManager.beginWindowSpecial(bGui_Editor))
+				if (guiManager.beginWindowSpecial(2))
 				{
 					//ImGui::Text(params_Preset.getName().c_str());
 
@@ -1111,7 +1130,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					//-
 
-					guiManager.endWindow();
+					guiManager.endWindowSpecial();
+					//guiManager.endWindow();
 				}
 			}
 			ImGui::PopID();
@@ -1138,40 +1158,15 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 
 		ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 		{
-			ImGuiWindowFlags flag = ImGuiWindowFlags_None;
-			if (bAutoResize_ClickerFloating) flag |= ImGuiWindowFlags_AlwaysAutoResize;
+			//ImGuiWindowFlags flag = ImGuiWindowFlags_None;
+			//if (bAutoResize_ClickerFloating) flag |= ImGuiWindowFlags_AlwaysAutoResize;
 
-			//if (guiManager.beginWindow(bGui_ClickerFloating))
-			if (guiManager.beginWindow(n.c_str(), bGui_ClickerFloating, flag))
+			////if (guiManager.beginWindow(bGui_ClickerFloating))
+			//if (guiManager.beginWindow(n.c_str(), bGui_ClickerFloating, flag))
+
+			if (guiManager.beginWindowSpecial(0))
+			//if (guiManager.beginWindowSpecial(bGui_ClickerFloating))
 			{
-				//--
-
-				//// Align Windows Engine
-
-				//if (guiManager.bLinkWindows)
-				//{
-				//	static ImVec2 pos;
-				//	static ImVec2 pos_PRE;
-				//	pos = ImGui::GetWindowPos();
-
-				//	static ImVec2 sz;
-				//	static ImVec2 sz_PRE;
-				//	sz = ImGui::GetWindowSize();
-
-				//	if ((sz.x != sz_PRE.x) && (sz.y != sz_PRE.y))
-				//	{
-				//		sz_PRE = sz;
-
-				//		doAlignWindowsRefresh();
-				//	}
-				//	if ((pos.x != pos_PRE.x) && (pos.y != pos_PRE.y))
-				//	{
-				//		pos_PRE = pos;
-
-				//		doAlignWindowsRefresh();
-				//	}
-				//}
-
 				//--
 
 				_w1 = getWidgetsWidth(1);
@@ -1214,32 +1209,6 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 
 				//guiManager.AddSpacing();
 
-				//--
-
-				//// Align Windows Engine
-
-				//if (!bMinimize)
-				//{
-				//	static bool bOpen = false;
-				//	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-				//	_flagt |= ImGuiTreeNodeFlags_Framed;
-
-				//	if (ImGui::TreeNodeEx("Align Windows", _flagt))
-				//	{
-				//		guiManager.refreshLayout();
-				//		guiManager.AddSpacing();
-
-				//		guiManager.Add(bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-
-				//		guiManager.Add(bAlignWindowsX, OFX_IM_BUTTON_SMALL, 2, true);
-				//		guiManager.Add(bAlignWindowsY, OFX_IM_BUTTON_SMALL, 2, false);
-				//	}
-				//	ImGui::TreePop();
-
-				//	guiManager.AddSpacing();
-				//}
-				//guiManager.AddSpacing();
-
 				// Toggles to show Panels
 				if (!bMinimize)
 				{
@@ -1274,7 +1243,11 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 
 					// Keys
 					//guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+					
+					//--
 				}
+
+				// Extra
 
 				if (!bMinimize)
 					if (bExtra_ClickerFloating)
@@ -1283,6 +1256,13 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 						{
 							_w1 = getWidgetsWidth(1);
 							_w2 = getWidgetsWidth(2);
+
+							//--
+
+							// Organizer aligners
+							guiManager.Add(guiManager.getWindowsAlignHelpersGuiToggle(), OFX_IM_TOGGLE_BUTTON_ROUNDED);
+							guiManager.Add(guiManager.getWindowsSpecialsGuiToggle(), OFX_IM_TOGGLE_BUTTON_ROUNDED);
+							guiManager.AddSpacing();
 
 							//guiManager.Add(bAlignWindowsX, OFX_IM_BUTTON_SMALL);
 
@@ -1298,7 +1278,8 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 						guiManager.Unindent();
 					}
 
-				guiManager.endWindow();
+				guiManager.endWindowSpecial();
+				//guiManager.endWindow();
 			}
 		}
 		ImGui::PopID();
@@ -1445,7 +1426,9 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 
 			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
-				if (guiManager.beginWindow(name_Window_Parameters, bGui_Parameters))
+				if (guiManager.beginWindowSpecial(1))
+				//if (guiManager.beginWindowSpecial(bGui_Parameters))
+				//if (guiManager.beginWindow(name_Window_Parameters, bGui_Parameters))
 				{
 					float _h = getWidgetsHeightUnit();
 					float _w100 = getWidgetsWidth(1);
@@ -1497,7 +1480,9 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 						guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 						guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 					}
-					guiManager.endWindow();
+
+					guiManager.endWindowSpecial();
+					//guiManager.endWindow();
 				}
 			}
 			ImGui::PopID();
@@ -1562,11 +1547,11 @@ void ofxSurfingPresets::draw_ImGui()
 
 }
 //--------------------------------------------------------------
-void ofxSurfingPresets::keyReleased(ofKeyEventArgs &eventArgs)
+void ofxSurfingPresets::keyReleased(ofKeyEventArgs& eventArgs)
 {
 	if (!bKeys) return;
 
-	const int &key = eventArgs.key;
+	const int& key = eventArgs.key;
 	ofLogNotice(__FUNCTION__) << (char)key << " [" << key << "]";
 
 	// modifiers
@@ -1580,11 +1565,11 @@ void ofxSurfingPresets::keyReleased(ofKeyEventArgs &eventArgs)
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::keyPressed(ofKeyEventArgs &eventArgs)
+void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 {
 	if (!bKeys) return;
 
-	const int &key = eventArgs.key;
+	const int& key = eventArgs.key;
 	ofLogNotice(__FUNCTION__) << (char)key << " [" << key << "]";
 
 	// modifiers
@@ -1731,7 +1716,7 @@ void ofxSurfingPresets::setGuiVisible(bool b)
 //}
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
+void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 {
 	if (bDISABLE_CALLBACKS) return;
 
@@ -1900,7 +1885,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 					//save(_fFrom);
 					save(_fTo);
 
-					if (bf&&bt) {
+					if (bf && bt) {
 						ofLogNotice(__FUNCTION__) << "PRESET SWAP!";
 						ofLogNotice(__FUNCTION__) << _fFrom << " <-> " << _fTo;
 					}
@@ -1995,7 +1980,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter &e)
 
 #ifdef USE_TOGGLE_TRIGGERS
 //--------------------------------------------------------------
-void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
+void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter& e)
 {
 	if (bDISABLE_CALLBACKS) return;
 
@@ -2031,7 +2016,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter &e)
 
 #ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 //--------------------------------------------------------------
-void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter &e)
+void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter& e)
 {
 	//ofLogVerbose(__FUNCTION__);
 
@@ -2616,7 +2601,7 @@ void ofxSurfingPresets::doRandomizeParams(bool bNoTrig) {
 
 		//-
 
-		auto &p = params_Preset[i];
+		auto& p = params_Preset[i];
 
 		float v;
 
@@ -2643,7 +2628,7 @@ void ofxSurfingPresets::doResetParams() {
 
 	for (int i = 0; i < params_Preset.size(); i++)
 	{
-		auto &p = params_Preset[i];
+		auto& p = params_Preset[i];
 
 		float v;
 
@@ -2661,139 +2646,3 @@ void ofxSurfingPresets::doResetParams() {
 
 	bIsRetrigged = true;
 }
-
-////--------------------------------------------------------------
-//void ofxSurfingPresets::doAlignWindowsRefresh(int ntimes)
-//{
-//	ofLogNotice(__FUNCTION__) << " amount " << ntimes;
-//
-//	bGui_Changed = true;
-//	countTimes = ntimes;
-//}
-//
-////--------------------------------------------------------------
-//void ofxSurfingPresets::doAlignWindowsOnce()
-//{
-//	ofLogNotice(__FUNCTION__) << " #" << countTimes;
-//
-//	//cout << __FUNCTION__ << " #" << countTimes << endl;
-//
-//	ImGuiContext* GImGui = guiManager.getContext();
-//	ImGuiContext& g = *GImGui;
-//
-//	ImVector<ImGuiWindow*> windows;
-//	for (ImGuiWindow* window : g.WindowsFocusOrder)
-//	{
-//		if (window->WasActive)
-//		{
-//			windows.push_back(window);
-//			//cout << window->Name << endl;
-//		}
-//	}
-//	//cout << endl;
-//
-//	//--
-//
-//	if (windows.Size > 0)
-//	{
-//		const int gapx = 0;
-//		const int gapy = 0;
-//
-//		ImVec2 pos;
-//		ImVec2 sz;
-//		ImVec2 gap;
-//
-//		if (modeAlignWindows == SURFING_ALIGN_HORIZONTAL) gap = ImVec2(gapx, 0.f);
-//		else if (modeAlignWindows == SURFING_ALIGN_VERTICAL) gap = ImVec2(0.f, gapy);
-//
-//		string namew;
-//
-//		// 0. window clicker (main and anchor window!)
-//		bool b = false;
-//		for (int n = 0; n < windows.Size; n++)
-//		{
-//			namew = windows[n]->Name;
-//			if ((namew == name_Window_ClickerFloating) && bGui_ClickerFloating.get())
-//			{
-//				b = true;
-//				pos = windows[n]->Pos;
-//				sz = windows[n]->Size;
-//				//cout << name_Window_ClickerFloating << endl;
-//				break;
-//			}
-//		}
-//		if (!b) return;//main window must be visible or we will skip all below and return.
-//
-//		// 1. window edit
-//		for (int n = 0; n < windows.Size; n++)
-//		{
-//			namew = windows[n]->Name;
-//			if ((namew == name_Window_Editor) /*&& bGui_Editor*/)
-//			{
-//				if (modeAlignWindows == SURFING_ALIGN_HORIZONTAL) pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
-//				else if (modeAlignWindows == SURFING_ALIGN_VERTICAL) pos = ImVec2(pos + ImVec2(0, sz.y) + gap);
-//
-//				sz = windows[n]->Size;
-//				ImGui::SetWindowPos(windows[n], pos);
-//				break;
-//			}
-//		}
-//
-//		// 2. window parameters 
-//		for (int n = 0; n < windows.Size; n++)
-//		{
-//			namew = windows[n]->Name;
-//			if ((namew == name_Window_Parameters) /*&& bGui_Parameters*/)
-//			{
-//				if (modeAlignWindows == SURFING_ALIGN_HORIZONTAL) pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
-//				else if (modeAlignWindows == SURFING_ALIGN_VERTICAL) pos = ImVec2(pos + ImVec2(0, sz.y) + gap);
-//
-//				sz = windows[n]->Size;
-//				ImGui::SetWindowPos(windows[n], pos);
-//				break;
-//			}
-//		}
-//
-//		// 3. window player 
-//#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-//		for (int n = 0; n < windows.Size; n++)
-//		{
-//			namew = windows[n]->Name;
-//			if ((namew == name_Window_Player) /*&& playerSurfer.bGui*/)
-//			{
-//				if (modeAlignWindows == SURFING_ALIGN_HORIZONTAL) pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
-//				else if (modeAlignWindows == SURFING_ALIGN_VERTICAL) pos = ImVec2(pos + ImVec2(0, sz.y) + gap);
-//
-//				sz = windows[n]->Size;
-//				ImGui::SetWindowPos(windows[n], pos);
-//				break;
-//			}
-//		}
-//#endif
-//	}
-
-	//---
-
-	//if (windows.Size > 0)
-	//{
-	//	ImVec2 base_pos = ImGui::GetMainViewport()->Pos;
-	//	ImVec2 v1 = ImVec2(0.7f, 0.7f);
-	//	ImVec2 step = ImFloor((ImGui::GetMainViewport()->Size * v1) / (float)windows.Size);
-	//	step.x = step.y = ImFloor(ImMin(step.x, step.y));
-	//	for (int n = 0; n < windows.Size; n++)
-	//	{
-	//		ImVec2 v2 = ImVec2(((float)n + 0.5f), ((float)n + 0.5f));
-	//		ImGui::SetWindowPos(windows[n], base_pos + step * v2);
-	//	}
-	//	--
-	//	ImVec2 pos = windows[0]->Pos;
-	//	ImVec2 sz = windows[0]->Size;
-	//	ImVec2 gap = ImVec2(5.f, 0.f);
-	//	for (int n = 1; n < windows.Size; n++)
-	//	{
-	//		cout << windows[n]->Name << endl;
-	//		pos = ImVec2(pos + ImVec2(sz.x, 0) + gap);
-	//		ImGui::SetWindowPos(windows[n], pos);
-	//	}
-	//}
-//}
