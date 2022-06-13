@@ -45,10 +45,9 @@ void ofApp::setup()
 ## Dependencies
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)  
 * [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui)
-* [ofxImGui](https://github.com/Daandelange/ofxImGui/)  [ _FORK from_ @**Daandelange** ]  
-**OPTIONAL**:  
-* [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams)  [ _FORK_ ]  
-* [ofxSurfingPlayer](https://github.com/moebiussurfing/ofxSurfingPlayer)  
+* [ofxImGui](https://github.com/Daandelange/ofxImGui/) / _FORK from_ @**Daandelange**  
+* [ofxMidiParams](https://github.com/moebiussurfing/ofxMidiParams) / _OPTIONAL FORK_
+* [ofxSurfingPlayer](https://github.com/moebiussurfing/ofxSurfingPlayer) / _OPTIONAL_  
 
 <details>
   <summary>A MORE POWERFUL ALTERNATIVE</summary>
