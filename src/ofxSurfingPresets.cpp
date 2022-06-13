@@ -444,7 +444,18 @@ void ofxSurfingPresets::startup()
 
 	bDISABLE_CALLBACKS = false;
 
-	//-
+	//--
+
+	//Force default states
+
+	bGui_ClickerFloating = true;
+	bGui_Parameters = false;
+	bGui_Editor = false;
+	guiManager.getWindowsSpecialsGuiToggle().set(false);
+	guiManager.getWindowsAlignHelpersGuiToggle().set(false);
+	//guiManager.set
+
+	//--
 
 	// Settings
 	bNoSettingsFileFound = !ofxSurfingHelpers::loadGroup(params_AppSettings, path_Global + path_Params_Control);
@@ -488,8 +499,8 @@ void ofxSurfingPresets::startup()
 
 	// Workflow
 
-	// Load first preset
-	index = 0;
+	// Force Load first preset
+	//index = 0;
 }
 
 //--------------------------------------------------------------
@@ -581,7 +592,6 @@ void ofxSurfingPresets::draw()
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 		surfingMIDI.drawImGui();
 #endif
-
 	}
 }
 
@@ -704,11 +714,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
-				//if (guiManager.beginWindow(n.c_str(), bGui_Editor))
-				//if (guiManager.beginWindowSpecial(bGui_Editor))
-				if (guiManager.beginWindowSpecial(2))
+				if (guiManager.beginWindowSpecial(bGui_Editor))
 				{
-					//ImGui::Text(params_Preset.getName().c_str());
+					//guiManager.AddLabelBig(params_Preset.getName(), false);
 
 					_w100 = getWidgetsWidth(1);
 					_w50 = getWidgetsWidth(2);
@@ -1010,6 +1018,15 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 						{
 							guiManager.Indent();
 							{
+								//--
+
+								// Organizer aligners
+								guiManager.Add(guiManager.getWindowsSpecialsGuiToggle(), OFX_IM_TOGGLE_BUTTON_ROUNDED);
+								//guiManager.Add(guiManager.getWindowsAlignHelpersGuiToggle(), OFX_IM_TOGGLE_BUTTON_ROUNDED);
+								guiManager.AddSpacing();
+
+								//--
+
 								// Keys
 								//ofxImGuiSurfing::AddToggleRoundedButton(bKeys);
 
@@ -1109,7 +1126,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 									guiManager.Unindent();
 								}
 
-								ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
+								//ofxImGuiSurfing::AddToggleRoundedButton(guiManager.bAutoResize);
 							}
 							guiManager.Unindent();
 
@@ -1131,7 +1148,6 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					//-
 
 					guiManager.endWindowSpecial();
-					//guiManager.endWindow();
 				}
 			}
 			ImGui::PopID();
@@ -1158,15 +1174,10 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 
 		ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 		{
-			//ImGuiWindowFlags flag = ImGuiWindowFlags_None;
-			//if (bAutoResize_ClickerFloating) flag |= ImGuiWindowFlags_AlwaysAutoResize;
-
-			////if (guiManager.beginWindow(bGui_ClickerFloating))
-			//if (guiManager.beginWindow(n.c_str(), bGui_ClickerFloating, flag))
-
-			if (guiManager.beginWindowSpecial(0))
-			//if (guiManager.beginWindowSpecial(bGui_ClickerFloating))
+			if (guiManager.beginWindowSpecial(bGui_ClickerFloating))
 			{
+				guiManager.AddLabelBig(params_Preset.getName(), false);
+
 				//--
 
 				_w1 = getWidgetsWidth(1);
@@ -1239,11 +1250,11 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 
 					// Extra
 					// for Floating
-					guiManager.Add(bExtra_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+					guiManager.Add(bExtra_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED);
 
 					// Keys
 					//guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-					
+
 					//--
 				}
 
@@ -1260,26 +1271,33 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 							//--
 
 							// Organizer aligners
-							guiManager.Add(guiManager.getWindowsAlignHelpersGuiToggle(), OFX_IM_TOGGLE_BUTTON_ROUNDED);
 							guiManager.Add(guiManager.getWindowsSpecialsGuiToggle(), OFX_IM_TOGGLE_BUTTON_ROUNDED);
+							//guiManager.Add(guiManager.getWindowsAlignHelpersGuiToggle(), OFX_IM_TOGGLE_BUTTON_ROUNDED);
 							guiManager.AddSpacing();
 
-							//guiManager.Add(bAlignWindowsX, OFX_IM_BUTTON_SMALL);
+							//--
 
-							if (bResponsiveButtons_ClickerFloating)
 							{
-								guiManager.Add(amountButtonsPerRowClickerFloat, OFX_IM_SLIDER);
-								//guiManager.Add(amountButtonsPerRowClickerFloat, OFX_IM_STEPPER);
-							}
+								static bool bOpen = false;
+								ImGuiColorEditFlags _flagw = (bOpen ? ImGuiWindowFlags_NoCollapse : ImGuiWindowFlags_None);
+								if (ImGui::CollapsingHeader("LAYOUT", _flagw))
+								{
+									guiManager.refreshLayout();
+									if (bResponsiveButtons_ClickerFloating)
+									{
+										guiManager.Add(amountButtonsPerRowClickerFloat, OFX_IM_SLIDER);
+										//guiManager.Add(amountButtonsPerRowClickerFloat, OFX_IM_STEPPER);
+									}
 
-							guiManager.Add(bResponsiveButtons_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-							guiManager.Add(bAutoResize_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+									guiManager.Add(bResponsiveButtons_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+									guiManager.Add(bAutoResize_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+								}
+							}
 						}
 						guiManager.Unindent();
 					}
 
 				guiManager.endWindowSpecial();
-				//guiManager.endWindow();
 			}
 		}
 		ImGui::PopID();
@@ -1426,15 +1444,13 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 
 			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
-				if (guiManager.beginWindowSpecial(1))
-				//if (guiManager.beginWindowSpecial(bGui_Parameters))
-				//if (guiManager.beginWindow(name_Window_Parameters, bGui_Parameters))
+				if (guiManager.beginWindowSpecial(bGui_Parameters))
 				{
 					float _h = getWidgetsHeightUnit();
 					float _w100 = getWidgetsWidth(1);
 					float _w50 = getWidgetsWidth(2);
 
-					//ImGui::Text(params_Preset.getName().c_str());
+					//guiManager.AddLabelBig(params_Preset.getName(), false);
 
 					//-
 
@@ -1467,22 +1483,20 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 
 						//-
 
-						ofxImGuiSurfing::AddSpacingSeparated();
-
 						//TODO: not implemented yet
 						if (bReset.getName() != "-1")
 						{
+							ofxImGuiSurfing::AddSpacingSeparated();
 							guiManager.Add(bReset, OFX_IM_BUTTON_SMALL);
 						}
 
 						//-
 
-						guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-						guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						//guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						//guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 					}
 
 					guiManager.endWindowSpecial();
-					//guiManager.endWindow();
 				}
 			}
 			ImGui::PopID();
@@ -1936,23 +1950,27 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 
 		//--
 
-		// Workflow
+//		//TODO:
+//		// Workflow
+//		//link minimize controls..
+//		else if (name == bMinimize.getName())
+//		{
+//			//skip
+//
+//			bDISABLE_CALLBACKS = true;
+//
+//			//guiManager.bMinimize = bMinimize;//linked
+//			bMinimize_Editor = bMinimize;
+//			bMinimize_Params = bMinimize;
+//
+//#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+//			playerSurfer.bMinimize_Player = bMinimize;
+//#endif
+//
+//			bDISABLE_CALLBACKS = false;
+//		}
 
-		//TODO:
-		else if (name == bMinimize.getName())
-		{
-			bDISABLE_CALLBACKS = true;
-
-			//guiManager.bMinimize = bMinimize;//linked
-			bMinimize_Editor = bMinimize;
-			bMinimize_Params = bMinimize;
-
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-			playerSurfer.bMinimize_Player = bMinimize;
-#endif
-
-			bDISABLE_CALLBACKS = false;
-		}
+		//--
 
 		//else if (name == bMODE_Active.getName())
 		//{
