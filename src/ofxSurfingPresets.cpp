@@ -30,8 +30,6 @@ ofxSurfingPresets::ofxSurfingPresets()
 	// 'z', 'x', 'c', 'v', 'b', 'n', 'm'
 
 	setKeyFirstChar('1');
-
-	//setup();
 }
 
 //--------------------------------------------------------------
@@ -55,7 +53,7 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	//ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	// Remote
-// Server
+	// Server
 #ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 	ofRemoveListener(params_Preset.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_Preset);
 #endif
@@ -258,6 +256,7 @@ void ofxSurfingPresets::setup()
 	params_FloatClicker.add(bExtra_ClickerFloating);
 	params_FloatClicker.add(bAutoResize_ClickerFloating);
 	params_FloatClicker.add(bMinimize_Editor);
+
 	params_AppSettings.add(params_FloatClicker);
 
 	//-
@@ -266,6 +265,7 @@ void ofxSurfingPresets::setup()
 	params_ClickerSimple.setName("CLICKER SIMPLE");
 	params_ClickerSimple.add(amountButtonsPerRowClickerMini);
 	params_ClickerSimple.add(bResponsiveButtons);
+
 	params_AppSettings.add(params_ClickerSimple);
 
 	//--
@@ -470,20 +470,24 @@ void ofxSurfingPresets::startup()
 	// List data files
 	bool b = doRefreshFiles();
 
+	//TODO:
+	// sometimes fails and populate more presets when dir is not empty!
 	// Initiate
-	if (!b) doPopulatePresetsRandomized();//if no files then populate a bundle of randomized presets.
+	if (!b) {
+		doPopulatePresetsRandomized(); // if no files then populate a bundle of randomized presets.
 
-	//-
+		//-
 
-	//// Create first preset if folder it's empty
-	//if (dir.size() == 0)
-	//{
-	//	doNewPreset();
-	//}
+		//// Create first preset if folder it's empty
+		//if (dir.size() == 0)
+		//{
+		//	doNewPreset();
+		//}
 
-	//--
+		//--
 
-	doRefreshFiles();
+		doRefreshFiles();
+	}
 
 	//--
 
@@ -1350,6 +1354,10 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 					// Editor window
 					guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
+					guiManager.refreshLayout();
+					guiManager.Add(bSave, (bAutoSave ? OFX_IM_BUTTON_SMALL : OFX_IM_BUTTON_SMALL), 2, true);
+					guiManager.Add(bAutoSave, OFX_IM_TOGGLE_SMALL, 2);
+
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 					guiManager.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 					//if (playerSurfer.bGui) 
@@ -1357,14 +1365,14 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 						guiManager.Indent();
 						guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 						guiManager.Unindent();
-					}
+				}
 #endif
 					//guiManager.Unindent();
-				}
 		}
+	}
 
 		if (bHeader) ImGui::TreePop();
-	}
+}
 }
 
 //--------------------------------------------------------------
@@ -2444,7 +2452,7 @@ bool ofxSurfingPresets::doRefreshFiles()
 	//#endif
 
 #endif
-}
+	}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRefreshFilesAndRename()

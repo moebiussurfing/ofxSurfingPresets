@@ -14,7 +14,7 @@
 	+ add memory mode. not reading from files.
 		+ a vector of json or a json should be fine.
 	+ add/check undo engine workflow.
-
+	+ simple smoothing fails sometimes...
 */
 
 
@@ -53,7 +53,7 @@
 
 //--
 
-// Create Preset Iindex Selector Toggles
+// Create Preset Index Selector Toggles
 #define USE__OFX_SURFING_PRESETS__INDEX_SELECTOR_TOGGLES
 
 //--------------------------------------
@@ -806,13 +806,15 @@ public:
 
 public:
 
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 	//--------------------------------------------------------------
 	void setPlayerPlay(bool b)
 	{
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 		playerSurfer.bPlay = b;
-	}
+		return;
 #endif
+		ofLogWarning(__FUNCTION__) << "Player module is disabled!";
+	}
 
 	//--------------------------------------------------------------
 	void setName(std::string s)// Customize global name to avoid collide with other preset manager instances
