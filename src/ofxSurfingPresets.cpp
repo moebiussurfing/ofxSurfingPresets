@@ -1432,6 +1432,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 		{
 			//ofxImGuiSurfing::AddToggleRoundedButton(bGui);//main
 			ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
+			ofxImGuiSurfing::AddToggleRoundedButton(bGui_ClickerFloating);
 		}
 
 		if (bHeader) ImGui::TreePop();
