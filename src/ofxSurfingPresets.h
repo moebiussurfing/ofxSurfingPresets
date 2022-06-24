@@ -8,17 +8,20 @@
 
 	TODO:
 
+	+ convert clicker window to main
 	+ add edit/live toggle
 	+ add help box bHelp
 	+ fix startup grow amount presets!
+	+ add / check undo engine workflow.
+
 	+ add multiple group as ofxPresetsManager does.
 	+ add mode to not set key commands, to avoid letters and be the same as the index.
 	+ add memory mode.
 		copy from ofxPresetsManager
 		not reading from files.
 		a vector of json or a json should be fine.
-	+ add / check undo engine workflow.
 	+ simple smoothing fails sometimes...
+
 */
 
 
@@ -123,7 +126,7 @@ public:
 
 	void draw();
 
-	void draw_ImGui_ClickerFloating();
+	void draw_ImGui_Clicker();
 	void draw_ImGui_Parameters();//will be the main or most used window
 
 	// Minimal
@@ -251,6 +254,7 @@ private:
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+
 public:
 
 	SurfingPlayer playerSurfer;
@@ -260,7 +264,7 @@ private:
 	ofEventListener listener_Beat;
 	ofParameter<bool> bRandomPlay{ "Random", false };
 	std::vector<std::string> randomTypesPlayNames = { "Next Index", "Random Index", "Random Params" };
-	ofParameter<int> randomTypePlayIndex{ "Type", 0, 0, 2 };
+	ofParameter<int> randomTypePlayIndex{ "Target", 0, 0, 2 };
 
 #endif
 
@@ -613,10 +617,14 @@ public:
 	void doPopulatePresets(int amount = -1);
 	void doPopulatePresetsRandomized();
 
-	void doResetParams();
-	void doRandomizeParams(bool bNoTrig = true);//true for silent mode for "scripting" purposes
+	void doResetParams(bool bNoTrig = false);
+	void doRandomizeParams(bool bNoTrig = false);//true for silent mode for "scripting" purposes
+	
 	void doRandomizeIndex();
+
 	//void doSortParams(int i);//TODO:? useful when params are kind of index selectors?
+
+	//--
 
 	bool doRefreshFiles();
 	void doRefreshFilesAndRename();
@@ -693,7 +701,7 @@ private:
 
 public:
 
-	ofParameter<int> index;//current selected preset index
+	ofParameter<int> index; // current selected preset index
 
 	//--
 
@@ -769,7 +777,7 @@ public:
 	ofParameter<bool> bGui;
 	ofParameter<bool> bGui_Global;
 	ofParameter<bool> bGui_Editor;
-	ofParameter<bool> bGui_ClickerFloating;
+	ofParameter<bool> bGui_Clicker;
 	ofParameter<bool> bGui_Parameters;
 
 public:
@@ -779,10 +787,10 @@ public:
 
 private:
 
-	//ofParameter<bool> bMODE_Active;
 	ofParameter<bool> bKeySpace;
 	ofParameter<bool> bKeysArrows;
 
+	//ofParameter<bool> bMODE_Active;
 	//ofParameter<glm::vec2> Gui_Position;
 	//ofParameter<bool> bHelp;
 	//ofParameter<int> MODE_App;

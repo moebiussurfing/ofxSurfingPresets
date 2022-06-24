@@ -5,7 +5,7 @@ void ofApp::setup() {
 	ofSetWindowPosition(-1920, 25);
 
 	// Group
-	params.setName("mySceneParams");
+	params.setName("myScene");
 	params.add(size1.set("size1", 0.5, 0, 1));
 	params.add(size2.set("size2", ofGetHeight() * 0.5, 0, ofGetHeight() * 0.25));
 	params.add(rotation1.set("rotation1", 1, 0, 2));

@@ -97,7 +97,7 @@ void ofxSurfingPresets::setup()
 	bGui.set("PRESETS", true);
 	bGui_Editor.set("EDITOR", true);
 	bGui_ClickerSimple.set("Clicker Simple", false);
-	bGui_ClickerFloating.set("CLICKER", true);
+	bGui_Clicker.set("CLICKER", true);
 	bGui_Parameters.set("PARAMETERS", false);
 
 	index.set("Index", 0, 0, 0);
@@ -105,8 +105,11 @@ void ofxSurfingPresets::setup()
 	bCycled.set("Cycled", true);
 	bSave.set("SAVE", false);
 	bLoad.set("LOAD", false);
-	bAutoSave.set("AUTOSAVE", true);
+
+	bAutoSave.set("EDIT", true);
+	//bAutoSave.set("AUTOSAVE", true);
 	//bAutoSaveTimed.set("AutoSaver", false);//not used
+
 	bNewPreset.set("NEW", false);
 	bSetPathPresets.set("PATH", false);
 	bRefresh.set("REFRESH", false);
@@ -137,7 +140,7 @@ void ofxSurfingPresets::setup()
 
 	//params_Control.add(bGui_Global);
 	params_Control.add(bGui);
-	params_Control.add(bGui_ClickerFloating);
+	params_Control.add(bGui_Clicker);
 	params_Control.add(bGui_Editor);
 	params_Control.add(bGui_Parameters);
 
@@ -149,7 +152,7 @@ void ofxSurfingPresets::setup()
 	//params_Control.add(bCycled);
 	//params_Control.add(bGui_Parameters);
 	//params_Control.add(bGui_ClickerSimple);
-	//params_Control.add(bGui_ClickerFloating);
+	//params_Control.add(bGui_Clicker);
 	//params_Control.add(bAutoSave);
 	//params_Control.add(bAutoSaveTimed);
 
@@ -165,7 +168,7 @@ void ofxSurfingPresets::setup()
 	if (bEnableSettingsHandle)
 	{
 		params_AppSettings.add(bGui);
-		params_AppSettings.add(bGui_ClickerFloating);
+		params_AppSettings.add(bGui_Clicker);
 	}
 
 	params_AppSettings.add(bGui_Editor);
@@ -222,30 +225,11 @@ void ofxSurfingPresets::setup()
 	//playerSurfer.setNameGuiToggle(name_Root);
 
 	//TODO:
-	// Split change gui toggle too. add another label ?
+	// Split change GUI toggle too. add another label ?
 	//playerSurfer.setNameSubPanel("Presets");
 
 	// queue settings
 	//params_AppSettings.add(playerSurfer.params_AppSettings);
-
-	//--
-
-	// Define the behaviors to trig when player trigs the callback!
-	//--------------------------------------------------------------
-	listener_Beat = playerSurfer.bPlayerBeatBang.newListener([this](bool& b) 
-		{
-		ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
-
-		//if (playerSurfer.bPlay) // gui bangs are bypassed if not..
-		{
-			switch (randomTypePlayIndex)
-			{
-			case 0: doLoadNext(); break;
-			case 1: doRandomizeIndex(); break;
-			case 2: doRandomizeParams(); break;
-			}
-		}
-		});
 
 #endif
 
@@ -314,7 +298,7 @@ void ofxSurfingPresets::setupGui()
 	guiManager.setWindowsMode(IM_GUI_MODE_WINDOWS_SPECIAL_ORGANIZER);
 	guiManager.setup();
 
-	guiManager.addWindowSpecial(bGui_ClickerFloating);
+	guiManager.addWindowSpecial(bGui_Clicker);
 	guiManager.addWindowSpecial(bGui_Parameters);
 	guiManager.addWindowSpecial(bGui_Editor);
 
@@ -426,6 +410,34 @@ void ofxSurfingPresets::startup()
 
 	}
 
+	//--
+
+	// Player
+
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
+
+	// Moved here for avoid setup() crashes bd initialization not finished!
+
+	// Define the behaviors to trig when player trigs the callback!
+	//--------------------------------------------------------------
+	listener_Beat = playerSurfer.bPlayerBeatBang.newListener([this](bool& b)
+		{
+			ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
+			if (!b) return;
+
+			//if (playerSurfer.bPlay) // gui bangs are bypassed if not..
+			{
+				switch (randomTypePlayIndex)
+				{
+				case 0: doLoadNext(); break;
+				case 1: doRandomizeIndex(); break;
+				case 2: doRandomizeParams(); break;
+				}
+			}
+		});
+
+#endif
+
 	//-
 
 	// Remote
@@ -454,7 +466,7 @@ void ofxSurfingPresets::startup()
 
 	//Force default states
 
-	bGui_ClickerFloating = true;
+	bGui_Clicker = true;
 	bGui_Parameters = false;
 	bGui_Editor = false;
 	guiManager.getWindowsSpecialsGuiToggle().set(false);
@@ -727,15 +739,13 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			std::string n;
 			n = name_Window_Editor;
 
-			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
+			if (bGui_Editor) ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
 				IMGUI_SUGAR__WINDOWS_CONSTRAINTSW_SMALL;
 
 				if (guiManager.beginWindowSpecial(bGui_Editor))
 				{
 					guiManager.AddLabelBig(bGui_Editor.getName(), false);
-					//guiManager.AddLabelBig("EDITOR", false);
-					//guiManager.AddLabelBig("EDITOR \n" + params_Preset.getName(), false);
 					//guiManager.AddLabelBig(params_Preset.getName(), false);
 
 					//--
@@ -808,16 +818,19 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					if (!bMinimize_Editor)
 						if (bGui_ClickerSimple)
 						{
+							guiManager.AddSpacingSeparated();
+
 							draw_ImGui_ClickerSimple(false, true, false);
 						}
 
-					//{
-					//	std::string ss;
-					//	if (dir.size() == 0) ss = "NO PRESETS";
-					//	else ss = ofToString(index) + "/" + ofToString(index.getMax());
-					//	ImGui::Text(ss.data());
-					//	ImGui::Text(fileName.data()); // -> using text input below
-					//}
+					{
+						std::string ss;
+						if (dir.size() == 0) ss = "NO PRESETS";
+						else ss = ofToString(index) + "/" + ofToString(index.getMax());
+						guiManager.AddSpacing();
+						ImGui::Text(ss.data());
+						//ImGui::Text(fileName.data()); // -> using text input below
+					}
 
 					//--
 
@@ -862,7 +875,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 						// Clicker
 
-						guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						guiManager.Add(bGui_Clicker, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
 						// Parameters
 
@@ -871,14 +884,14 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 						guiManager.AddSpacingSeparated();
 					}
 
-					//-
+					//--
 
 					// MIDI
 
 #ifdef USE__OFX_SURFING_PRESET__MIDI__
 					guiManager.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 #endif
-					//-
+					//--
 
 					if (!bMinimize_Editor)
 					{
@@ -903,29 +916,38 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 								{
 									doNewPreset();
 								}
+								guiManager.AddTooltip("Create a new Preset at the end");
+
 								ImGui::SameLine();
 
-								if (ImGui::Button("DELETE", ImVec2(_w50, _h))) ImGui::OpenPopup("DELETE?");
+								if (ImGui::Button("DELETE", ImVec2(_w50, _h))) ImGui::OpenPopup("DELETE ?");
+								guiManager.AddTooltip("Remove current Preset");
 
-								if (ImGui::BeginPopupModal("DELETE?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+								if (ImGui::BeginPopupModal("DELETE ?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 								{
-									ImGui::Text("Current Preset will be deleted.\nThis operation cannot be undone!\n\n");
-									ImGui::Separator();
+									guiManager.AddLabelBig("Current Preset will be deleted.", true, true);
+									guiManager.AddSpacing();
+									guiManager.AddLabelBig("This operation cannot be undone!", true, true);
+									guiManager.AddSpacingBig();
 
 									static bool dont_ask_me_next_time = false;
 									ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 									ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
 									ImGui::PopStyleVar();
 
+									guiManager.AddSpacing();
+
 									if (!dont_ask_me_next_time) {
-										if (ImGui::Button("OK", ImVec2(120, 0))) {
+										if (ImGui::Button("OK", ImVec2(120, 2 * _h))) {
 											ofLogNotice(__FUNCTION__) << "DELETE";
 											doDeletePreset(index);
 											ImGui::CloseCurrentPopup();
 										}
 										ImGui::SetItemDefaultFocus();
 										ImGui::SameLine();
-										if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+										if (ImGui::Button("Cancel", ImVec2(120, 2 * _h))) {
+											ImGui::CloseCurrentPopup();
+										}
 									}
 									else {
 										ofLogNotice(__FUNCTION__) << "DELETE";
@@ -936,6 +958,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 									ImGui::EndPopup();
 								}
 
+								// More methods / buttons
 								draw_ImGui_ToolsWidgets();
 
 								ImGui::TreePop();
@@ -954,42 +977,38 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 								_w25 = getWidgetsWidth(4);
 								_h = getWidgetsHeightUnit();
 
-								guiManager.Add(bRefresh, OFX_IM_BUTTON_SMALL, 2, true);
-								guiManager.Add(bSetPathPresets, OFX_IM_BUTTON_SMALL, 2, false);
-
-								//TODO:
-								//if (ImGui::Button("COPY", ImVec2(_w2, _h)))
-								//{
-								//	doCopyPreset();
-								//}
-
-								//TODO: show only on last preset
-								//if (index == index.getMax())
 								{
-									if (ImGui::Button("CLEAR KIT", ImVec2(_w100, _h)))
+									if (ImGui::Button("CLEAR", ImVec2(_w100, _h)))
 									{
-										ImGui::OpenPopup("CLEAR KIT?");
+										ImGui::OpenPopup("CLEAR KIT ?");
 									}
+									guiManager.AddTooltip("Remove all file presets!");
 
-									if (ImGui::BeginPopupModal("CLEAR KIT?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+									if (ImGui::BeginPopupModal("CLEAR KIT ?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 									{
-										ImGui::Text("User Kit will be erased.\nThis operation cannot be undone!\n\n");
-										ImGui::Separator();
+										guiManager.AddLabelBig("Presets Kit will be erased.", true, true);
+										guiManager.AddSpacing();
+										guiManager.AddLabelBig("This operation cannot be undone!", true, true);
+										guiManager.AddSpacingBig();
 
 										static bool dont_ask_me_next_time = false;
 										ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 										ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
 										ImGui::PopStyleVar();
 
+										guiManager.AddSpacing();
+
 										if (!dont_ask_me_next_time) {
-											if (ImGui::Button("OK", ImVec2(120, 0))) {
+											if (ImGui::Button("OK", ImVec2(120, 2 * _h))) {
 												ofLogNotice(__FUNCTION__) << "CLEAR";
 												doClearPresets();
 												ImGui::CloseCurrentPopup();
 											}
 											ImGui::SetItemDefaultFocus();
 											ImGui::SameLine();
-											if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+											if (ImGui::Button("Cancel", ImVec2(120, 2 * _h))) {
+												ImGui::CloseCurrentPopup();
+											}
 										}
 										else {
 											ofLogNotice(__FUNCTION__) << "CLEAR";
@@ -1000,20 +1019,29 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 										ImGui::EndPopup();
 									}
 
-									if (ImGui::Button("RECREATE", ImVec2(_w100, _h)))
-									{
-										doRefreshFilesAndRename();
-									}
-
 									if (ImGui::Button("POPULATE", ImVec2(_w100, _h)))
 									{
 										doPopulatePresets();
 									}
+									guiManager.AddTooltip("Clear Kit and create new presets copies");
 
 									if (ImGui::Button("POPU RND", ImVec2(_w100, _h)))
 									{
 										doPopulatePresetsRandomized();
 									}
+									guiManager.AddTooltip("Clear Kit and create new randomized presets");
+
+									if (ImGui::Button("RECREATE", ImVec2(_w100, _h)))
+									{
+										doRefreshFilesAndRename();
+									}
+									guiManager.AddTooltip("Reload preset files on folder");
+
+									guiManager.Add(bRefresh, OFX_IM_BUTTON_SMALL, 2, true);
+									guiManager.AddTooltip("Reload Preset files on folder");
+
+									guiManager.Add(bSetPathPresets, OFX_IM_BUTTON_SMALL, 2, false);
+									guiManager.AddTooltip("Open dialog to customize presets folder");
 								}
 
 								ImGui::TreePop();
@@ -1107,9 +1135,9 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 											bool bOpen = false;
 											ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
 											//_flagt |= ImGuiTreeNodeFlags_Framed;
-											if (ImGui::TreeNodeEx("Paths", _flagt))
+											if (ImGui::TreeNodeEx("Path", _flagt))
 											{
-												ImGui::Text(path_Presets.data()); // -> show path
+												ImGui::TextWrapped(path_Presets.data()); // -> show path
 												ImGui::TreePop();
 											}
 										}
@@ -1176,15 +1204,15 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					guiManager.endWindowSpecial();
 				}
 			}
-			ImGui::PopID();
+			if (bGui_Editor) ImGui::PopID();
 		}
 	}
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::draw_ImGui_ClickerFloating()
+void ofxSurfingPresets::draw_ImGui_Clicker()
 {
-	if (bGui_ClickerFloating)
+	if (bGui_Clicker)
 	{
 		IMGUI_SUGAR__WINDOWS_CONSTRAINTSW_SMALL;
 
@@ -1195,14 +1223,14 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 		float _w4;
 		float _h;
 
-		// 3. Floating Clicker
-
 		std::string n;
 		n = name_Window_ClickerFloating;
 
-		ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
+		// avoid collision with other presets manager instances
+		// if the windows have the same name.
+		if (bGui_Clicker) ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 		{
-			if (guiManager.beginWindowSpecial(bGui_ClickerFloating))
+			if (guiManager.beginWindowSpecial(bGui_Clicker))
 			{
 				guiManager.AddLabelBig("PRESETS \n\n" + params_Preset.getName(), false);
 				//guiManager.AddLabelBig(params_Preset.getName(), false);
@@ -1214,13 +1242,10 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 				_w3 = getWidgetsWidth(3);
 				_h = getWidgetsHeightUnit();
 
-				//-
+				//--
 
 				// Minimize
 				guiManager.Add(bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
-				//// Align Windows
-				//if (!bMinimize) guiManager.Add(guiManager.bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 				// Keys
 				if (!bMinimize) guiManager.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
@@ -1236,8 +1261,26 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 					ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtons_ClickerFloating, amountButtonsPerRowClickerFloat, true, sizey);
 
 					//TODO:
-					//using ptr
+					// using ptr
 					//ofxImGuiSurfing::AddMatrixClickerLabels(index, (char *) keyCommandsChars, bResponsiveButtons_ClickerFloating, amountButtonsPerRowClickerFloat, true, sizey);
+				}
+
+				// Edit mode
+				guiManager.AddSpacing();
+				guiManager.Add(bAutoSave, OFX_IM_TOGGLE_BORDER_BLINK);
+
+				//--
+
+				if (bMinimize)
+				{
+					guiManager.AddSpacingSeparated();
+
+					// Editor
+					guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
+					// Parameters
+					guiManager.Add(bGui_Parameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
 				}
 
 				//--
@@ -1245,28 +1288,28 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 				// Play
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+
 				if (bMinimize)
 				{
 					guiManager.AddSpacingSeparated();
 
-					//guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
 					_h = getWidgetsHeightUnit();
-					float _r = bMinimize ? 1.0 : 1.5;
+					float _r = bMinimize ? 1.25 : 1.5;
 					_w1 = getWidgetsWidth(1);
 					ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
 						_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
 
+					//guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
+					guiManager.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
 				}
+
 #endif
+				// Panels
 
-				//guiManager.AddSpacing();
-
-				// Toggles to show Panels
 				if (!bMinimize)
 				{
 					guiManager.AddSeparator();
-
 					guiManager.AddLabelBig("Panels");
 
 					//--
@@ -1286,6 +1329,8 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 					// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+					
+					guiManager.AddLabelBig("Player");
 
 					guiManager.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 					//if (playerSurfer.bGui)
@@ -1293,12 +1338,14 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 						guiManager.Indent();
 
 						//guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-						
+
 						_h = getWidgetsHeightUnit();
 						float _r = bMinimize ? 1.0 : 1.5;
 						_w1 = getWidgetsWidth(1);
 						ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
 							_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
+
+						guiManager.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
 
 						//if (!bMinimize_Editor)
 						if (!bMinimize)
@@ -1372,7 +1419,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 				guiManager.endWindowSpecial();
 			}
 		}
-		ImGui::PopID();
+		if (bGui_Clicker) ImGui::PopID();
 	}
 }
 
@@ -1442,7 +1489,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 						//guiManager.Add(playerSurfer.bPlay, OFX_IM_TOGGLE_BUTTON_ROUNDED);
 
 						float _h = getWidgetsHeightUnit();
-						float _r = bMinimize ? 1.0 : 1.5;
+						float _r = bMinimize ? 1.25 : 1.5;
 						float _w1 = getWidgetsWidth(1);
 						ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
 							_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
@@ -1516,7 +1563,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 		{
 			//ofxImGuiSurfing::AddToggleRoundedButton(bGui);//main
 			ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
-			ofxImGuiSurfing::AddToggleRoundedButton(bGui_ClickerFloating);
+			ofxImGuiSurfing::AddToggleRoundedButton(bGui_Clicker);
 		}
 
 		if (bHeader) ImGui::TreePop();
@@ -1535,7 +1582,7 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 			std::string n;
 			n = name_Window_Parameters;
 
-			ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
+			if (bGui_Parameters) ImGui::PushID(("##" + n + params_Preset.getName()).c_str());
 			{
 				if (guiManager.beginWindowSpecial(bGui_Parameters))
 				{
@@ -1546,13 +1593,16 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 
 					//-
 
-					//guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-					//guiManager.Add(bGui_ClickerFloating, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+					if (!bGui_Editor && !bGui_Clicker) {
+						guiManager.AddSpacingBigSeparated();
+						guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						guiManager.Add(bGui_Clicker, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+					}
 
 					guiManager.endWindowSpecial();
 				}
 			}
-			ImGui::PopID();
+			if (bGui_Parameters) ImGui::PopID();
 		}
 	}
 }
@@ -1564,25 +1614,33 @@ void ofxSurfingPresets::draw_ImGui_ToolsWidgets()
 	float _w50 = ofxImGuiSurfing::getWidgetsWidth(2);
 	float _h = getWidgetsHeightRelative();
 
-	if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
-	{
-		doRecallState();
-	}
-	ImGui::SameLine();
 	if (ImGui::Button("STORE", ImVec2(_w50, _h)))
 	{
 		doStoreState();
 	}
+	guiManager.AddTooltip("Store current Preset State");
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("RECALL", ImVec2(_w50, _h)))
+	{
+		doRecallState();
+	}
+	guiManager.AddTooltip("Recall current Preset stored State");
 
 	if (ImGui::Button("RESET", ImVec2(_w50, _h)))
 	{
-		doResetParams();
+		doResetParams(false);
 	}
+	guiManager.AddTooltip("Reset current Preset parameters to min values");
+
 	ImGui::SameLine();
+
 	if (ImGui::Button("RANDOM", ImVec2(_w50, _h)))
 	{
-		doRandomizeParams();
+		doRandomizeParams(false);
 	}
+	guiManager.AddTooltip("Randomize current Preset parameters");
 }
 
 //--------------------------------------------------------------
@@ -1592,7 +1650,7 @@ void ofxSurfingPresets::draw_ImGui()
 
 	guiManager.begin();
 	{
-		draw_ImGui_ClickerFloating();
+		draw_ImGui_Clicker();
 
 		//--
 
@@ -1609,11 +1667,36 @@ void ofxSurfingPresets::draw_ImGui()
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-	//guiManager.setNextWindowAfterWindowNamed();
-	playerSurfer.draw();
+
+	if (playerSurfer.bGui)
+	{
+		//guiManager.setNextWindowOnViewport();
+
+		//--
+
+		//TODO: fix
+		//string n = guiManager.getWindowSpecialLast();
+
+		////string n2 = "PLAYER";
+		//string n2 = playerSurfer.bGui.getName();
+
+		//cout << n << "  -  " << n2 << endl;
+
+		//if (n != "-1" && n != n2)
+		//{
+		//	guiManager.setNextWindowAfterWindowNamed(n);
+		//}
+
+		//--
+
+		playerSurfer.draw();
+	}
+
 #endif
 
+	//--
 }
+
 //--------------------------------------------------------------
 void ofxSurfingPresets::keyReleased(ofKeyEventArgs& eventArgs)
 {
@@ -1826,7 +1909,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 //		else if (guiManager.bLinkWindows)
 //		{
 //			if ((name == bGui.getName()) ||
-//				(name == bGui_ClickerFloating.getName()) ||
+//				(name == bGui_Clicker.getName()) ||
 //				(name == bGui_Editor.getName()) ||
 //				(name == bGui_Parameters.getName())
 //#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
@@ -1900,12 +1983,12 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 //#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 						refreshToggleNotes();
 #endif
-				}
+					}
 					else
 					{
 						ofLogError(__FUNCTION__) << "File out of range";
 					}
-			}
+				}
 
 				//--
 
@@ -1926,7 +2009,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 					ofLogNotice(__FUNCTION__) << "PRESET COPY!";
 
 					index_PRE = index;
-		}
+				}
 
 				//--
 
@@ -1963,7 +2046,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 
 					index_PRE = index;
 				}
-	}
+			}
 
 			//--
 
@@ -1973,7 +2056,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 			{
 				bIsRetrigged = true;
 			}
-}
+		}
 
 		//--
 
@@ -2042,12 +2125,12 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 
 		//else if (name == bGui.getName())
 		//{
-		//	if (!bGui_Editor && !bGui_ClickerFloating)
+		//	if (!bGui_Editor && !bGui_Clicker)
 		//	{
 		//		bGui_Editor = true;
 		//	}
 		//}
-}
+	}
 }
 
 #ifdef USE_TOGGLE_TRIGGERS
@@ -2098,7 +2181,7 @@ void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter& e)
 	//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 	//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 	//remoteServer.syncParameters();
-		}
+}
 #endif
 
 ////--------------------------------------------------------------
@@ -2351,7 +2434,7 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 	{
 		index = i;
 		doNewPreset();
-		doRandomizeParams(); // silent
+		doRandomizeParams(true); // silent
 		doSaveCurrent();
 	}
 
@@ -2657,62 +2740,75 @@ void ofxSurfingPresets::doRandomizeIndex() {
 //}
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::doRandomizeParams(bool bNoTrig) {
+void ofxSurfingPresets::doRandomizeParams(bool bSilent) {
 	ofLogNotice(__FUNCTION__);
+
+	//TODO:
+	// this is not recursive inside the group content!
+	// get from ImHelpers. AddGroup iterate groups
 
 	for (int i = 0; i < params_Preset.size(); i++)
 	{
-		//// apply only if enabled
-		//auto &pe = params_Preset[i];
-		//auto type = pe.type();
-		//bool isBool = type == typeid(ofParameter<bool>).name();
-		//if (isBool) {
-		//	ofParameter<bool> pb = pe.cast<bool>();
-		//	if (!pb.get()) continue;
-		//}
-
-		//-
-
 		auto& p = params_Preset[i];
-
-		float v;
 
 		if (p.type() == typeid(ofParameter<float>).name())
 		{
 			ofParameter<float> pr = p.cast<float>();
-			if (bNoTrig) pr.setWithoutEventNotifications(ofRandom(pr.getMin(), pr.getMax()));
-			else pr = ofRandom(pr.getMin(), pr.getMax());
+			float v = ofRandom(pr.getMin(), pr.getMax());
+			if (bSilent) pr.setWithoutEventNotifications(v);
+			else pr.set(v);
 		}
+
 		else if (p.type() == typeid(ofParameter<int>).name())
 		{
 			ofParameter<int> pr = p.cast<int>();
-			if (bNoTrig) pr.setWithoutEventNotifications(ofRandom(pr.getMin(), pr.getMax() + 1));
-			else pr = ofRandom(pr.getMin(), pr.getMax() + 1);
+			int v = ofRandom(pr.getMin(), pr.getMax());
+			if (bSilent) pr.setWithoutEventNotifications(v);
+			else pr.set(v);
+		}
+
+		// include booleans
+		else if (p.type() == typeid(ofParameter<bool>).name())
+		{
+			ofParameter<bool> pr = p.cast<bool>();
+			bool b = (ofRandom(1.f) >= 0.5f);
+			if (bSilent) pr.setWithoutEventNotifications(b);
+			else pr.set(b);
 		}
 	}
 
-	if (!bNoTrig) bIsRetrigged = true;
+	if (!bSilent) bIsRetrigged = true;
 }
 
 //--------------------------------------------------------------
-void ofxSurfingPresets::doResetParams() {
+void ofxSurfingPresets::doResetParams(bool bNoTrig) {
 	ofLogNotice(__FUNCTION__);
 
 	for (int i = 0; i < params_Preset.size(); i++)
 	{
 		auto& p = params_Preset[i];
 
-		float v;
-
 		if (p.type() == typeid(ofParameter<float>).name())
 		{
 			ofParameter<float> pr = p.cast<float>();
-			pr = pr.getMin();
+			if (bNoTrig) pr.setWithoutEventNotifications(pr.getMin());
+			else pr.set(pr.getMin());
 		}
+
 		else if (p.type() == typeid(ofParameter<int>).name())
 		{
 			ofParameter<int> pr = p.cast<int>();
-			pr = pr.getMin();
+			if (bNoTrig) pr.setWithoutEventNotifications(pr.getMin());
+			else pr.set(pr.getMin());
+		}
+
+		// include booleans
+		else if (p.type() == typeid(ofParameter<bool>).name())
+		{
+			ofParameter<bool> pr = p.cast<bool>();
+			bool b = false;
+			if (bNoTrig) pr.setWithoutEventNotifications(b);
+			else pr.set(b);
 		}
 	}
 
