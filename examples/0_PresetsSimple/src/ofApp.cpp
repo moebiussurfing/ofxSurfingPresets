@@ -2,9 +2,10 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
+	ofSetWindowPosition(-1920, 25);
 
 	// Group
-	params.setName("Scene Params");
+	params.setName("mySceneParams");
 	params.add(size1.set("size1", 0.5, 0, 1));
 	params.add(size2.set("size2", ofGetHeight() * 0.5, 0, ofGetHeight() * 0.25));
 	params.add(rotation1.set("rotation1", 1, 0, 2));
@@ -17,7 +18,7 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	drawScene(); // Using the params
+	drawScene(); // Will use the presets params!
 
 	presetsManager.draw(); // Draw Gui
 }
@@ -26,7 +27,8 @@ void ofApp::draw()
 void ofApp::drawScene()
 {
 	// Bg Color
-	ofColor _colorBg = 255;//white
+	//ofColor _colorBg = 255;//white
+	ofColor _colorBg = 32;//dark
 
 	//-
 

@@ -4,7 +4,8 @@
 
 #include "ofxSurfingPresets.h"
 
-class ofApp : public ofBaseApp{
+class ofApp : public ofBaseApp
+{
 
 public:
 		void setup();

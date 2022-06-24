@@ -8,12 +8,16 @@
 
 	TODO:
 
+	+ add edit/live toggle
+	+ add help box bHelp
 	+ fix startup grow amount presets!
 	+ add multiple group as ofxPresetsManager does.
 	+ add mode to not set key commands, to avoid letters and be the same as the index.
-	+ add memory mode. not reading from files.
-		+ a vector of json or a json should be fine.
-	+ add/check undo engine workflow.
+	+ add memory mode.
+		copy from ofxPresetsManager
+		not reading from files.
+		a vector of json or a json should be fine.
+	+ add / check undo engine workflow.
 	+ simple smoothing fails sometimes...
 */
 
@@ -58,8 +62,9 @@
 
 //--------------------------------------
 
+//--
 
-// Midi
+// MIDI
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 #include "ofxSurfingMidi.h"
@@ -71,7 +76,7 @@
 #define USE__OFX_SURFING_PRESET__MIDI__
 #endif
 
-//-
+//--
 
 // Remote Server
 
@@ -79,28 +84,54 @@
 #include "ofxRemoteParameters/Server.h"
 #endif
 
-//----
+//--
 
-
-#include "ofxSurfingHelpers.h"
-#include "ofxSurfingImGui.h"
+// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 #include "ofxSurfingPlayer.h"
 #endif
 
+//--
+
+#include "ofxSurfingHelpers.h"
+#include "ofxSurfingImGui.h"
 
 //----
 
 
 class ofxSurfingPresets
 {
-	//----
 
 public:
 
 	ofxSurfingPresets();
 	~ofxSurfingPresets();
+
+public:
+
+	void setup();
+	void setupGui();
+
+private:
+
+	void update(ofEventArgs& args);
+	void exit();
+	void startup();
+
+public:
+
+	void draw();
+
+	void draw_ImGui_ClickerFloating();
+	void draw_ImGui_Parameters();//will be the main or most used window
+
+	// Minimal
+	void draw_ImGui_ClickerMinimal();
+
+	// Clicker Simple (Inner)
+	void draw_ImGui_ClickerSimple(bool bHeader/* = true*/, bool bMinimal = false, bool bShowMinimize = true, bool bExtras = false);//inner clicker to fast integrate clicker to an external ImGui panel windows.
+	void draw_ImGui_ClickerSimple();//forced simple clicker!
 
 	//--
 
@@ -109,10 +140,15 @@ private:
 	bool bEnableSettingsHandle = true;
 
 public:
+
 	//--------------------------------------
 	void setEnableHandleSettingsFile(bool b) {
 		bEnableSettingsHandle = b;
 	}
+
+private:
+
+	std::string name_Root = "-1";
 
 private:
 
@@ -165,29 +201,31 @@ public:
 	void refreshToggleNotes();
 	bool bSyncRemote;
 
+	//TODO:
 	//--------------------------------------------------------------
-	ofParameterGroup& getParametersSelectorToggles() { // To select index preset using bool toggle parameters triggers!
+	// To select index preset using bool toggle parameters triggers!
+	ofParameterGroup& getParametersSelectorToggles() {
 
-//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-//	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-//notesIndex.clear();
-//params_PresetToggles.clear();
-//for (int i = 0; i <= index.getMax(); i++)
-//{
-//	std::string n = "Preset ";
-//	//n += ofToString(i < 10 ? "0" : "");
-//	n += ofToString(i);
-//
-//	ofParameter<bool> b{ n, false };
-//	notesIndex.push_back(b);
-//	params_PresetToggles.add(b);
-//}
-//ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-//
-//	surfingMIDI.clear();
-//	surfingMIDI.add(params_Preset); // -> to control preset params
-//	surfingMIDI.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
-//#endif
+		//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+		//	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+		//notesIndex.clear();
+		//params_PresetToggles.clear();
+		//for (int i = 0; i <= index.getMax(); i++)
+		//{
+		//	std::string n = "Preset ";
+		//	//n += ofToString(i < 10 ? "0" : "");
+		//	n += ofToString(i);
+		//
+		//	ofParameter<bool> b{ n, false };
+		//	notesIndex.push_back(b);
+		//	params_PresetToggles.add(b);
+		//}
+		//ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+		//
+		//	surfingMIDI.clear();
+		//	surfingMIDI.add(params_Preset); // -> to control preset params
+		//	surfingMIDI.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
+		//#endif
 
 		return params_PresetToggles;
 	}
@@ -415,46 +453,17 @@ private:
 
 	//--
 
-private:
+//private:
 
-	bool bAutoDraw; // Must be false when multiple ImGui instances created!
+	//bool bAutoDraw; // Must be false when multiple ImGui instances created!
 
-public:
-
-	void setup();
-	void setupGui();
-
-private:
-
-	std::string name_Root = "-1";
-
-private:
-
-	void update(ofEventArgs& args);
-	void exit();
-	void startup();
-
-public:
-
-	void draw();
-
-	void draw_ImGui_ClickerFloating();
-	void draw_ImGui_Parameters();//will be the main or most used window
-
-	// Minimal
-	void draw_ImGui_ClickerMinimal();
-
-	// Clicker Simple (Inner)
-	void draw_ImGui_ClickerSimple(bool bHeader/* = true*/, bool bMinimal = false, bool bShowMinimize = true, bool bExtras = false);//inner clicker to fast integrate clicker to an external ImGui panel windows.
-	void draw_ImGui_ClickerSimple();//forced simple clicker!
-
-	// TODO: REMOVE. This is deprecated!
-	// Required to set to false when only one ImGui instance is created. 
-	// By default is setted to ImGui multi instances
-	//--------------------------------------------------------------
-	void setImGuiAutodraw(bool b) {
-		bAutoDraw = b;
-	}
+	//// TODO: REMOVE. This is deprecated!
+	//// Required to set to false when only one ImGui instance is created. 
+	//// By default is setted to ImGui multi instances
+	////--------------------------------------------------------------
+	//void setImGuiAutodraw(bool b) {
+	//	bAutoDraw = b;
+	//}
 
 private:
 
@@ -463,9 +472,11 @@ private:
 	ofParameterGroup params_ClickerSimple;
 
 public:
+
 	ofParameter<bool> bMinimize_Editor{ "Minimize", true };
 
 private:
+
 	ofParameter<bool> bMinimize_Params{ "Minimize", true };
 
 private:
@@ -603,7 +614,7 @@ public:
 	void doPopulatePresetsRandomized();
 
 	void doResetParams();
-	void doRandomizeParams(bool bNoTrig = false);//true for silent mode for "scripting" purposes
+	void doRandomizeParams(bool bNoTrig = true);//true for silent mode for "scripting" purposes
 	void doRandomizeIndex();
 	//void doSortParams(int i);//TODO:? useful when params are kind of index selectors?
 
@@ -611,10 +622,13 @@ public:
 	void doRefreshFilesAndRename();
 
 private:
+
 	void setPath();//open dialog to select a path manually.
 
 	bool bResetDefined = false;
+
 public:
+
 	//--------------------------------------------------------------
 	void setRandomizerBpm(float bpm) {
 
@@ -629,9 +643,12 @@ public:
 	// Bc each group could have different appropiated reset values
 
 private:
+
 	ofParameter <bool> bReset{ "-1", false }; // TODO: Must set a name when defined a callback function..
 	//TODO: we could use a memory state save/load(reset) that we will use as "Reset State"
+
 public:
+
 	//--------------------------------------------------------------
 	void setResetPtr(ofParameter<bool>& b) {
 		bReset.makeReferenceTo(b);
@@ -640,6 +657,7 @@ public:
 	//-
 
 public:
+
 	// Exposed to gui's
 	ofParameter<bool> bAutoSave;
 	ofParameter<bool> bNewPreset;
@@ -727,10 +745,10 @@ private:
 
 	//int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
 
-	// Autosave
-	ofParameter<bool> bAutoSaveTimed;
-	uint64_t timerLast_Autosave = 0;
-	int timeToAutosave = 5000;
+	//// Autosave
+	//ofParameter<bool> bAutoSaveTimed;
+	//uint64_t timerLast_Autosave = 0;
+	//int timeToAutosave = 5000;
 
 	// Updating some params before save will trigs also the group callbacks
 	// So we disable this callbacks just in case params updatings are required
@@ -1026,6 +1044,7 @@ private:
 	// API getters
 
 public:
+
 	// Simplified getters
 	// To get the smoothed single parameters.
 	// Notice that when smooth is disabled, we will get the raw values without smoothing.
@@ -1104,6 +1123,7 @@ public:
 #ifndef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
 
 public:
+
 	//--------------------------------------------------------------
 	float get(ofParameter<float>& e) { // Gets raw value for passed param. Will use his name and search into param group.
 		std::string name = e.getName();
@@ -1138,6 +1158,7 @@ public:
 			}
 		}
 	}
+
 #endif
 
 	//----
@@ -1145,6 +1166,7 @@ public:
 	// Align Windows Engine
 
 private:
+
 	string name_Window_ClickerFloating;
 	string name_Window_Editor;
 	string name_Window_Parameters;
@@ -1175,21 +1197,18 @@ public:
 		name_Window_Parameters = name_Root + " PARAMS";
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-		name_Window_Player = name_Root + " PLAYER";
-		playerSurfer.setNameWindow(name_Window_Player);
+
+		name_Window_Player = name_Root;
+		playerSurfer.setNameInstance(name_Window_Player);
+
 #endif
+
 	}
-	private:
+
+private:
+
+#define countTimes_MAX 4
 	bool bGui_Changed = false;
 	int countTimes;
-#define countTimes_MAX 4
 
-	//--
-
-	//TODO:
-	//https://github.com/ocornut/imgui/issues/5287
-public:
-	void doAlignWindowsOnce(); // run once
-	void doAlignWindowsRefresh(int ntimes = countTimes_MAX); // run many times
-	// that's to run during some frames.
 };
