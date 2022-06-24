@@ -145,6 +145,7 @@ void ofxSurfingPresets::setup()
 	params_Control.add(bGui_ClickerFloating);
 	params_Control.add(bGui_Editor);
 	params_Control.add(bGui_Parameters);
+
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
 	params_Control.add(playerSurfer.bGui);
 #endif
@@ -317,6 +318,10 @@ void ofxSurfingPresets::setupGui()
 	guiManager.addWindowSpecial(bGui_ClickerFloating);
 	guiManager.addWindowSpecial(bGui_Parameters);
 	guiManager.addWindowSpecial(bGui_Editor);
+
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
+	guiManager.addWindowSpecial(playerSurfer.bGui);
+#endif
 
 	guiManager.startup();
 
@@ -1164,6 +1169,8 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 {
 	if (bGui_ClickerFloating)
 	{
+		IMGUI_SUGAR__WINDOWS_CONSTRAINTSW_SMALL;
+
 		// Widgets Sizes
 		float _w1;
 		float _w2;
@@ -1180,7 +1187,9 @@ void ofxSurfingPresets::draw_ImGui_ClickerFloating()
 		{
 			if (guiManager.beginWindowSpecial(bGui_ClickerFloating))
 			{
-				guiManager.AddLabelBig(params_Preset.getName(), false);
+				//guiManager.AddLabelBig("PRESETS");
+				guiManager.AddLabelBig("PRESETS \n" + params_Preset.getName(), false);
+				//guiManager.AddLabelBig(params_Preset.getName(), false);
 
 				//--
 
@@ -1564,7 +1573,8 @@ void ofxSurfingPresets::draw_ImGui()
 
 	// Player
 
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
+	guiManager.setNextWindowAfterWindowNamed();
 	playerSurfer.draw();
 #endif
 
