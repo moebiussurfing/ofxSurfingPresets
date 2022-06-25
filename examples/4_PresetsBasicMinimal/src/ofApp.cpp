@@ -31,46 +31,76 @@ void ofApp::draw()
 		ImGuiCond flag = ImGuiCond_FirstUseEver;
 		ImGui::SetNextWindowPos(ImVec2(ofGetWidth() - 200, 20), flag);
 
-		if (guiManager.beginWindow(bWindow))
+		if (guiManager.beginWindow(bGui_1))
 		{
-			guiManager.AddLabelBig("Parameters");//uppercased
-			guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			if (bParameters) {
-				guiManager.Indent();//refreshes layout size checks
-				guiManager.AddGroup(params);
-				guiManager.AddSeparator();
-				guiManager.Unindent();//refreshes layout size checks
-			}
+			guiManager.AddLabelBig("Simple and minimal / Inner Selectors");
+
+			guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_BIG);
+			guiManager.Add(presetsManager.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_BIG);
+			
+			guiManager.AddSpacingBigSeparated();
+			
+			//--
 
 			guiManager.AddLabelBig("Presets Manager");
-			guiManager.Add(presetsManager.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-			guiManager.Indent();
-			{
-				guiManager.Add(presetsManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-				guiManager.Add(presetsManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-				guiManager.AddSeparator();
-				guiManager.Add(presetsManager.bLinkWindows, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-				guiManager.Add(presetsManager.bAlignWindowsX, OFX_IM_BUTTON_SMALL, 2, true);
-				guiManager.Add(presetsManager.bAlignWindowsY, OFX_IM_BUTTON_SMALL, 2, false);
-				guiManager.AddSeparator();
 
-				guiManager.AddLabelBig("Inner Selectors");
-				guiManager.Add(bClickerMinimal, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-				guiManager.Add(presetsManager.bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-				guiManager.AddSeparator();
+			guiManager.AddLabel("These are the full version windows of the add-on. On this example we are trying to preview the below minimal / simple versions! Go play with INNER SELECTOR sections below.", false, false);
+
+			guiManager.Add(presetsManager.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
+			if (presetsManager.bGui) {
+				guiManager.Indent();
+				{
+					guiManager.Add(presetsManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+					guiManager.Add(presetsManager.bAutoResize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+					guiManager.AddSeparator();
+				}
+				guiManager.Unindent();
 			}
-			guiManager.Unindent();
+
+			guiManager.AddSpacingBigSeparated();
+
+			//--
+
+			guiManager.AddLabelBig("Parameters"); // uppercased
+
+			guiManager.Add(bParameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
+			if (bParameters) {
+				guiManager.Indent(); // refreshes layout size checks
+				guiManager.AddGroup(params);
+				guiManager.Unindent(); // refreshes layout size checks
+			}
+
+			//--
+
+			guiManager.endWindow();
+		}
+
+		//--
+
+		if (guiManager.beginWindow(bGui_2))
+		{
+			guiManager.AddLabel("These are the minimal versions of the add-on: the minimal / simple versions! These are the bundle of widgets that we will like to easy integrate into our app GUIs.", false, false);
+
+			guiManager.AddSpacingBigSeparated();
 
 			if (bClickerMinimal)
 			{
-				guiManager.AddLabel("Clicker Minimal");
-				presetsManager.draw_ImGui_ClickerMinimal();
-				guiManager.AddSeparator();
+				guiManager.AddLabelBig("Clicker Minimal");
+
+				presetsManager.draw_ImGui_ClickerMinimal(); // -> That bundle of widgets if what we want to use!
+
+				guiManager.AddSpacingBigSeparated();
 			}
+
 			if (presetsManager.bGui_ClickerSimple)
 			{
-				guiManager.AddLabel("Clicker Simple");
-				presetsManager.draw_ImGui_ClickerSimple(false, false);
+				guiManager.AddLabelBig("Clicker Simple");
+
+				presetsManager.draw_ImGui_ClickerSimple(false); // -> That bundle of widgets if what we want to use!. First argument is to hide header.
+				
+				guiManager.AddSpacingBigSeparated();
 			}
 
 			guiManager.endWindow();
@@ -86,8 +116,7 @@ void ofApp::draw()
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	if (key == OF_KEY_F10) bWindow = !bWindow;
-	if (key == OF_KEY_F11) presetsManager.doAlignWindowsOnce();
+	if (key == OF_KEY_F10) bGui_1 = !bGui_1;
 }
 
 //--------------------------------------------------------------
@@ -156,7 +185,7 @@ void ofApp::drawScene()
 	ofPushStyle();
 	ofPushMatrix();
 	{
-		ofTranslate(ofGetWidth()*.5f, ofGetHeight()*.5f);
+		ofTranslate(ofGetWidth() * .5f, ofGetHeight() * .5f);
 		ofRotateDeg(ofGetElapsedTimef() * TWO_PI);
 		ofRotateZDeg(_rotation1 * 45);
 		ofScale(1.3f);

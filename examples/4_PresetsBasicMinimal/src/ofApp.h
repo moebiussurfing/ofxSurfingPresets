@@ -6,7 +6,7 @@
 /*
 
 	This example shows and example with the minimal expression of a preset selector.
-	Kind of a player when you don't need deep edition in first plain.
+	Kind of a player when you don't need deep edition in first plane.
 
 */
 
@@ -42,9 +42,11 @@ public:
 
 	ofxSurfing_ImGui_Manager guiManager; // -> The ImGui Manager !
 	
-	ofParameter<bool> bWindow{ "Window", true };
+	ofParameter<bool> bGui_1{ "Window 1", true };
 	ofParameter<bool> bClickerMinimal{ "Clicker Minimal", false };
 	ofParameter<bool> bParameters{ "Parameters", false };
+
+	ofParameter<bool> bGui_2{ "Window 2", true };
 
 	//--
 

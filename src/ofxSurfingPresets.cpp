@@ -311,15 +311,15 @@ void ofxSurfingPresets::buildHelp()
 	helpInfo += "\n";
 	helpInfo += "LOAD PRESET \n";
 	helpInfo += "\n";
-	helpInfo += " MOUSE CLICK \n";
+	helpInfo += "MOUSE CLICK \n";
 	helpInfo += "\n";
 	helpInfo += "+CTRL            COPY \n";
 	helpInfo += "+ALT             SWAP \n";
 	helpInfo += "\n";
-	helpInfo += " KEYS \n";
+	helpInfo += "KEYS \n";
 	helpInfo += "\n";
 	helpInfo += "1-9              BROWSE \n";
-	helpInfo += "< >               \n";
+	helpInfo += "< > \n";
 	helpInfo += "SPACE            NEXT \n";
 	helpInfo += "+CTRL            PLAY \n";
 	helpInfo += "\n";
@@ -339,7 +339,7 @@ void ofxSurfingPresets::setupGui()
 	guiManager.setName("ofxSurfingPresets");
 	// customizing name helps to organize folder settings files on bin/data/  
 	// when using multiple GUI instances!
-	 
+
 	//--
 
 	guiManager.setWindowsMode(IM_GUI_MODE_WINDOWS_SPECIAL_ORGANIZER);
@@ -633,7 +633,7 @@ void ofxSurfingPresets::update(ofEventArgs& args)
 		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 		remoteServer.syncParameters();
-}
+	}
 #endif
 
 	//--
@@ -1367,44 +1367,40 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 		ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClickerSimple, amountButtonsPerRowClickerMini, true, WIDGETS_HEIGHT / 2);
 		//ofxImGuiSurfing::AddMatrixClicker(index, bResponsiveButtonsClickerSimple, amountButtonsPerRowClickerMini, true, WIDGETS_HEIGHT / 2);
 
+		guiManager.AddSpacing();
+
 		if (!bNoExtras)
 		{
+
 			if (bShowMinimize) guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 			if (!guiManager.bMinimize)
 				if (!bMinimal)
 				{
-					//guiManager.Indent();
+					ofxImGuiSurfing::AddToggleRoundedButton(bGui_Main);
 
-					// Editor window
-					guiManager.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+					//TODO: not working?
+					ImGui::PushID("##12TOGEDIT01");
+					guiManager.Add(bAutoSave, OFX_IM_TOGGLE_BORDER_BLINK);
+					ImGui::PopID();
 
-					guiManager.refreshLayout();
-					guiManager.Add(bSave, (bAutoSave ? OFX_IM_BUTTON_SMALL : OFX_IM_BUTTON_SMALL), 2, true);
-					guiManager.Add(bAutoSave, OFX_IM_TOGGLE_SMALL, 2);
+					if (!bAutoSave.get()) guiManager.Add(bSave, OFX_IM_BUTTON);
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 
-					guiManager.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-					{
-						guiManager.Indent();
+					float _h = getWidgetsHeightUnit();
+					float _r = bMinimize ? 1.25 : 1.5;
+					float _w1 = getWidgetsWidth(1);
 
-						float _h = getWidgetsHeightUnit();
-						float _r = bMinimize ? 1.25 : 1.5;
-						float _w1 = getWidgetsWidth(1);
-						ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
-							_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
-
-						guiManager.Unindent();
-					}
+					ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
+						_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
+				}
 
 #endif
-					//guiManager.Unindent();
-				}
 		}
-
-		if (bHeader) ImGui::TreePop();
 	}
+
+	if (bHeader) ImGui::TreePop();
 }
 
 //--------------------------------------------------------------
@@ -1462,7 +1458,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 
 		if (!guiManager.bMinimize)
 		{
-			ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
+			//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 			ofxImGuiSurfing::AddToggleRoundedButton(bGui_Main);
 		}
 
@@ -1944,7 +1940,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 				ofLogNotice(__FUNCTION__) << "PRESET COPY!";
 
 				index_PRE = index;
-		}
+			}
 
 			//--
 
@@ -1978,7 +1974,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 
 				index_PRE = index;
 			}
-	}
+		}
 
 		//--
 
@@ -1988,7 +1984,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 		{
 			bIsRetrigged = true;
 		}
-}
+	}
 
 	//--
 
@@ -2112,7 +2108,7 @@ void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter& e)
 	//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 	//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 	//remoteServer.syncParameters();
-		}
+}
 #endif
 
 ////--------------------------------------------------------------
