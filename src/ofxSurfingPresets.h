@@ -301,7 +301,7 @@ private:
 public:
 
 	//--------------------------------------------------------------
-	bool isDoneLoad()
+	bool isDoneLoad()//easy callback to notify when a preset just loaded
 	{
 		if (bIsDoneLoad)
 		{
@@ -320,11 +320,12 @@ private:
 public:
 
 	//--------------------------------------------------------------
-	bool isDoneSave()
+	bool isDoneSave()//easy callback to notify when a preset just saved
 	{
 		if (bIsDoneSave)
 		{
-			bIsDoneSave = false;
+			bIsDoneSave = false;//catched
+
 			return true;
 		}
 		return false;
@@ -471,7 +472,7 @@ private:
 private:
 
 	ofParameter<int> amountButtonsPerRowClickerMini{ "Amt Buttons", -1, 1, 4 };
-	ofParameter<bool> bResponsiveButtons{ "Responsive", true };
+	ofParameter<bool> bResponsiveButtonsClickerSimple{ "Responsive", true };
 	ofParameterGroup params_ClickerSimple;
 
 public:
@@ -621,8 +622,8 @@ public:
 	void doPopulatePresets(int amount = -1);
 	void doPopulatePresetsRandomized();
 
-	void doResetParams(bool bNoTrig = false);
-	void doRandomizeParams(bool bNoTrig = false);//true for silent mode for "scripting" purposes
+	void doResetParams(bool bSilent = true);
+	void doRandomizeParams(bool bSilent = true);//true for silent mode for "scripting" purposes
 
 	void doRandomizeIndex();
 

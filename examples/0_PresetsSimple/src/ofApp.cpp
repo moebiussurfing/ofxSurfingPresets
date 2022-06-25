@@ -1,7 +1,8 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup() {
+void ofApp::setup() 
+{
 	ofSetWindowPosition(-1920, 25);
 
 	// Group
