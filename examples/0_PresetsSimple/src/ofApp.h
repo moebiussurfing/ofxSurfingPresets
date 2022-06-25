@@ -14,7 +14,7 @@ public:
 
 		ofxSurfingPresets presetsManager;
 
-		//-
+		//--
 
 		// Scene Parameters 
 

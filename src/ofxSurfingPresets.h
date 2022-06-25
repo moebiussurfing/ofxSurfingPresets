@@ -8,19 +8,17 @@
 
 	TODO:
 
-	+ convert clicker window to main
-	+ add edit/live toggle
-	+ add help box bHelp
 	+ fix startup grow amount presets!
 	+ add / check undo engine workflow.
 
+	+ simple smoothing fails sometimes...
 	+ add multiple group as ofxPresetsManager does.
-	+ add mode to not set key commands, to avoid letters and be the same as the index.
 	+ add memory mode.
 		copy from ofxPresetsManager
 		not reading from files.
 		a vector of json or a json should be fine.
-	+ simple smoothing fails sometimes...
+	+ add mode to not set key commands, to avoid letters and be the same as the index.
+	+ amount selector for populator
 
 */
 
@@ -99,6 +97,7 @@
 
 #include "ofxSurfingHelpers.h"
 #include "ofxSurfingImGui.h"
+#include "TextBoxWidget.h"
 
 //----
 
@@ -126,7 +125,7 @@ public:
 
 	void draw();
 
-	void draw_ImGui_Clicker();
+	void draw_ImGui_Main();
 	void draw_ImGui_Parameters();//will be the main or most used window
 
 	// Minimal
@@ -138,16 +137,16 @@ public:
 
 	//--
 
-private:
-
-	bool bEnableSettingsHandle = true;
-
-public:
-
-	//--------------------------------------
-	void setEnableHandleSettingsFile(bool b) {
-		bEnableSettingsHandle = b;
-	}
+//private:
+//
+//	//bool bEnableSettingsHandle = true;
+//
+//public:
+//
+//	//--------------------------------------
+//	void setEnableHandleSettingsFile(bool b) {
+//		bEnableSettingsHandle = b;
+//	}
 
 private:
 
@@ -490,7 +489,8 @@ private:
 
 public:
 
-	void draw_ImGui_ToolsWidgets();
+	void draw_ImGui_ToolsPreset();
+	void draw_ImGui_ToolsKit();
 
 	//-
 
@@ -533,6 +533,10 @@ public:
 		addSmooth(group);
 
 		addParamsAppExtra(params_SmoothControl);
+#endif
+
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
+		playerSurfer.setName(name_Root);
 #endif
 
 		//-
@@ -619,7 +623,7 @@ public:
 
 	void doResetParams(bool bNoTrig = false);
 	void doRandomizeParams(bool bNoTrig = false);//true for silent mode for "scripting" purposes
-	
+
 	void doRandomizeIndex();
 
 	//void doSortParams(int i);//TODO:? useful when params are kind of index selectors?
@@ -777,7 +781,7 @@ public:
 	ofParameter<bool> bGui;
 	ofParameter<bool> bGui_Global;
 	ofParameter<bool> bGui_Editor;
-	ofParameter<bool> bGui_Clicker;
+	ofParameter<bool> bGui_Main;
 	ofParameter<bool> bGui_Parameters;
 
 public:
@@ -797,11 +801,11 @@ private:
 	//ofParameter<std::string> MODE_App_Name;
 
 	// Floating Clicker Layout
-	ofParameter<int> amountButtonsPerRowClickerFloat{ "MaxBut", -1, 1, 1 };
-	ofParameter<bool> bResponsiveButtons_ClickerFloating{ "Responsive", true };
-	ofParameter<bool> bExtra_ClickerFloating{ "Extra", false };
-	ofParameter<bool> bAutoResize_ClickerFloating{ "Auto Resize ", true };
-	ofParameterGroup params_FloatClicker;
+	ofParameter<int> amountButtonsPerRowClicker{ "ButtsRow", -1, 1, 1 };
+	ofParameter<bool> bResponsiveButtonsClicker{ "Responsive", true };
+	ofParameter<bool> bExtra_Main{ "Extra", false };
+	ofParameter<bool> bAutoResize_Clicker{ "Auto Resize ", true };
+	ofParameterGroup params_Clicker;
 
 public:
 
@@ -809,7 +813,7 @@ public:
 	void setAmountButtonsPerRowClickers(int num) // amount of preset buttons per row on matrix clickers
 	{
 		num = MIN(num, index.getMax() - index.getMin());
-		amountButtonsPerRowClickerFloat = num;
+		amountButtonsPerRowClicker = num;
 		amountButtonsPerRowClickerMini = num;
 	}
 
@@ -822,7 +826,7 @@ public:
 	//--------------------------------------------------------------
 	void setMaxPresetsAmountPerRowClickerFloat(int amount)
 	{
-		amountButtonsPerRowClickerFloat = amount;
+		amountButtonsPerRowClicker = amount;
 	}
 	//--------------------------------------------------------------
 	void setMaxPresetsAmountPerRowClickerMini(int amount)
@@ -1169,54 +1173,14 @@ public:
 
 #endif
 
-	//----
-
-	// Align Windows Engine
-
 private:
-
-	string name_Window_ClickerFloating;
-	string name_Window_Editor;
-	string name_Window_Parameters;
-	string name_Window_Player;
 
 	bool bNoSettingsFileFound = false;
 
-	//enum surfingAlignMode
-	//{
-	//	SURFING_ALIGN_HORIZONTAL = 0,
-	//	SURFING_ALIGN_VERTICAL
-	//};
-	//surfingAlignMode modeAlignWindows = SURFING_ALIGN_HORIZONTAL;
-
-public:
-
-	//ofParameter <bool> bAlignWindowsX{ "AlignX", false };
-	//ofParameter <bool> bAlignWindowsY{ "AlignY", false };
-	//ofParameter <bool> bLinkWindows{ "-1", false };//align windows engine
-
-	// Define the names that we will use on populate each window.
-	// Usually we use the name of the bool bGui. But we can rename too the window.
-	//--------------------------------------------------------------
-	void refreshWindowsNames()
-	{
-		name_Window_ClickerFloating = name_Root + " PRESETS";
-		name_Window_Editor = name_Root + " EDITOR";
-		name_Window_Parameters = name_Root + " PARAMS";
-
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-
-		name_Window_Player = name_Root;
-		playerSurfer.setNameInstance(name_Window_Player);
-
-#endif
-
-	}
+	//----
 
 private:
 
-#define countTimes_MAX 4
-	bool bGui_Changed = false;
-	int countTimes;
-
+	TextBoxWidget textBoxWidget;
+	void buildHelp();
 };

@@ -7,7 +7,7 @@ void ofApp::setup() {
 	// Group
 	params.setName("myScene");
 	params.add(size1.set("size1", 0.5, 0, 1));
-	params.add(size2.set("size2", ofGetHeight() * 0.5, 0, ofGetHeight() * 0.25));
+	params.add(size2.set("size2", ofGetHeight() /2, 0, ofGetHeight()/4));
 	params.add(rotation1.set("rotation1", 1, 0, 2));
 	params.add(rotation2.set("rotation2", 180, 0, 360));
 	params.add(indexColor.set("indexColor", 0, 0, 2));
@@ -27,8 +27,7 @@ void ofApp::draw()
 void ofApp::drawScene()
 {
 	// Bg Color
-	//ofColor _colorBg = 255;//white
-	ofColor _colorBg = 32;//dark
+	ofColor _colorBg = 24;//dark
 
 	//-
 
