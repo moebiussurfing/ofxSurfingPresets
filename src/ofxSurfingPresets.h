@@ -10,6 +10,7 @@
 
 	+ fix startup grow amount presets!
 	+ add / check undo engine workflow.
+	+ amount selector for kit populator
 
 	+ simple smoothing fails sometimes...
 	+ add multiple group as ofxPresetsManager does.
@@ -17,8 +18,8 @@
 		copy from ofxPresetsManager
 		not reading from files.
 		a vector of json or a json should be fine.
-	+ add mode to not set key commands, to avoid letters and be the same as the index.
-	+ amount selector for populator
+	+ add mode to not set key commands, 
+		to avoid letters and be the same as the index.
 
 */
 
@@ -260,6 +261,7 @@ public:
 
 private:
 
+	ofEventListener listener_Play;
 	ofEventListener listener_Beat;
 	ofParameter<bool> bRandomPlay{ "Random", false };
 	std::vector<std::string> randomTypesPlayNames = { "Next Index", "Random Index", "Random Params" };
@@ -360,9 +362,18 @@ public:
 
 	//--
 
+public:
+
+	// In some scenarios we will prefer to disable this mode.
+	// TODO: explain
+	//--------------------------------------------------------------
+	void setAutoLoadOnReTrig(bool b) {
+		bAutoLoadOnReTrig = b;
+	}
+
 private:
 
-	bool bAutoTrigMode = true;
+	bool bAutoLoadOnReTrig = true;
 
 public:
 
@@ -490,7 +501,7 @@ private:
 
 public:
 
-	void draw_ImGui_ToolsPreset();
+	void draw_ImGui_ToolsPreset(bool bMini = true);
 	void draw_ImGui_ToolsKit();
 
 	//-
@@ -622,8 +633,8 @@ public:
 	void doPopulatePresets(int amount = -1);
 	void doPopulatePresetsRandomized();
 
-	void doResetParams(bool bSilent = true);
-	void doRandomizeParams(bool bSilent = true);//true for silent mode for "scripting" purposes
+	void doResetParams(bool bSilent = false);
+	void doRandomizeParams(bool bSilent = false);//true for silent mode for "scripting" purposes
 
 	void doRandomizeIndex();
 
@@ -671,8 +682,9 @@ public:
 
 public:
 
-	// Exposed to gui's
-	ofParameter<bool> bAutoSave;
+	// Exposed to include on GUI's
+
+	ofParameter<bool> bEditMode; // aka bAutoSave
 	ofParameter<bool> bNewPreset;
 	ofParameter<bool> bSave;
 
@@ -740,7 +752,7 @@ public:
 	//--------------------------------------------------------------
 	void setAutoSave(bool b)
 	{
-		bAutoSave = b;
+		bEditMode = b;
 	}
 	//void setKey_MODE_App(int k);
 
@@ -779,10 +791,9 @@ private:
 public:
 
 	// Exposed public to use on external Gui's
-	ofParameter<bool> bGui;
+	ofParameter<bool> bGui;//main
 	ofParameter<bool> bGui_Global;
 	ofParameter<bool> bGui_Editor;
-	ofParameter<bool> bGui_Main;
 	ofParameter<bool> bGui_Parameters;
 
 public:
@@ -794,12 +805,6 @@ private:
 
 	ofParameter<bool> bKeySpace;
 	ofParameter<bool> bKeysArrows;
-
-	//ofParameter<bool> bMODE_Active;
-	//ofParameter<glm::vec2> Gui_Position;
-	//ofParameter<bool> bHelp;
-	//ofParameter<int> MODE_App;
-	//ofParameter<std::string> MODE_App_Name;
 
 	// Floating Clicker Layout
 	ofParameter<int> amountButtonsPerRowClicker{ "ButtsRow", -1, 1, 1 };
