@@ -250,11 +250,10 @@ void ofxSurfingPresets::setup()
 	// Help
 	textBoxWidget.setPath(path_Global + "HelpBox_" + name_Root + "/");//customize path before call setup
 	textBoxWidget.setup();
-	buildHelp();
 
 	//--
 
-	//startup(); // called from AddGroup
+	//startup(); // Auto called from AddGroup
 }
 
 //--------------------------------------------------------------
@@ -264,20 +263,22 @@ void ofxSurfingPresets::buildHelp()
 
 	helpInfo += "PRESETS \n";
 	helpInfo += "HELP \n\n";
+
+	helpInfo += "KEY COMMANDS \n\n";
+
 	if (!bKeys) {
-		helpInfo += "\n";
-		helpInfo += "KEY TOGGLE IS DISABLED. \n";
-		helpInfo += "ENABLE KEY TOGGLE! \n";
+		helpInfo += "Keys toggle is disabled. \n";
+		helpInfo += "Enable Keys toggle! \n";
 	}
 	else {
-		helpInfo += "         KEY COMMANDS \n";
-		helpInfo += "\n";
 		helpInfo += "G                GUI \n";
 		helpInfo += "I                HELP INFO \n";
 		helpInfo += "\n";
+
 		helpInfo += "LOAD \n";
-		helpInfo += "PRESET \n";
-		helpInfo += "         MOUSE CLICK \n";
+		helpInfo += "PRESET \n\n";
+
+		helpInfo += "MOUSE CLICK \n";
 		helpInfo += "+CTRL            COPY \n";
 		helpInfo += "+ALT             SWAP \n";
 		helpInfo += "\n";
@@ -289,7 +290,7 @@ void ofxSurfingPresets::buildHelp()
 		helpInfo += "BACKSPACE        RESET \n";
 		helpInfo += "RETURN           RANDOM \n";
 		helpInfo += "\n";
-		helpInfo += "         COMPARE MEM \n";
+		helpInfo += "COMPARE MEM \n";
 		helpInfo += "S                STORE \n";
 		helpInfo += "R                RECALL \n";
 	}
@@ -547,6 +548,8 @@ void ofxSurfingPresets::startup()
 
 	// Force Load first preset
 	//index = 0;
+
+	buildHelp();
 }
 
 //--------------------------------------------------------------
@@ -614,7 +617,7 @@ void ofxSurfingPresets::update(ofEventArgs& args)
 		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 		remoteServer.syncParameters();
-	}
+}
 #endif
 
 	//--
@@ -643,7 +646,7 @@ void ofxSurfingPresets::draw()
 	surfingMIDI.drawImGui();
 #endif
 
-	if (guiManager.bHelpInternal) 
+	if (guiManager.bHelpInternal)
 	{
 		static bool bKeys_PRE = false;
 		if (bKeys != bKeys_PRE) {
@@ -2278,9 +2281,9 @@ void ofxSurfingPresets::doNewPreset()
 #endif
 
 		//doRecreateMidi();
-	}
+		}
 #endif
-}
+	}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doDeletePreset(int pos)
