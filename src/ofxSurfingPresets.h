@@ -60,9 +60,25 @@
 //--
 
 // Create Preset Index Selector Toggles
-#define USE__OFX_SURFING_PRESETS__INDEX_SELECTOR_TOGGLES
+// Useful to easy link to MIDI / OSC triggers by auto populating adreses listeners or MIDI notes.
+
+//--
+
+// 5. Undo Engine
+#define USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER // -> Declarations to help integrate into our apps/add-ons
+
+#ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
+#include "ofxSurfingUndoHelper.h"
+#endif
 
 //--------------------------------------
+
+
+//--
+
+#include "ofxSurfingHelpers.h"
+#include "ofxSurfingImGui.h"
+#include "TextBoxWidget.h"
 
 //--
 
@@ -94,18 +110,12 @@
 #include "ofxSurfingPlayer.h"
 #endif
 
-//--
-
-#include "ofxSurfingHelpers.h"
-#include "ofxSurfingImGui.h"
-#include "TextBoxWidget.h"
 
 //----
 
 
 class ofxSurfingPresets
 {
-
 public:
 
 	ofxSurfingPresets();
@@ -124,7 +134,8 @@ private:
 
 public:
 
-	void draw();
+	void draw();//legacy API, could remove
+	void drawGui() { draw(); };
 
 	void draw_ImGui_Main();
 	void draw_ImGui_Parameters();//will be the main or most used window
@@ -137,17 +148,6 @@ public:
 	void draw_ImGui_ClickerSimple();//forced simple clicker!
 
 	//--
-
-//private:
-//
-//	//bool bEnableSettingsHandle = true;
-//
-//public:
-//
-//	//--------------------------------------
-//	void setEnableHandleSettingsFile(bool b) {
-//		bEnableSettingsHandle = b;
-//	}
 
 private:
 
@@ -267,6 +267,16 @@ private:
 	std::vector<std::string> randomTypesPlayNames = { "Next Index", "Random Index", "Random Params" };
 	ofParameter<int> randomTypePlayIndex{ "Target", 0, 0, 2 };
 
+#endif
+
+	//--
+
+public: // to expose save methods too
+//private:
+
+	// Undo Engine
+#ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
+	ofxSurfingUndoHelper undoManager;
 #endif
 
 	//--
@@ -550,6 +560,14 @@ public:
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
 		playerSurfer.setName(name_Root);
 #endif
+		//--
+
+		// Undo Manager
+#ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
+
+		undoManager.setPathGlobal(name_Root);
+		undoManager.setup(params_Preset);
+#endif
 
 		//-
 
@@ -630,12 +648,15 @@ public:
 
 	//--
 
+	// Kit helpers
 	void doPopulatePresets(int amount = -1);
 	void doPopulatePresetsRandomized();
 
+	// Preset Helpers
 	void doResetParams(bool bSilent = false);
 	void doRandomizeParams(bool bSilent = false);//true for silent mode for "scripting" purposes
 
+	// Helpers
 	void doRandomizeIndex();
 
 	//void doSortParams(int i);//TODO:? useful when params are kind of index selectors?
@@ -647,7 +668,7 @@ public:
 
 private:
 
-	void setPath();//open dialog to select a path manually.
+	void setPath(); // Open dialog to select a path manually.
 
 	bool bResetDefined = false;
 
@@ -678,7 +699,7 @@ public:
 		bReset.makeReferenceTo(b);
 	}
 
-	//-
+	//--
 
 public:
 
@@ -718,7 +739,7 @@ private:
 
 public:
 
-	ofParameter<int> index; // current selected preset index
+	ofParameter<int> index; // Current selected preset index
 
 	//--
 
@@ -734,18 +755,18 @@ public:
 	//--------------------------------------------------------------
 	void setEnableKeySpace(bool b) {
 		bKeySpace = b;
-	};
+	}
 
 	//--------------------------------------------------------------
 	void setEnableKeysArrows(bool b) {
 		bKeysArrows = b;
-	};
+	}
 
 	//--------------------------------------------------------------
 	void setEnableKeys(bool b) {
 		bKeys = b;
 		setActive(bKeys);
-	};
+	}
 
 	//--------------------------------------------------------------
 	void setModeAutoSave(bool b) { setAutoSave(b); }; // Legacy Api
@@ -754,6 +775,7 @@ public:
 	{
 		bEditMode = b;
 	}
+
 	//void setKey_MODE_App(int k);
 
 private:

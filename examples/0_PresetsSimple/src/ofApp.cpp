@@ -13,7 +13,7 @@ void ofApp::setup()
 	params.add(rotation2.set("rotation2", 180, 0, 360));
 	params.add(indexColor.set("indexColor", 0, 0, 2));
 
-	presetsManager.addGroup(params);
+	presetsManager.addGroup(params); // Add a Group
 }
 
 //--------------------------------------------------------------
