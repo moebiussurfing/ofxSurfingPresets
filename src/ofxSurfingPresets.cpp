@@ -137,7 +137,9 @@ void ofxSurfingPresets::setup()
 	params_Control.add(bGui_Parameters);
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-	params_Control.add(playerSurfer.bGui);
+	if (!bDisablePlayer) {
+		params_Control.add(playerSurfer.bGui);
+	}
 #endif
 
 	ofAddListener(params_Control.parameterChangedE(), this, &ofxSurfingPresets::Changed_Control);
@@ -164,9 +166,11 @@ void ofxSurfingPresets::setup()
 	//params_AppSettings.add(guiManager.bExtra);
 	//params_AppSettings.add(guiManager.bAutoResize);
 
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-	params_AppSettings.add(randomTypePlayIndex);
-	//params_AppSettings.add(playerSurfer.bGui_WidgetBeat);
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER					
+	if (!bDisablePlayer) {
+		params_AppSettings.add(randomTypePlayIndex);
+		//params_AppSettings.add(playerSurfer.bGui_WidgetBeat);
+	}
 #endif
 
 	//--
@@ -183,15 +187,20 @@ void ofxSurfingPresets::setup()
 
 	//----
 
+	// Link
 	bAutoResize.makeReferenceTo(guiManager.bAutoResize);
+	bKeys.makeReferenceTo(guiManager.bKeys);
 
 	//--
 
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-	playerSurfer.bGui = false; // hidden by default 
-	playerSurfer.setPathGlobal(path_Global);
+	if (!bDisablePlayer)
+	{
+		playerSurfer.bGui = false; // hidden by default 
+		playerSurfer.setPathGlobal(path_Global);
+	}
 #endif
 
 	//----
@@ -314,11 +323,10 @@ void ofxSurfingPresets::setupGui()
 	guiManager.addWindowSpecial(bGui_Parameters);
 	guiManager.addWindowSpecial(bGui_Editor);
 
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-
-	//guiManager.addWindowSpecial(playerSurfer.bGui);
-
-#endif
+	//#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
+	//	//if(!bDisablePlayer)
+	//	//guiManager.addWindowSpecial(playerSurfer.bGui);
+	//#endif
 
 	guiManager.startup();
 
@@ -428,41 +436,44 @@ void ofxSurfingPresets::startup()
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
 
-	// Moved here for avoid setup() crashes bd initialization not finished!
+	if (!bDisablePlayer)
+	{
+		// Moved here for avoid setup() crashes bd initialization not finished!
 
-	// Define the behaviors to trig when player trigs the callback!
-	//--------------------------------------------------------------
-	listener_Beat = playerSurfer.bPlayerBeatBang.newListener([this](bool& b)
-		{
-			ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
-			if (!b) return;
-
-			// bangs can be bypassed when not playing
-			//if (playerSurfer.bPlay) 
+		// Define the behaviors to trig when player trigs the callback!
+		//--------------------------------------------------------------
+		listener_Beat = playerSurfer.bPlayerBeatBang.newListener([this](bool& b)
 			{
-				switch (randomTypePlayIndex)
+				ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
+				if (!b) return;
+
+				// bangs can be bypassed when not playing
+				//if (playerSurfer.bPlay) 
 				{
-				case 0: doLoadNext(); break;
-				case 1: doRandomizeIndex(); break;
-				case 2: doRandomizeParams(); break;
+					switch (randomTypePlayIndex)
+					{
+					case 0: doLoadNext(); break;
+					case 1: doRandomizeIndex(); break;
+					case 2: doRandomizeParams(); break;
+					}
 				}
-			}
-		});
+			});
 
-	//--------------------------------------------------------------
-	listener_Play = playerSurfer.bPlay.newListener([this](bool& b)
-		{
-			ofLogNotice("PLAY: ") << (b ? "TRUE" : "FALSE");
-
-			// workflow
-			// disable edit mode when playing to avoid accidental overwrite settings
-			// also could improve performance reducing saving files!
-			if (!b) return;
-			else
+		//--------------------------------------------------------------
+		listener_Play = playerSurfer.bPlay.newListener([this](bool& b)
 			{
-				if (bEditMode) bEditMode = false;
-			}
-		});
+				ofLogNotice("PLAY: ") << (b ? "TRUE" : "FALSE");
+
+				// workflow
+				// disable edit mode when playing to avoid accidental overwrite settings
+				// also could improve performance reducing saving files!
+				if (!b) return;
+				else
+				{
+					if (bEditMode) bEditMode = false;
+				}
+			});
+	}
 
 #endif
 
@@ -617,7 +628,7 @@ void ofxSurfingPresets::update(ofEventArgs& args)
 		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 		remoteServer.syncParameters();
-}
+	}
 #endif
 
 	//--
@@ -812,7 +823,10 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 						// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-						guiManager.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						if (!bDisablePlayer)
+						{
+							guiManager.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+						}
 #endif
 						//--
 
@@ -967,6 +981,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					if (bMinimize_Editor) guiManager.AddSpacingSeparated();
 
+					guiManager.AddLabel("Tools", true, true);
 					draw_ImGui_ToolsPreset(false);
 
 					//--
@@ -974,9 +989,10 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					// Undo Manager
 
 #ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
-					guiManager.AddSpacing();
+					guiManager.AddSpacingSeparated();
 
 					// Browse
+					guiManager.AddLabel("Undo History", true, true);
 					// Undo / Redo
 					undoManager.drawImGuiWidgetsBrowse(true);
 
@@ -1237,49 +1253,68 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 
-				if (bMinimize)
+				if (!bDisablePlayer)
 				{
-					guiManager.AddSpacingSeparated();
+					if (bMinimize)
+					{
+						guiManager.AddSpacingSeparated();
 
-					_h = 2 * getWidgetsHeightUnit();
-					_w1 = getWidgetsWidth(1);
-					ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
-						_w1, _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
+						_h = 2 * getWidgetsHeightUnit();
+						_w1 = getWidgetsWidth(1);
+						ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
+							_w1, _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
 
-					// Bang
-					guiManager.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
+						// Bang
+						guiManager.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
+					}
 				}
-
 #endif
 				//--
 
-				// 
+#ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER
+				if (!bGui_Editor)
+				{
+					guiManager.AddSpacingSeparated();
+
+					// Browse
+					// Undo / Redo
+					undoManager.drawImGuiWidgetsBrowse(true);
+
+					// History
+					undoManager.drawImGuiWidgetsHistoryInfo(true);
+				}
+#endif
+				//--
+
+				guiManager.AddSpacingSeparated();
 
 				if (!bMinimize)
 				{
-					guiManager.AddSeparator();
-					guiManager.AddSpacing();
-
 					//--
 
 					// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 
-					guiManager.AddSpacing();
-
-					_h = 2 * getWidgetsHeightUnit();
-					_w1 = getWidgetsWidth(1);
-
-					ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
-						_w1, _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
-
-					if (!bMinimize)
+					if (!bDisablePlayer)
 					{
-						ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
-					}
+						guiManager.AddSpacing();
 
-					guiManager.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
+						_h = 2 * getWidgetsHeightUnit();
+						_w1 = getWidgetsWidth(1);
+
+						ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
+							_w1, _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
+
+						if (!bMinimize)
+						{
+							ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
+						}
+
+						guiManager.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
+
+						guiManager.AddSpacingBigSeparated();
+					}
 #endif
 					//--
 
@@ -1292,14 +1327,8 @@ void ofxSurfingPresets::draw_ImGui_Main()
 #endif
 					//--
 
-					guiManager.AddSpacingBigSeparated();
-
-					// Help
-					guiManager.Add(guiManager.bHelpInternal, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-
 					// Extra
 					guiManager.Add(bExtra_Main, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-
 				}
 
 				//--
@@ -1309,6 +1338,8 @@ void ofxSurfingPresets::draw_ImGui_Main()
 				if (!bMinimize)
 					if (bExtra_Main)
 					{
+						//guiManager.AddSpacingBigSeparated();
+
 						guiManager.Indent();
 						{
 							_w1 = getWidgetsWidth(1);
@@ -1339,7 +1370,12 @@ void ofxSurfingPresets::draw_ImGui_Main()
 							}
 						}
 						guiManager.Unindent();
+						guiManager.AddSpacingSeparated();
 					}
+
+
+				// Help
+				guiManager.Add(guiManager.bHelpInternal, OFX_IM_TOGGLE_BUTTON_ROUNDED);
 
 				guiManager.endWindowSpecial();
 			}
@@ -1392,7 +1428,6 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 
 		if (!bNoExtras)
 		{
-
 			if (bShowMinimize) guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 			if (!guiManager.bMinimize)
@@ -1408,16 +1443,17 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 					if (!bEditMode.get()) guiManager.Add(bSave, OFX_IM_BUTTON);
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+					if (!bDisablePlayer)
+					{
+						float _h = getWidgetsHeightUnit();
+						float _r = bMinimize ? 1.25 : 1.5;
+						float _w1 = getWidgetsWidth(1);
 
-					float _h = getWidgetsHeightUnit();
-					float _r = bMinimize ? 1.25 : 1.5;
-					float _w1 = getWidgetsWidth(1);
-
-					ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
-						_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
-				}
-
+						ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
+							_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
 #endif
+					}
+				}
 		}
 	}
 
@@ -1660,31 +1696,32 @@ void ofxSurfingPresets::draw_ImGui()
 	// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
-
-	if (playerSurfer.bGui)
+	if (!bDisablePlayer)
 	{
-		//guiManager.setNextWindowOnViewport();
+		if (playerSurfer.bGui)
+		{
+			//guiManager.setNextWindowOnViewport();
 
-		//--
+			//--
 
-		//TODO: fix
-		//string n = guiManager.getWindowSpecialLast();
+			//TODO: fix
+			//string n = guiManager.getWindowSpecialLast();
 
-		////string n2 = "PLAYER";
-		//string n2 = playerSurfer.bGui.getName();
+			////string n2 = "PLAYER";
+			//string n2 = playerSurfer.bGui.getName();
 
-		//cout << n << "  -  " << n2 << endl;
+			//cout << n << "  -  " << n2 << endl;
 
-		//if (n != "-1" && n != n2)
-		//{
-		//	guiManager.setNextWindowAfterWindowNamed(n);
-		//}
+			//if (n != "-1" && n != n2)
+			//{
+			//	guiManager.setNextWindowAfterWindowNamed(n);
+			//}
 
-		//--
+			//--
 
-		playerSurfer.draw();
+			playerSurfer.draw();
+		}
 	}
-
 #endif
 
 	//--
@@ -1712,6 +1749,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 	//--
 
 	// Undo Engine
+
 #ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
 	undoManager.keyPressed(eventArgs);
 #endif
@@ -1752,8 +1790,12 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 
-	else if (bKeyCtrl && key == ' ') {
-		playerSurfer.setPlayToggle();
+	else if (bKeyCtrl && key == ' ')
+	{
+		if (!bDisablePlayer)
+		{
+			playerSurfer.setPlayToggle();
+		}
 		return;
 	}
 
@@ -2111,7 +2153,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter& e)
 		{
 			notesIndex[i] = false;
 		}
-	}
+}
 }
 #endif
 
@@ -2281,9 +2323,9 @@ void ofxSurfingPresets::doNewPreset()
 #endif
 
 		//doRecreateMidi();
-		}
+}
 #endif
-	}
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doDeletePreset(int pos)

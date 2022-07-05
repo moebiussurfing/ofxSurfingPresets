@@ -18,7 +18,7 @@
 		copy from ofxPresetsManager
 		not reading from files.
 		a vector of json or a json should be fine.
-	+ add mode to not set key commands, 
+	+ add mode to not set key commands,
 		to avoid letters and be the same as the index.
 
 */
@@ -252,6 +252,25 @@ private:
 	//----
 
 	// Player
+
+	//TODO: workaround to fast disable player without disabling / commenting the directive,
+	// or removing the player add-on form the project...
+
+private:
+
+	bool bDisablePlayer = false;
+
+public:
+
+	//--------------------------------------------------------------
+	void setDiablePlayer()
+	{
+		bDisablePlayer = true;
+		bGui = false;
+		//#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+		//#undef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+		//#endif
+	}
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 
