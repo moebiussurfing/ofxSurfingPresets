@@ -1680,14 +1680,16 @@ void ofxSurfingPresets::draw_ImGui()
 		draw_ImGui_Editor();
 
 		//--
-
-		draw_ImGui_Parameters();
+		 
+		//workflow
+		if (bGui_Editor) draw_ImGui_Parameters();
 
 		//--
 
 		// Undo Engine
 #ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
-		undoManager.drawImGuiWindow();
+		//workflow
+		if(bGui_Editor) undoManager.drawImGuiWindow();
 #endif
 	}
 	guiManager.end();
