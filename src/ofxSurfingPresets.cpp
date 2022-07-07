@@ -1383,14 +1383,14 @@ void ofxSurfingPresets::draw_ImGui_Main()
 	}
 }
 
-//-----------------------------------------i---------------------
+//--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_ClickerSimple()
 {
 	if (!bGui_ClickerSimple) bGui_ClickerSimple = true;
 	draw_ImGui_ClickerSimple(false, false, false, true);
 }
 
-//-----------------------------------------i---------------------
+//--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bool bShowMinimize, bool bNoExtras)
 {
 	if (!bGui_ClickerSimple) return;
@@ -1408,11 +1408,14 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 	{
 		guiManager.refreshLayout();
 
+		guiManager.AddSpacing();
+
 		//--
 
 		// Index
 
-		if (!bNoExtras)guiManager.Add(index, OFX_IM_HSLIDER_SMALL_NO_LABELS);
+		if (!bNoExtras) guiManager.Add(index);
+		//if (!bNoExtras) guiManager.Add(index, OFX_IM_HSLIDER_NO_NUMBER);
 
 		//guiManager.AddSpacing();
 
@@ -1427,34 +1430,39 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 
 		if (!bNoExtras)
 		{
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+			if (!bDisablePlayer)
+			{
+				float _h = getWidgetsHeightUnit();
+				float _r = 2.0f;
+				//float _r = bMinimize ? 1.5f : 2.0f;
+				float _w1 = getWidgetsWidth(1);
+
+				ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
+					_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
+#endif
+			}
+
 			if (bShowMinimize) guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 			if (!guiManager.bMinimize)
-				if (!bMinimal)
-				{
-					ofxImGuiSurfing::AddToggleRoundedButton(bGui);
+				//if (!bMinimal)
+			{
+				//// main
+				//ofxImGuiSurfing::AddToggleRoundedButton(bGui);
 
-					//TODO: not working?
-					ImGui::PushID("##12TOGEDIT01");
-					guiManager.Add(bEditMode, OFX_IM_TOGGLE_BORDER_BLINK);
-					ImGui::PopID();
+				//TODO: not working?
+				//ImGui::PushID("##12TOGEDIT01");
+				guiManager.Add(bEditMode, OFX_IM_TOGGLE);
+				//ImGui::PopID();
 
-					if (!bEditMode.get()) guiManager.Add(bSave, OFX_IM_BUTTON);
+				if (!bEditMode.get()) guiManager.Add(bSave, OFX_IM_BUTTON);
+			}
 
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-					if (!bDisablePlayer)
-					{
-						float _h = getWidgetsHeightUnit();
-						float _r = bMinimize ? 1.25 : 1.5;
-						float _w1 = getWidgetsWidth(1);
-
-						ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
-							_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
-#endif
-					}
-				}
 		}
 	}
+	guiManager.AddSpacing();
+	guiManager.AddSpacing();
 
 	if (bHeader) ImGui::TreePop();
 }
@@ -1462,6 +1470,8 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 {
+	return;
+
 	bool bOpen = false;
 	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
 	_flagt |= ImGuiTreeNodeFlags_Framed;
@@ -1680,17 +1690,21 @@ void ofxSurfingPresets::draw_ImGui()
 		draw_ImGui_Editor();
 
 		//--
-		 
+
 		//workflow
-		if (bGui_Editor) draw_ImGui_Parameters();
+		//if (bGui_Editor) draw_ImGui_Parameters();
+		draw_ImGui_Parameters();
 
 		//--
 
 		// Undo Engine
 #ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
+
 		//workflow
-		if(bGui_Editor) undoManager.drawImGuiWindow();
+		//if (bGui_Editor) undoManager.drawImGuiWindow();
+		undoManager.drawImGuiWindow();
 #endif
+
 	}
 	guiManager.end();
 
@@ -2155,7 +2169,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter& e)
 		if (i != index && notesIndex[i].get())
 		{
 			notesIndex[i] = false;
-}
+		}
 	}
 }
 #endif
