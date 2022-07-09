@@ -1386,8 +1386,9 @@ void ofxSurfingPresets::draw_ImGui_Main()
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_ClickerSimple()
 {
-	if (!bGui_ClickerSimple) bGui_ClickerSimple = true;
-	draw_ImGui_ClickerSimple(false, false, false, true);
+	if (!bGui_ClickerSimple) bGui_ClickerSimple = true;//workaround..
+
+	draw_ImGui_ClickerSimple(true, false, true, true);
 }
 
 //--------------------------------------------------------------
@@ -1399,8 +1400,10 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
 	_flagt |= ImGuiTreeNodeFlags_Framed;
 
-	bool b;
+	float _hm = guiManager.getWidgetsHeightUnit();
+	_hm *= guiManager.bMinimize ? 1.2f : 1.5f;
 
+	bool b;
 	if (bHeader) b = (ImGui::TreeNodeEx("PRESETS", _flagt));
 	else b = true;
 
@@ -1408,70 +1411,53 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 	{
 		guiManager.refreshLayout();
 
-		guiManager.AddSpacing();
+		if (bShowMinimize) guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
 
 		//--
 
 		// Index
 
-		if (!bNoExtras) guiManager.Add(index);
-		//if (!bNoExtras) guiManager.Add(index, OFX_IM_HSLIDER_NO_NUMBER);
-
-		//guiManager.AddSpacing();
+		if (!guiManager.bMinimize)
+			if (!bNoExtras) guiManager.Add(index);
 
 		//--
 
 		// Clicker
 
-		ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClickerSimple, amountButtonsPerRowClickerMini, true, WIDGETS_HEIGHT / 2);
-		//ofxImGuiSurfing::AddMatrixClicker(index, bResponsiveButtonsClickerSimple, amountButtonsPerRowClickerMini, true, WIDGETS_HEIGHT / 2);
+		ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClickerSimple, amountButtonsPerRowClickerMini, true, _hm);
 
 		guiManager.AddSpacing();
 
 		if (!bNoExtras)
 		{
+
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 			if (!bDisablePlayer)
 			{
 				float _h = getWidgetsHeightUnit();
-				float _r = 2.0f;
-				//float _r = bMinimize ? 1.5f : 2.0f;
+				float _r = guiManager.bMinimize ? 1.5f : 2.0f;
 				float _w1 = getWidgetsWidth(1);
 
 				ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
 					_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
-#endif
 			}
-
-			if (bShowMinimize) guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+#endif
 
 			if (!guiManager.bMinimize)
-				//if (!bMinimal)
 			{
-				//// main
-				//ofxImGuiSurfing::AddToggleRoundedButton(bGui);
-
-				//TODO: not working?
-				//ImGui::PushID("##12TOGEDIT01");
 				guiManager.Add(bEditMode, OFX_IM_TOGGLE);
-				//ImGui::PopID();
 
 				if (!bEditMode.get()) guiManager.Add(bSave, OFX_IM_BUTTON);
 			}
-
 		}
 	}
-	guiManager.AddSpacing();
-	guiManager.AddSpacing();
 
-	if (bHeader) ImGui::TreePop();
+	if (bHeader && b) ImGui::TreePop();
 }
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 {
-	return;
-
 	bool bOpen = false;
 	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
 	_flagt |= ImGuiTreeNodeFlags_Framed;
@@ -1525,7 +1511,6 @@ void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 		if (!guiManager.bMinimize)
 		{
 			ofxImGuiSurfing::AddToggleRoundedButton(bGui);
-			//ofxImGuiSurfing::AddToggleRoundedButton(bGui_Editor);
 		}
 
 		if (bHeader) ImGui::TreePop();
@@ -2340,7 +2325,7 @@ void ofxSurfingPresets::doNewPreset()
 #endif
 
 		//doRecreateMidi();
-}
+	}
 #endif
 }
 
