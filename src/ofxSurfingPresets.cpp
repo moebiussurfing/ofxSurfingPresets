@@ -1396,7 +1396,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 {
 	if (!bGui_ClickerSimple) return;
 
-	static bool bOpen = true;
+	static bool bOpen = !bHeader;
 	ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
 	_flagt |= ImGuiTreeNodeFlags_Framed;
 
