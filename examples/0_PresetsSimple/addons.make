@@ -3,3 +3,4 @@ ofxSurfingHelpers
 ofxSurfingImGui
 ofxSurfingPlayer
 ofxSurfingPresets
+ofxSurfingUndoHelper

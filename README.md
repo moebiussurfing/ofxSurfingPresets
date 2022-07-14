@@ -65,7 +65,8 @@ void ofApp::setup()
 </details>
 
 ## Tested Systems
-* **Windows 10** / **VS 2017** / **OF ~0.11**
+- **Windows 10** / **VS 2017** / **OF ~0.11**
+- **macOS 11.6.7 Big Sur** / **Xcode 13.2.1** / **oF 0.11.2**
 
 ## Author
 An add-on by **@moebiusSurfing**  
