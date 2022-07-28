@@ -770,8 +770,8 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_Editor()
 {
-	if (bGui_Editor)
-	{
+	if (!bGui_Editor) return;
+	
 		// Widgets sizes
 		float _w1;
 		float _w2;
@@ -1171,14 +1171,13 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			}
 			//if (bGui_Editor) ImGui::PopID();
 		}
-	}
 }
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_Main()
 {
-	if (bGui)
-	{
+	if (!bGui) return;
+	
 		IMGUI_SUGAR__WINDOWS_CONSTRAINTSW_SMALL;
 
 		// Widgets Sizes
@@ -1380,7 +1379,6 @@ void ofxSurfingPresets::draw_ImGui_Main()
 			}
 		}
 		//if (bGui) ImGui::PopID();
-	}
 }
 
 //--------------------------------------------------------------
@@ -1390,6 +1388,14 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple()
 
 	draw_ImGui_ClickerSimple(true, false, true, true);
 }
+
+/*
+//snippet
+bool bHeader = true;
+bool bMinimal = true;
+bool bShowMinimize = true; 
+bool bNoExtras = false;
+*/
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bool bShowMinimize, bool bNoExtras)
@@ -1417,8 +1423,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 
 		// Index
 
-		if (!guiManager.bMinimize)
-			if (!bNoExtras) guiManager.Add(index);
+		if (!guiManager.bMinimize) if (!bNoExtras) guiManager.Add(index);
 
 		//--
 
@@ -1432,7 +1437,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 		{
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-			if (!bDisablePlayer)
+			if (!bDisablePlayer && !bMinimal)
 			{
 				float _h = getWidgetsHeightUnit();
 				float _r = guiManager.bMinimize ? 1.5f : 2.0f;
@@ -1443,9 +1448,14 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 			}
 #endif
 
-			if (!guiManager.bMinimize)
+			if (!guiManager.bMinimize && !bMinimal)
 			{
-				guiManager.Add(bEditMode, OFX_IM_TOGGLE);
+				ImGui::PushID("##CLICKEREDIT");
+				//TODO: Bug ??
+				//guiManager.Add(bEditMode, OFX_IM_TOGGLE);
+				//guiManager.Add(bEditMode, OFX_IM_TOGGLE_BIG_XXL);
+				guiManager.Add(bEditMode, OFX_IM_TOGGLE_ROUNDED);
+				ImGui::PopID();
 
 				if (!bEditMode.get()) guiManager.Add(bSave, OFX_IM_BUTTON);
 			}
@@ -1481,8 +1491,9 @@ void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
 		}
 
 		// Minimize
-
-		guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+		ImGui::PushID("#CLICKERMINI");
+		guiManager.Add(guiManager.bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED);
+		ImGui::PopID();
 
 		// Index
 
