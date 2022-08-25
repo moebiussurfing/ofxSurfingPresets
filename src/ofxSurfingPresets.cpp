@@ -509,8 +509,8 @@ void ofxSurfingPresets::startup()
 		bGui_Parameters = false;
 		bGui_Editor = false;
 
-		guiManager.getWindowsSpecialsGuiToggle().set(false);
-		guiManager.getWindowsAlignHelpersGuiToggle().set(false);
+		//guiManager.getWindowsSpecialsGuiToggle().set(false);
+		//guiManager.getWindowsAlignHelpersGuiToggle().set(false);
 	}
 
 	//--
@@ -785,7 +785,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 			{
 				IMGUI_SUGAR__WINDOWS_CONSTRAINTSW_SMALL;
 
-				if (guiManager.beginWindowSpecial(bGui_Editor))
+				if (guiManager.BeginWindowSpecial(bGui_Editor))
 				{
 					guiManager.AddLabelBig(bGui_Editor.getName(), false);
 
@@ -1054,7 +1054,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 							guiManager.Indent();
 							{
 								// Organizer Aligners
-								guiManager.Add(guiManager.getWindowsSpecialsGuiToggle(), OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+								guiManager.Add(guiManager.bGui_Organizer, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 								guiManager.AddTooltip("Panel to align, link, cascade or reset windows");
 
 								guiManager.AddSpacing();
@@ -1165,8 +1165,8 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					//-
 
-					guiManager.endWindowSpecial();
-					//guiManager.endWindowSpecial(bGui_Editor);
+					guiManager.EndWindowSpecial();
+					//guiManager.EndWindowSpecial(bGui_Editor);
 				}
 			}
 			//if (bGui_Editor) ImGui::PopID();
@@ -1191,7 +1191,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 		// if the windows have the same name.
 		//if (bGui) ImGui::PushID(("##MAIN" + params_Preset.getName()).c_str());
 		{
-			if (guiManager.beginWindowSpecial(bGui))
+			if (guiManager.BeginWindowSpecial(bGui))
 			{
 				string n = "PRESETS \n\n" + params_Preset.getName();
 				guiManager.AddLabelBig(n, false);
@@ -1346,7 +1346,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 							//--
 
 							// Organizer Aligners
-							guiManager.Add(guiManager.getWindowsSpecialsGuiToggle(), OFX_IM_TOGGLE_BUTTON_ROUNDED);
+							guiManager.Add(guiManager.bGui_Organizer, OFX_IM_TOGGLE_BUTTON_ROUNDED);
 							guiManager.AddSpacing();
 
 							//--
@@ -1375,7 +1375,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 				// Help
 				guiManager.Add(guiManager.bHelpInternal, OFX_IM_TOGGLE_BUTTON_ROUNDED);
 
-				guiManager.endWindowSpecial();
+				guiManager.EndWindowSpecial();
 			}
 		}
 		//if (bGui) ImGui::PopID();
@@ -1539,13 +1539,13 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 		{
 			//if (bGui_Parameters) ImGui::PushID(("##PARAMS" + params_Preset.getName()).c_str());
 			{
-				if (guiManager.beginWindowSpecial(bGui_Parameters))
+				if (guiManager.BeginWindowSpecial(bGui_Parameters))
 				{
 					guiManager.AddLabelBig(bGui_Parameters.getName(), false);
 
 					guiManager.AddGroup(params_Preset);
 
-					guiManager.endWindowSpecial();
+					guiManager.EndWindowSpecial();
 				}
 			}
 			//if (bGui_Parameters) ImGui::PopID();
@@ -1677,7 +1677,7 @@ void ofxSurfingPresets::draw_ImGui()
 {
 	if (!bGui_Global) return;
 
-	guiManager.begin();
+	guiManager.Begin();
 	{
 		draw_ImGui_Main();
 
@@ -1702,7 +1702,7 @@ void ofxSurfingPresets::draw_ImGui()
 #endif
 
 	}
-	guiManager.end();
+	guiManager.End();
 
 	//--
 

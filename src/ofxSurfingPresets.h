@@ -60,12 +60,12 @@
 //--
 
 // Create Preset Index Selector Toggles
-// Useful to easy link to MIDI / OSC triggers by auto populating adreses listeners or MIDI notes.
+// Useful to easy link to MIDI / OSC triggers by auto populating addresses listeners or MIDI notes.
 
 //--
 
 // 5. Undo Engine
-#define USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER // -> Declarations to help integrate into our apps/add-ons
+//#define USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER // -> Declarations to help integrate into our apps/add-ons
 
 #ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
 #include "ofxSurfingUndoHelper.h"
@@ -539,7 +539,7 @@ private:
 
 	std::string nameSelected;
 
-	ofxSurfing_ImGui_Manager guiManager;
+	ofxSurfingGui guiManager;
 
 	// Preset Params
 	ofParameterGroup params_Preset{ "-1" }; //-> The params that we are storing into each preset file.
