@@ -13,6 +13,8 @@ void ofApp::setup()
 	params.add(rotation2.set("rotation2", 180, 0, 360));
 	params.add(indexColor.set("indexColor", 0, 0, 2));
 
+	//presetsManager.setFliped(true);
+	
 	presetsManager.addGroup(params); // Add a Group
 }
 
@@ -28,7 +30,7 @@ void ofApp::draw()
 void ofApp::drawScene()
 {
 	// Bg Color
-	ofColor _colorBg = 24;//dark
+	ofColor _colorBg = 48;//dark
 
 	//-
 

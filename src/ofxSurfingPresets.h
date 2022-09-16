@@ -291,9 +291,9 @@ private:
 	//--
 
 public: // to expose save methods too
-//private:
+	//private:
 
-	// Undo Engine
+		// Undo Engine
 #ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
 	ofxSurfingUndoHelper undoManager;
 #endif
@@ -435,7 +435,8 @@ private:
 	// or when colliding with other add-ons.
 
 	char keysFullMap[NUM_KEY_COMMANDS] = { // predefined picked keys to assign commands
-	'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	//'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
 	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
 	'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
 	'z', 'x', 'c', 'v', 'b', 'n', 'm' };
@@ -447,7 +448,11 @@ private:
 	//TODO:
 	// add mode without triggers and using just numbers
 
+	bool bFlip = false;
+
 public:
+
+	void setFliped(bool b) { bFlip = b; };
 
 	//--------------------------------------------------------------
 	void setKeyFirstChar(char kChar)//Customizable keys to avoid collide when using multiple presets manager instances!
@@ -539,7 +544,7 @@ private:
 
 	std::string nameSelected;
 
-	ofxSurfingGui guiManager;
+	ofxSurfingGui ui;
 
 	// Preset Params
 	ofParameterGroup params_Preset{ "-1" }; //-> The params that we are storing into each preset file.

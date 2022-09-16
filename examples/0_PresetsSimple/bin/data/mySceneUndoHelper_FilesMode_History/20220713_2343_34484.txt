@@ -1,7 +1,0 @@
-<myScene>
-	<size1>0.810666</size1>
-	<size2>187</size2>
-	<rotation1>1.53402</rotation1>
-	<rotation2>57.1297</rotation2>
-	<indexColor>0</indexColor>
-</myScene>
