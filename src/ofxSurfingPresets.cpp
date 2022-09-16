@@ -773,450 +773,457 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 void ofxSurfingPresets::draw_ImGui_Editor()
 {
 	if (!bGui_Editor) return;
-	
-		// Widgets sizes
-		float _w1;
-		float _w2;
-		float _h;
 
-		//-
+	// Widgets sizes
+	float _w1;
+	float _w2;
+	float _h;
 
-		// 1. Editor
+	//-
+
+	// 1. Editor
+	{
+		//if (bGui_Editor) ImGui::PushID(("##EDIT" + params_Preset.getName()).c_str());
 		{
-			//if (bGui_Editor) ImGui::PushID(("##EDIT" + params_Preset.getName()).c_str());
+			IMGUI_SUGAR__WINDOWS_CONSTRAINTSW_SMALL;
+
+			if (ui.BeginWindowSpecial(bGui_Editor))
 			{
-				IMGUI_SUGAR__WINDOWS_CONSTRAINTSW_SMALL;
+				ui.AddLabelBig(bGui_Editor.getName(), false);
 
-				if (ui.BeginWindowSpecial(bGui_Editor))
+				//--
+
+				_w1 = getWidgetsWidth(1);
+				_w2 = getWidgetsWidth(2);
+				_h = getWidgetsHeightUnit();
+
+				//--
+
+				// Minimize
+
+				ui.Add(bMinimize_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED);
+
+				//--
+
+				ui.AddSpacingSeparated();
+
+				//--
+
+				if (!bMinimize_Editor)
 				{
-					ui.AddLabelBig(bGui_Editor.getName(), false);
+					ui.AddLabelBig("Panels", true, true);
+				}
 
-					//--
-
-					_w1 = getWidgetsWidth(1);
-					_w2 = getWidgetsWidth(2);
-					_h = getWidgetsHeightUnit();
-
-					//--
-
-					// Minimize
-
-					ui.Add(bMinimize_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-
-					//--
-
-					ui.AddSpacingSeparated();
-
-					//--
-
-					if (!bMinimize_Editor)
-					{
-						ui.AddLabelBig("Panels", true, true);
-					}
-
-					// Player
+				// Player
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-					if (!bDisablePlayer)
-					{
-						ui.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-					}
+				if (!bDisablePlayer)
+				{
+					ui.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+				}
 #endif
-					//--
+				//--
 
-					// Undo Engine
+				// Undo Engine
 
 #ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
-					{
-						ui.Add(undoManager.bGui_UndoEngine, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-					}
+				{
+					ui.Add(undoManager.bGui_UndoEngine, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+				}
 #endif
 
+				//--
+
+				//if (!bMinimize_Editor)
+				{
 					//--
 
-					//if (!bMinimize_Editor)
+					// Parameters
+
+					ui.Add(bGui_Parameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+
+					//ui.AddSpacingSeparated();
+				}
+
+				//--
+
+				// Scrollable list
+
+				if (!fileNames.empty())
+				{
+					ui.AddSpacingSeparated();
+					ui.AddSpacing();
+
+					int _i = index;
+					if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
 					{
-						//--
+						ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
 
-						// Parameters
-
-						ui.Add(bGui_Parameters, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
-						//ui.AddSpacingSeparated();
+						if (_i < fileNames.size())
+						{
+							index = _i;
+						}
 					}
+				}
 
-					//--
+				// Index
+				//TODO: starts on zero... should correlate to clicker starting at 1
+				// //or displaying each key command on the matrix clicker!
+				//ui.Add(index);
 
-					// Scrollable list
+				// Label
 
-					if (!fileNames.empty())
+				if (!bMinimize_Editor)
+				{
+					std::string ss;
+					if (dir.size() == 0) ss = "NO PRESETS";
+					else ss = ofToString(index) + "/" + ofToString(index.getMax());
+					ui.AddSpacing();
+					ImGui::Text(ss.data());
+				}
+
+				// Browse
+
+				if (bMinimize_Editor)
+				{
+					ImGui::PushButtonRepeat(true);
+					{
+						if (ImGui::Button("<", ImVec2(_w2, _h * 1.25f)))
+						{
+							doLoadPrevious();
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button(">", ImVec2(_w2, _h * 1.25f)))
+						{
+							doLoadNext();
+						}
+					}
+					ImGui::PopButtonRepeat();
+				}
+
+				//--
+
+				// Simple Clicker 
+
+				// Inner and simple, 
+				// non floating clicker to embed into GUI contents.
+
+				if (!bMinimize_Editor)
+					if (bGui_ClickerSimple)
 					{
 						ui.AddSpacingSeparated();
-						ui.AddSpacing();
-
-						int _i = index;
-						if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
-						{
-							ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
-
-							if (_i < fileNames.size())
-							{
-								index = _i;
-							}
-						}
+						ui.AddLabelBig("Clicker Simple");
+						draw_ImGui_ClickerSimple(false, true, false);
 					}
 
-					// Index
-					//TODO: starts on zero... should correlate to clicker starting at 1
-					// //or displaying each key command on the matrix clicker!
-					//ui.Add(index);
+				//--
 
-					// Label
+				if (!bMinimize_Editor)
+				{
+					ui.AddSpacing();
 
-					if (!bMinimize_Editor)
+					ImGui::PushButtonRepeat(true);
 					{
-						std::string ss;
-						if (dir.size() == 0) ss = "NO PRESETS";
-						else ss = ofToString(index) + "/" + ofToString(index.getMax());
+						if (ImGui::Button("<", ImVec2(_w2, _h * 1.25f)))
+						{
+							doLoadPrevious();
+						}
+						ImGui::SameLine();
+						if (ImGui::Button(">", ImVec2(_w2, _h * 1.25f)))
+						{
+							doLoadNext();
+						}
+					}
+					ImGui::PopButtonRepeat();
+
+					// Save, Load
+					ui.Add(bSave, OFX_IM_BUTTON, 2, true);
+					ui.Add(bLoad, OFX_IM_BUTTON, 2, false);
+
+					// New
+					ui.Add(bNewPreset, OFX_IM_BUTTON, 2, true);
+					ui.AddTooltip("Create a new Preset at the end");
+
+					// Delete
+					if (ImGui::Button("DELETE", ImVec2(_w2, _h * 1.25f))) ImGui::OpenPopup("DELETE ?");
+					if (ImGui::BeginPopupModal("DELETE ?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+					{
+						ui.AddLabelBig("Current Preset \nwill be deleted.", true, true);
 						ui.AddSpacing();
-						ImGui::Text(ss.data());
-					}
+						ui.AddLabelBig("This operation \ncannot be undone!", true, true);
+						ui.AddSpacingBig();
 
-					// Browse
+						static bool dont_ask_me_next_time = false;
+						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+						ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+						ImGui::PopStyleVar();
 
-					if (bMinimize_Editor)
-					{
-						ImGui::PushButtonRepeat(true);
-						{
-							if (ImGui::Button("<", ImVec2(_w2, _h * 1.25f)))
-							{
-								doLoadPrevious();
-							}
-
-							ImGui::SameLine();
-
-							if (ImGui::Button(">", ImVec2(_w2, _h * 1.25f)))
-							{
-								doLoadNext();
-							}
-						}
-						ImGui::PopButtonRepeat();
-					}
-
-					//--
-
-					// Simple Clicker 
-
-					// Inner and simple, 
-					// non floating clicker to embed into GUI contents.
-
-					if (!bMinimize_Editor)
-						if (bGui_ClickerSimple)
-						{
-							ui.AddSpacingSeparated();
-							ui.AddLabelBig("Clicker Simple");
-							draw_ImGui_ClickerSimple(false, true, false);
-						}
-
-					//--
-
-					if (!bMinimize_Editor)
-					{
 						ui.AddSpacing();
 
-						ImGui::PushButtonRepeat(true);
-						{
-							if (ImGui::Button("<", ImVec2(_w2, _h * 1.25f)))
-							{
-								doLoadPrevious();
-							}
-							ImGui::SameLine();
-							if (ImGui::Button(">", ImVec2(_w2, _h * 1.25f)))
-							{
-								doLoadNext();
-							}
-						}
-						ImGui::PopButtonRepeat();
-
-						// Save, Load
-						ui.Add(bSave, OFX_IM_BUTTON, 2, true);
-						ui.Add(bLoad, OFX_IM_BUTTON, 2, false);
-
-						// New
-						ui.Add(bNewPreset, OFX_IM_BUTTON, 2, true);
-						ui.AddTooltip("Create a new Preset at the end");
-
-						// Delete
-						if (ImGui::Button("DELETE", ImVec2(_w2, _h * 1.25f))) ImGui::OpenPopup("DELETE ?");
-						if (ImGui::BeginPopupModal("DELETE ?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-						{
-							ui.AddLabelBig("Current Preset \nwill be deleted.", true, true);
-							ui.AddSpacing();
-							ui.AddLabelBig("This operation \ncannot be undone!", true, true);
-							ui.AddSpacingBig();
-
-							static bool dont_ask_me_next_time = false;
-							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-							ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
-							ImGui::PopStyleVar();
-
-							ui.AddSpacing();
-
-							if (!dont_ask_me_next_time) {
-								if (ImGui::Button("OK", ImVec2(120, 2 * _h))) {
-									ofLogNotice(__FUNCTION__) << "DELETE";
-									doDeletePreset(index);
-									ImGui::CloseCurrentPopup();
-								}
-								ImGui::SetItemDefaultFocus();
-								ImGui::SameLine();
-								if (ImGui::Button("Cancel", ImVec2(120, 2 * _h))) {
-									ImGui::CloseCurrentPopup();
-								}
-							}
-							else {
+						if (!dont_ask_me_next_time) {
+							if (ImGui::Button("OK", ImVec2(120, 2 * _h))) {
 								ofLogNotice(__FUNCTION__) << "DELETE";
 								doDeletePreset(index);
 								ImGui::CloseCurrentPopup();
 							}
-
-							ImGui::EndPopup();
+							ImGui::SetItemDefaultFocus();
+							ImGui::SameLine();
+							if (ImGui::Button("Cancel", ImVec2(120, 2 * _h))) {
+								ImGui::CloseCurrentPopup();
+							}
 						}
-						ui.AddTooltip("Remove current Preset");
+						else {
+							ofLogNotice(__FUNCTION__) << "DELETE";
+							doDeletePreset(index);
+							ImGui::CloseCurrentPopup();
+						}
 
-						ui.AddSpacingSeparated();
+						ImGui::EndPopup();
 					}
+					ui.AddTooltip("Remove current Preset");
 
-					//--
+					ui.AddSpacingSeparated();
+				}
 
-					// Presets Tools
+				//--
 
-					if (bMinimize_Editor) ui.AddSpacingSeparated();
+				// Presets Tools
 
-					ui.AddLabel("Tools", true, true);
-					draw_ImGui_ToolsPreset(false);
+				if (bMinimize_Editor) ui.AddSpacingSeparated();
 
-					//--
+				ui.AddLabel("Tools", true, true);
+				draw_ImGui_ToolsPreset(false);
 
-					// Undo Manager
+				//--
+
+				// Undo Manager
 
 #ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
-					ui.AddSpacingSeparated();
+				ui.AddSpacingSeparated();
 
-					// Browse
-					ui.AddLabel("Undo History", true, true);
-					// Undo / Redo
-					undoManager.drawImGuiWidgetsBrowse(true);
+				// Browse
+				ui.AddLabel("Undo History", true, true);
+				// Undo / Redo
+				undoManager.drawImGuiWidgetsBrowse(true);
 
-					// History
-					undoManager.drawImGuiWidgetsHistoryInfo(true);
+				// History
+				undoManager.drawImGuiWidgetsHistoryInfo(true);
 #endif
 
-					//--
+				//--
 
-					if (!bMinimize_Editor) ui.AddSpacingSeparated();
+				if (!bMinimize_Editor) ui.AddSpacingSeparated();
 
-					//--
+				//--
 
-					// MIDI
+				// MIDI
 
 #ifdef USE__OFX_SURFING_PRESET__MIDI__
-					ui.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+				ui.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 #endif
-					//--
+				//--
 
-					if (!bMinimize_Editor)
+				if (!bMinimize_Editor)
+				{
+					bool bOpen = false;
+					ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+					_flagt |= ImGuiTreeNodeFlags_Framed;
+
+					if (ImGui::TreeNodeEx("KIT", _flagt))
 					{
-						bool bOpen = false;
-						ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-						_flagt |= ImGuiTreeNodeFlags_Framed;
+						draw_ImGui_ToolsKit();
 
-						if (ImGui::TreeNodeEx("KIT", _flagt))
-						{
-							draw_ImGui_ToolsKit();
-
-							ImGui::TreePop();
-						}
+						ImGui::TreePop();
 					}
+				}
 
-					//-
+				//-
 
-					// Extra
+				// Extra
 
-					static ofParameter<bool> bFiles{ "Files", false };
+				static ofParameter<bool> bFiles{ "Files", false };
 
-					if (!bMinimize_Editor)
+				if (!bMinimize_Editor)
+				{
+					ui.AddSpacingSeparated();
+
+					ui.Add(ui.bExtra, OFX_IM_TOGGLE_BUTTON_ROUNDED);
+
+					if (ui.bExtra)
 					{
-						ui.AddSpacingSeparated();
-
-						ui.Add(ui.bExtra, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-
-						if (ui.bExtra)
+						ui.Indent();
 						{
-							ui.Indent();
+							// Organizer Aligners
+							ui.Add(ui.bGui_Organizer, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+							ui.AddTooltip("Panel to align, link, cascade or reset windows");
+
+							ui.AddSpacing();
+
+							//--
+
+							// Smooth
+
+							// Extra app
+
+							if (params_AppExtra.getName() != "-1")
 							{
-								// Organizer Aligners
-								ui.Add(ui.bGui_Organizer, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-								ui.AddTooltip("Panel to align, link, cascade or reset windows");
+								static ofParameter<bool> b = params_AppExtra.getBool("Smooth");
+								static ofParameter<float> v = params_AppExtra.getFloat("Speed");
 
-								ui.AddSpacing();
-
-								//--
-
-								// Smooth
-
-								// Extra app
-
-								if (params_AppExtra.getName() != "-1")
-								{
-									static ofParameter<bool> b = params_AppExtra.getBool("Smooth");
-									static ofParameter<float> v = params_AppExtra.getFloat("Speed");
-
-									ui.Add(b, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-									if (b)
-									{
-										ui.Indent();
-										ofxImGuiSurfing::AddParameter(v, "%.1f");
-										//ui.Add(v, OFX_IM_HSLIDER_SMALL_NO_LABELS, 2);
-										ui.Unindent();
-									}
-								}
-
-								ui.Add(bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-								if (bGui_ClickerSimple)
+								ui.Add(b, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+								if (b)
 								{
 									ui.Indent();
-									static bool bOpen = false;
-									ImGuiColorEditFlags _flagw = (bOpen ? ImGuiWindowFlags_NoCollapse : ImGuiWindowFlags_None);
-									if (ImGui::CollapsingHeader("CLICKER SIMPLE", _flagw))
-									{
-										ui.Add(bResponsiveButtonsClickerSimple, OFX_IM_CHECKBOX);
-										if (bResponsiveButtonsClickerSimple)
-										{
-											ui.Add(amountButtonsPerRowClickerMini, OFX_IM_STEPPER);
-										}
-									}
-									ui.Unindent();
-								}
-
-								ui.Add(bCycled, OFX_IM_CHECKBOX);
-								ui.AddTooltip("Allows browsing by arrows unlocked");
-
-								//-
-
-								// Files
-
-								ui.Add(bFiles, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
-								if (bFiles)
-								{
-									ui.Indent();
-									{
-										// Paths
-										{
-											bool bOpen = false;
-											ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
-											//_flagt |= ImGuiTreeNodeFlags_Framed;
-
-											if (ImGui::TreeNodeEx("Path", _flagt))
-											{
-												ImGui::TextWrapped(path_Presets.data()); // -> show path
-												ImGui::TreePop();
-											}
-										}
-
-										// Files
-										// Buttons Selector for each file
-										if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
-										{
-											// Buttons Matrix
-
-											//TODO: 
-											// Index back not working
-											// this is a workaround
-											// could fail on macOS/Linux -> requires fix paths slashes
-
-											for (int i = 0; i < dir.size(); i++)
-											{
-												std::string si = ofToString(i);
-												if (i < 10) si = "0" + si;
-												std::string ss = name_Root + "_" + si;
-												fileName = ss;
-
-												auto s0 = ofSplitString(nameSelected, "\\", true);
-												std::string s1 = s0[s0.size() - 1]; // filename
-												auto s = ofSplitString(s1, ".json");
-
-												std::string _nameSelected = s[0];
-
-												if (_nameSelected == fileName)
-												{
-													index = i;
-												}
-											}
-
-											ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
-										}
-									}
+									ofxImGuiSurfing::AddParameter(v, "%.1f");
+									//ui.Add(v, OFX_IM_HSLIDER_SMALL_NO_LABELS, 2);
 									ui.Unindent();
 								}
 							}
-							ui.Unindent();
 
+							ui.Add(bGui_ClickerSimple, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+							if (bGui_ClickerSimple)
+							{
+								ui.Indent();
+								static bool bOpen = false;
+								ImGuiColorEditFlags _flagw = (bOpen ? ImGuiWindowFlags_NoCollapse : ImGuiWindowFlags_None);
+								if (ImGui::CollapsingHeader("CLICKER SIMPLE", _flagw))
+								{
+									ui.Add(bResponsiveButtonsClickerSimple, OFX_IM_CHECKBOX);
+									if (bResponsiveButtonsClickerSimple)
+									{
+										ui.Add(amountButtonsPerRowClickerMini, OFX_IM_STEPPER);
+									}
+								}
+								ui.Unindent();
+							}
+
+							ui.Add(bCycled, OFX_IM_CHECKBOX);
+							ui.AddTooltip("Allows browsing by arrows unlocked");
+
+							//-
+
+							// Files
+
+							ui.Add(bFiles, OFX_IM_TOGGLE_BUTTON_ROUNDED_SMALL);
+							if (bFiles)
+							{
+								ui.Indent();
+								{
+									// Paths
+									{
+										bool bOpen = false;
+										ImGuiTreeNodeFlags _flagt = (bOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+										//_flagt |= ImGuiTreeNodeFlags_Framed;
+
+										if (ImGui::TreeNodeEx("Path", _flagt))
+										{
+											ImGui::TextWrapped(path_Presets.data()); // -> show path
+											ImGui::TreePop();
+										}
+									}
+
+									// Files
+									// Buttons Selector for each file
+									if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
+									{
+										// Buttons Matrix
+
+										//TODO: 
+										// Index back not working
+										// this is a workaround
+										// could fail on macOS/Linux -> requires fix paths slashes
+
+										for (int i = 0; i < dir.size(); i++)
+										{
+											std::string si = ofToString(i);
+											if (i < 10) si = "0" + si;
+											std::string ss = name_Root + "_" + si;
+											fileName = ss;
+
+											auto s0 = ofSplitString(nameSelected, "\\", true);
+											std::string s1 = s0[s0.size() - 1]; // filename
+											auto s = ofSplitString(s1, ".json");
+
+											std::string _nameSelected = s[0];
+
+											if (_nameSelected == fileName)
+											{
+												index = i;
+											}
+										}
+
+										ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
+									}
+								}
+								ui.Unindent();
+							}
 						}
+						ui.Unindent();
+
 					}
-
-					//-
-
-					ui.EndWindowSpecial();
-					//ui.EndWindowSpecial(bGui_Editor);
 				}
+
+				//-
+
+				ui.EndWindowSpecial();
+				//ui.EndWindowSpecial(bGui_Editor);
 			}
-			//if (bGui_Editor) ImGui::PopID();
 		}
+		//if (bGui_Editor) ImGui::PopID();
+	}
 }
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_Main()
 {
 	if (!bGui) return;
-	
-		IMGUI_SUGAR__WINDOWS_CONSTRAINTSW_SMALL;
 
-		// Widgets Sizes
-		float _w1;
-		float _w2;
-		float _w3;
-		float _w4;
-		float _h;
+	IMGUI_SUGAR__WINDOWS_CONSTRAINTSW_SMALL;
 
-		// avoid collision with other presets manager instances
-		// if the windows have the same name.
-		//if (bGui) ImGui::PushID(("##MAIN" + params_Preset.getName()).c_str());
+	// Widgets Sizes
+	float _w1;
+	float _w2;
+	float _w3;
+	float _w4;
+	float _h;
+
+	// avoid collision with other presets manager instances
+	// if the windows have the same name.
+	//if (bGui) ImGui::PushID(("##MAIN" + params_Preset.getName()).c_str());
+	{
+		if (ui.BeginWindowSpecial(bGui))
 		{
-			if (ui.BeginWindowSpecial(bGui))
+			string n = "PRESETS \n" + params_Preset.getName();
+			ui.AddLabelBig(n, false);
+			ui.AddSpacing();
+
+			//--
+
+			_w1 = getWidgetsWidth(1);
+			_w2 = getWidgetsWidth(2);
+			_w3 = getWidgetsWidth(3);
+			_h = getWidgetsHeightUnit();
+
+			//--
+
+			// Minimize
+			ui.Add(bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED);
+
+			// Keys
+			if (!bMinimize) ui.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED);
+
+			//ui.AddSpacing();
+			ui.AddSpacingSeparated();
+
+			bool b = true;
+			if (bMinimize) {
+				b = ui.BeginTree("Panels");
+			}
+
+			if (b)
 			{
-				string n = "PRESETS \n\n" + params_Preset.getName();
-				ui.AddLabelBig(n, false);
-
-				//--
-
-				_w1 = getWidgetsWidth(1);
-				_w2 = getWidgetsWidth(2);
-				_w3 = getWidgetsWidth(3);
-				_h = getWidgetsHeightUnit();
-
-				//--
-
-				// Minimize
-				ui.Add(bMinimize, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-
-				// Keys
-				//if (!bMinimize)
-				ui.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-
-				//ui.AddSpacing();
-				ui.AddSpacingSeparated();
-
 				// Editor
 				ui.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
@@ -1226,170 +1233,175 @@ void ofxSurfingPresets::draw_ImGui_Main()
 					{
 						ui.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 					}
+			}
 
-				//----
+			if (bMinimize) {
+				if (b) ui.EndTree();
+			}
 
+			//----
+
+			ui.AddSpacingSeparated();
+
+			// debug
+			if (0) {
+				ui.Add(index);
+				ui.AddToggle("Flip", bFlip);
 				ui.AddSpacingSeparated();
-				
-				// debug
-				if (0) {
-					ui.Add(index);
-					ui.AddToggle("Flip", bFlip);
-					ui.AddSpacingSeparated();
-				}
+			}
 
-				//--
+			//--
 
-				// Clicker Matrix
-				{
-					float _h2 = 2 * ui.getWidgetsHeightUnit();
+			// Clicker Matrix
+			{
+				float _h2 = 2 * ui.getWidgetsHeightUnit();
 
-					string toolTip = "";
-					if (bKeyCtrl) toolTip = "Copy To";
-					else if (bKeyAlt) toolTip = "Swap With";
-					ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2, toolTip, bFlip);
+				string toolTip = "";
+				if (bKeyCtrl) toolTip = "Copy To";
+				else if (bKeyAlt) toolTip = "Swap With";
+				ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2, toolTip, bFlip);
 
-					//TODO:
-					// using Ptr
-					//ofxImGuiSurfing::AddMatrixClickerLabels(index, (char *) keyCommandsChars, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2);
-				}
+				//TODO:
+				// using Ptr
+				//ofxImGuiSurfing::AddMatrixClickerLabels(index, (char *) keyCommandsChars, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2);
+			}
 
-				ui.AddSpacingSeparated();
-				//ui.AddSpacing();
+			ui.AddSpacingSeparated();
+			//ui.AddSpacing();
 
-				//--
+			//--
 
-				// Edit mode
+			// Edit mode
 
-				ui.Add(bEditMode, OFX_IM_TOGGLE_BIG_BORDER_BLINK);
-				//ui.Add(bEditMode, bMinimize ? OFX_IM_TOGGLE_BORDER_BLINK : OFX_IM_TOGGLE_BIG_BORDER_BLINK);
-				if (bEditMode) ui.AddTooltip("Auto Save when modified parameters.");
-				else ui.AddTooltip("Requires manual Save!");
+			ui.Add(bEditMode, OFX_IM_TOGGLE_BIG_BORDER_BLINK);
+			//ui.Add(bEditMode, bMinimize ? OFX_IM_TOGGLE_BORDER_BLINK : OFX_IM_TOGGLE_BIG_BORDER_BLINK);
+			if (bEditMode) ui.AddTooltip("Auto Save when modified parameters.");
+			else ui.AddTooltip("Requires manual Save!");
 
-				// Save, Load
-				if (!bMinimize || (!bEditMode && bMinimize))
-				{
-					ui.AddSpacing();
-					ui.Add(bSave, bEditMode ? OFX_IM_BUTTON : OFX_IM_BUTTON_BORDER_BLINK, 2, true);
-					ui.Add(bLoad, OFX_IM_BUTTON, 2, false);
-					ui.AddTooltip("Reload last Preset. Discard last modifications.");
-				}
+			// Save, Load
+			if (!bMinimize || (!bEditMode && bMinimize))
+			{
+				ui.AddSpacing();
+				ui.Add(bSave, bEditMode ? OFX_IM_BUTTON : OFX_IM_BUTTON_BORDER_BLINK, 2, true);
+				ui.Add(bLoad, OFX_IM_BUTTON, 2, false);
+				ui.AddTooltip("Reload last Preset. Discard last modifications.");
+			}
 
-				//--
+			//--
 
-				// Play
+			// Play
 
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 
-				if (!bDisablePlayer)
-				{
-					if (!(bMinimize && playerSurfer.bGui))
-					{
-						ui.AddSpacingSeparated();
-
-						_h = 3 * getWidgetsHeightUnit();
-						_w1 = getWidgetsWidth(1);
-
-						ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
-							_w1, _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
-
-						if (!bMinimize)
-						{
-							// Target
-							ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
-
-							// Bang
-							ui.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
-						}
-					}
-				}
-#endif
-				//--
-
-#ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER
-				if (!bGui_Editor)
+			if (!bDisablePlayer)
+			{
+				if (!(bMinimize && playerSurfer.bGui))
 				{
 					ui.AddSpacingSeparated();
 
-					// Browse
-					// Undo / Redo
-					undoManager.drawImGuiWidgetsBrowse(true);
+					//_h = 3 * getWidgetsHeightUnit();
+					_h = (bMinimize ? 2 : 3) * getWidgetsHeightUnit();
+					_w1 = getWidgetsWidth(1);
 
-					// History
-					undoManager.drawImGuiWidgetsHistoryInfo(true);
+					ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
+						_w1, _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
+
+					if (!bMinimize)
+					{
+						// Target
+						ofxImGuiSurfing::AddCombo(randomTypePlayIndex, randomTypesPlayNames);
+
+						// Bang
+						ui.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
+					}
 				}
+			}
 #endif
-				//--
+			//--
 
+#ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER
+			if (!bGui_Editor)
+			{
 				ui.AddSpacingSeparated();
 
-				if (!bMinimize)
-				{
-					//--
+				// Browse
+				// Undo / Redo
+				undoManager.drawImGuiWidgetsBrowse(true);
 
-					// MIDI
+				// History
+				undoManager.drawImGuiWidgetsHistoryInfo(true);
+			}
+#endif
+			//--
+
+			if (!bMinimize)
+			{
+				ui.AddSpacingSeparated();
+
+				//--
+
+				// MIDI
 
 #ifdef USE__OFX_SURFING_PRESET__MIDI__
-
-					ui.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-
+				ui.Add(surfingMIDI.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 #endif
-					//--
-
-					// Extra
-					ui.Add(bExtra_Main, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-				}
-
 				//--
 
 				// Extra
+				ui.Add(bExtra_Main, OFX_IM_TOGGLE_BUTTON_ROUNDED);
+			}
 
-				if (!bMinimize)
-					if (bExtra_Main)
+			//--
+
+			// Extra
+
+			if (!bMinimize)
+				if (bExtra_Main)
+				{
+					//ui.AddSpacingBigSeparated();
+
+					ui.Indent();
 					{
-						//ui.AddSpacingBigSeparated();
+						_w1 = getWidgetsWidth(1);
+						_w2 = getWidgetsWidth(2);
 
-						ui.Indent();
+						//--
+
+						// Organizer Aligners
+						ui.Add(ui.bGui_Organizer, OFX_IM_TOGGLE_BUTTON_ROUNDED);
+						ui.AddSpacing();
+
+						//--
+
 						{
-							_w1 = getWidgetsWidth(1);
-							_w2 = getWidgetsWidth(2);
-
-							//--
-
-							// Organizer Aligners
-							ui.Add(ui.bGui_Organizer, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-							ui.AddSpacing();
-
-							//--
-
+							static bool bOpen = false;
+							ImGuiColorEditFlags _flagw = (bOpen ? ImGuiWindowFlags_NoCollapse : ImGuiWindowFlags_None);
+							if (ImGui::CollapsingHeader("CLICKER", _flagw))
 							{
-								static bool bOpen = false;
-								ImGuiColorEditFlags _flagw = (bOpen ? ImGuiWindowFlags_NoCollapse : ImGuiWindowFlags_None);
-								if (ImGui::CollapsingHeader("CLICKER", _flagw))
+								ui.refreshLayout();
+								if (bResponsiveButtonsClicker)
 								{
-									ui.refreshLayout();
-									if (bResponsiveButtonsClicker)
-									{
-										ui.Add(amountButtonsPerRowClicker, OFX_IM_STEPPER);
-									}
-
-									ui.Add(bResponsiveButtonsClicker, OFX_IM_CHECKBOX);
-									ui.Add(bAutoResize_Clicker, OFX_IM_CHECKBOX);
+									ui.Add(amountButtonsPerRowClicker, OFX_IM_STEPPER);
 								}
+
+								ui.Add(bResponsiveButtonsClicker, OFX_IM_CHECKBOX);
+								ui.Add(bAutoResize_Clicker, OFX_IM_CHECKBOX);
 							}
 						}
-						ui.Unindent();
-						ui.AddSpacingSeparated();
 					}
+					ui.Unindent();
+				}
 
-
-				// Help
+			// Help
+			if (!bMinimize) {
+				ui.AddSpacingSeparated();
 				ui.Add(ui.bHelpInternal, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-
-				ui.EndWindowSpecial();
 			}
+
+			ui.EndWindowSpecial();
 		}
-		//if (bGui) ImGui::PopID();
+	}
+	//if (bGui) ImGui::PopID();
 }
 
 //--------------------------------------------------------------
@@ -1404,7 +1416,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple()
 //snippet
 bool bHeader = true;
 bool bMinimal = true;
-bool bShowMinimize = true; 
+bool bShowMinimize = true;
 bool bNoExtras = false;
 */
 
