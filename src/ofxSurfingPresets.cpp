@@ -1195,7 +1195,10 @@ void ofxSurfingPresets::draw_ImGui_Main()
 	{
 		if (ui.BeginWindowSpecial(bGui))
 		{
-			string n = "PRESETS \n" + params_Preset.getName();
+			string n;
+			//n += "PRESETS \n";
+			n += params_Preset.getName();
+
 			ui.AddLabelBig(n, false);
 			ui.AddSpacing();
 
@@ -1330,7 +1333,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 				// History
 				undoManager.drawImGuiWidgetsHistoryInfo(true);
-			}
+		}
 #endif
 			//--
 
@@ -1399,8 +1402,8 @@ void ofxSurfingPresets::draw_ImGui_Main()
 			}
 
 			ui.EndWindowSpecial();
-		}
 	}
+}
 	//if (bGui) ImGui::PopID();
 }
 
@@ -2188,7 +2191,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter& e)
 		if (i != index && notesIndex[i].get())
 		{
 			notesIndex[i] = false;
-		}
+}
 	}
 }
 #endif
@@ -2359,7 +2362,7 @@ void ofxSurfingPresets::doNewPreset()
 #endif
 
 		//doRecreateMidi();
-	}
+}
 #endif
 }
 
