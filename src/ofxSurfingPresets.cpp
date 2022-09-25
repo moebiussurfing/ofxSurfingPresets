@@ -325,6 +325,12 @@ void ofxSurfingPresets::setupGui()
 	ui.addWindowSpecial(bGui_Parameters);
 	ui.addWindowSpecial(bGui_Editor);
 
+#ifdef USE__OFX_IM_GUI_EXTERNAL
+	playerSurfer.setUiPtr(&ui);
+	if (!bDisablePlayer)
+		ui.addWindowSpecial(playerSurfer.bGui);
+#endif
+
 	//#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
 	//	//if(!bDisablePlayer)
 	//	//ui.addWindowSpecial(playerSurfer.bGui);
@@ -789,7 +795,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 			if (ui.BeginWindowSpecial(bGui_Editor))
 			{
-				ui.AddLabelBig(bGui_Editor.getName(), false);
+				//ui.AddLabelBig(bGui_Editor.getName(), false);
 
 				//--
 
@@ -1333,7 +1339,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 				// History
 				undoManager.drawImGuiWidgetsHistoryInfo(true);
-		}
+			}
 #endif
 			//--
 
@@ -1402,8 +1408,8 @@ void ofxSurfingPresets::draw_ImGui_Main()
 			}
 
 			ui.EndWindowSpecial();
+		}
 	}
-}
 	//if (bGui) ImGui::PopID();
 }
 
@@ -1567,7 +1573,7 @@ void ofxSurfingPresets::draw_ImGui_Parameters()
 			{
 				if (ui.BeginWindowSpecial(bGui_Parameters))
 				{
-					ui.AddLabelBig(bGui_Parameters.getName(), false);
+					//ui.AddLabelBig(bGui_Parameters.getName(), false);
 
 					ui.AddGroup(params_Preset);
 
@@ -1727,6 +1733,10 @@ void ofxSurfingPresets::draw_ImGui()
 		undoManager.drawImGuiWindow();
 #endif
 
+#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
+		playerSurfer.draw();
+#endif
+
 	}
 	ui.End();
 
@@ -1737,7 +1747,7 @@ void ofxSurfingPresets::draw_ImGui()
 #ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER
 	if (!bDisablePlayer)
 	{
-		if (playerSurfer.bGui)
+		//if (playerSurfer.bGui)
 		{
 			//ui.setNextWindowOnViewport();
 
@@ -1758,7 +1768,7 @@ void ofxSurfingPresets::draw_ImGui()
 
 			//--
 
-			playerSurfer.draw();
+			//playerSurfer.draw();
 		}
 	}
 #endif
@@ -2191,7 +2201,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter& e)
 		if (i != index && notesIndex[i].get())
 		{
 			notesIndex[i] = false;
-}
+		}
 	}
 }
 #endif
@@ -2362,7 +2372,7 @@ void ofxSurfingPresets::doNewPreset()
 #endif
 
 		//doRecreateMidi();
-}
+	}
 #endif
 }
 

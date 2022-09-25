@@ -586,3 +586,4 @@ examples/4_PresetsBasicMinimal/bin/imgui.ini
 examples/1_PresetsBasic/bin/imgui.ini
 examples/4_PresetsBasicMinimal/bin/imgui.ini
 *.txt
+examples/0_PresetsSimple/bin/imgui.ini
