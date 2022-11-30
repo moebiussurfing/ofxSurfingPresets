@@ -47,7 +47,7 @@
 
 // 3. Index Player (Is a timed player to auto browse presets index)
 // -> Optional. Can be commented to disable player browser add-on.
-#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+//#define USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
 
 //--
 
