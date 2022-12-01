@@ -8,6 +8,7 @@
 
 	TODO:
 
+	+ fix locked params. cant randomize/reset
 	+ fix startup grow amount presets!
 	+ add / check undo engine workflow.
 	+ amount selector for kit populator

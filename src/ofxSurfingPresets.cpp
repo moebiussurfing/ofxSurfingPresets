@@ -574,6 +574,8 @@ void ofxSurfingPresets::startup()
 //--------------------------------------------------------------
 void ofxSurfingPresets::update(ofEventArgs& args)
 {
+	//return;
+
 	// auto reload preset when clicked. that's to undo current editing!
 	if (bAutoLoadOnReTrig)
 		if (isRetrigged())
@@ -950,7 +952,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 					// New
 					ui.Add(bNewPreset, OFX_IM_BUTTON, 2, true);
-					ui.AddTooltip("Create a new Preset at the end");
+					ui.AddTooltip("Create a new Preset \nat the end");
 
 					// Delete
 					if (ImGui::Button("DELETE", ImVec2(_w2, _h * 1.25f))) ImGui::OpenPopup("DELETE ?");
@@ -1063,7 +1065,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 						{
 							// Organizer Aligners
 							ui.Add(ui.bGui_Organizer, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-							ui.AddTooltip("Panel to align, link, cascade or reset windows");
+							ui.AddTooltip("Panel to align, link, \ncascade or reset windows");
 
 							ui.AddSpacing();
 
@@ -1106,7 +1108,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 							}
 
 							ui.Add(bCycled, OFX_IM_CHECKBOX);
-							ui.AddTooltip("Allows browsing by arrows unlocked");
+							ui.AddTooltip("Allows browsing by \narrows unlocked");
 
 							//-
 
@@ -1287,7 +1289,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 			ui.Add(bEditMode, OFX_IM_TOGGLE_BIG_BORDER_BLINK);
 			//ui.Add(bEditMode, bMinimize ? OFX_IM_TOGGLE_BORDER_BLINK : OFX_IM_TOGGLE_BIG_BORDER_BLINK);
-			if (bEditMode) ui.AddTooltip("Auto Save when modified parameters.");
+			if (bEditMode) ui.AddTooltip("Auto Save when \nmodified parameters.");
 			else ui.AddTooltip("Requires manual Save!");
 
 			// Save, Load
@@ -1296,7 +1298,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 				ui.AddSpacing();
 				ui.Add(bSave, bEditMode ? OFX_IM_BUTTON : OFX_IM_BUTTON_BORDER_BLINK, 2, true);
 				ui.Add(bLoad, OFX_IM_BUTTON, 2, false);
-				ui.AddTooltip("Reload last Preset. Discard last modifications.");
+				ui.AddTooltip("Reload last Preset. \nDiscard last modifications.");
 			}
 
 			//--
@@ -1601,7 +1603,7 @@ void ofxSurfingPresets::draw_ImGui_ToolsKit()
 		{
 			ImGui::OpenPopup("CLEAR KIT ?");
 		}
-		ui.AddTooltip("Remove all file Presets!");
+		ui.AddTooltip("Remove all \nfile Presets!");
 
 		if (ImGui::BeginPopupModal("CLEAR KIT ?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 		{
@@ -1642,26 +1644,26 @@ void ofxSurfingPresets::draw_ImGui_ToolsKit()
 		{
 			doPopulatePresets();
 		}
-		ui.AddTooltip("Clear Kit and create New Presets copying current");
+		ui.AddTooltip("Clear Kit and create \nNew Presets copying current");
 
 		if (ImGui::Button("POPULATE RAND", ImVec2(_w1, _h)))
 		{
 			doPopulatePresetsRandomized();
 		}
-		ui.AddTooltip("Clear Kit and create New randomized Presets");
+		ui.AddTooltip("Clear Kit and create \nNew randomized Presets");
 		if (ui.bExtra)
 		{
 			if (ImGui::Button("RECREATE", ImVec2(_w1, _h)))
 			{
 				doRefreshFilesAndRename();
 			}
-			ui.AddTooltip("Fix file names and reload Presets");
+			ui.AddTooltip("Fix file names \nand reload Presets");
 
 			ui.Add(bRefresh, OFX_IM_BUTTON_SMALL);
 			ui.AddTooltip("Reload Preset files");
 
 			ui.Add(bSetPathPresets, OFX_IM_BUTTON_SMALL);
-			ui.AddTooltip("Open dialog to customize Presets folder");
+			ui.AddTooltip("Open dialog to customize \nPresets folder");
 		}
 	}
 }
@@ -1679,7 +1681,7 @@ void ofxSurfingPresets::draw_ImGui_ToolsPreset(bool bMini)
 	{
 		doResetParams();
 	}
-	ui.AddTooltip("Reset current Preset parameters to min values");
+	ui.AddTooltip("Reset current Preset \nparameters to min values");
 
 	ImGui::SameLine();
 
@@ -1687,7 +1689,7 @@ void ofxSurfingPresets::draw_ImGui_ToolsPreset(bool bMini)
 	{
 		doRandomizeParams();
 	}
-	ui.AddTooltip("Randomize current Preset parameters");
+	ui.AddTooltip("Randomize current \nPreset parameters");
 
 	//--
 
@@ -1695,7 +1697,7 @@ void ofxSurfingPresets::draw_ImGui_ToolsPreset(bool bMini)
 	{
 		doStoreState();
 	}
-	ui.AddTooltip("Store current Preset State");
+	ui.AddTooltip("Store current \nPreset State");
 
 	ImGui::SameLine();
 
@@ -1703,7 +1705,7 @@ void ofxSurfingPresets::draw_ImGui_ToolsPreset(bool bMini)
 	{
 		doRecallState();
 	}
-	ui.AddTooltip("Recall current Preset stored State");
+	ui.AddTooltip("Recall current \nPreset stored State");
 
 }
 
@@ -2831,7 +2833,7 @@ void ofxSurfingPresets::doRandomizeParams(bool bSilent) {
 
 	//--
 
-	if (!bSilent) bIsRetrigged = true;
+	//if (!bSilent) bIsRetrigged = true;
 }
 
 //--------------------------------------------------------------
@@ -2870,5 +2872,5 @@ void ofxSurfingPresets::doResetParams(bool bSilent) {
 		}
 	}
 
-	if (!bSilent) bIsRetrigged = true;
+	//if (!bSilent) bIsRetrigged = true;
 }
