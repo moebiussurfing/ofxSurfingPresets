@@ -352,7 +352,7 @@ void ofxSurfingPresets::setupGui()
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRecreateMidi()
 {
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
 
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 	//// Group all together
@@ -391,7 +391,7 @@ void ofxSurfingPresets::doRecreateMidi()
 //--------------------------------------------------------------
 void ofxSurfingPresets::startup()
 {
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
 
 	//--
 
@@ -453,18 +453,18 @@ void ofxSurfingPresets::startup()
 		listener_Beat = playerSurfer.bPlayerBeatBang.newListener([this](bool& b)
 			{
 				ofLogNotice("BEAT: ") << (b ? "TRUE" : "FALSE");
-				if (!b) return;
+		if (!b) return;
 
-				// bangs can be bypassed when not playing
-				//if (playerSurfer.bPlay) 
-				{
-					switch (randomTypePlayIndex)
-					{
-					case 0: doLoadNext(); break;
-					case 1: doRandomizeIndex(); break;
-					case 2: doRandomizeParams(); break;
-					}
-				}
+		// bangs can be bypassed when not playing
+		//if (playerSurfer.bPlay) 
+		{
+			switch (randomTypePlayIndex)
+			{
+			case 0: doLoadNext(); break;
+			case 1: doRandomizeIndex(); break;
+			case 2: doRandomizeParams(); break;
+			}
+		}
 			});
 
 		//--------------------------------------------------------------
@@ -472,14 +472,14 @@ void ofxSurfingPresets::startup()
 			{
 				ofLogNotice("PLAY: ") << (b ? "TRUE" : "FALSE");
 
-				// workflow
-				// disable edit mode when playing to avoid accidental overwrite settings
-				// also could improve performance reducing saving files!
-				if (!b) return;
-				else
-				{
-					if (bEditMode) bEditMode = false;
-				}
+		// workflow
+		// disable edit mode when playing to avoid accidental overwrite settings
+		// also could improve performance reducing saving files!
+		if (!b) return;
+		else
+		{
+			if (bEditMode) bEditMode = false;
+		}
 			});
 	}
 
@@ -625,7 +625,7 @@ void ofxSurfingPresets::update(ofEventArgs& args)
 		bDISABLE_CALLBACKS = false;
 
 		timerLast_Autosave = ofGetElapsedTimeMillis();
-		ofLogNotice(__FUNCTION__) << "Autosaved DONE";
+		ofLogNotice("ofxSurfingPresets")<<(__FUNCTION__) << "Autosaved DONE";
 	}
 
 	*/
@@ -769,7 +769,7 @@ void ofxSurfingPresets::updateSmoothParam(ofAbstractParameter& ap)
 
 	else
 	{
-		//ofLogError(__FUNCTION__) << "Not the expected type for ofParam: " << name;
+		//ofLogError("ofxSurfingPresets") << "Not the expected type for ofParam: " << name;
 	}
 }
 
@@ -865,7 +865,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 					int _i = index;
 					if (ofxImGuiSurfing::VectorCombo(" ", &_i, fileNames))
 					{
-						ofLogNotice(__FUNCTION__) << "_i: " << ofToString(_i);
+						ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "_i: " << ofToString(_i);
 
 						if (_i < fileNames.size())
 						{
@@ -972,7 +972,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 						if (!dont_ask_me_next_time) {
 							if (ImGui::Button("OK", ImVec2(120, 2 * _h))) {
-								ofLogNotice(__FUNCTION__) << "DELETE";
+								ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "DELETE";
 								doDeletePreset(index);
 								ImGui::CloseCurrentPopup();
 							}
@@ -983,7 +983,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 							}
 						}
 						else {
-							ofLogNotice(__FUNCTION__) << "DELETE";
+							ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "DELETE";
 							doDeletePreset(index);
 							ImGui::CloseCurrentPopup();
 						}
@@ -1162,7 +1162,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 											}
 										}
 
-										ofLogNotice(__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
+										ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
 									}
 								}
 								ui.Unindent();
@@ -1621,7 +1621,7 @@ void ofxSurfingPresets::draw_ImGui_ToolsKit()
 
 			if (!dont_ask_me_next_time) {
 				if (ImGui::Button("OK", ImVec2(120, 2 * _h))) {
-					ofLogNotice(__FUNCTION__) << "CLEAR";
+					ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "CLEAR";
 					doClearPresets();
 					ImGui::CloseCurrentPopup();
 				}
@@ -1632,7 +1632,7 @@ void ofxSurfingPresets::draw_ImGui_ToolsKit()
 				}
 			}
 			else {
-				ofLogNotice(__FUNCTION__) << "CLEAR";
+				ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "CLEAR";
 				doClearPresets();
 				ImGui::CloseCurrentPopup();
 			}
@@ -1785,7 +1785,7 @@ void ofxSurfingPresets::draw_ImGui()
 void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 {
 	const int& key = eventArgs.key;
-	ofLogNotice(__FUNCTION__) << (char)key << " [" << key << "]";
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << (char)key << " [" << key << "]";
 
 	// Modifiers
 	bool mod_COMMAND = eventArgs.hasModifier(OF_KEY_COMMAND);
@@ -1812,10 +1812,10 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 
 	if (0)
 	{
-		ofLogNotice(__FUNCTION__) << "mod_COMMAND : " << (mod_COMMAND ? "ON" : "OFF");
-		ofLogNotice(__FUNCTION__) << "mod_CONTROL : " << (mod_CONTROL ? "ON" : "OFF");
-		ofLogNotice(__FUNCTION__) << "mod_ALT     : " << (mod_ALT ? "ON" : "OFF");
-		ofLogNotice(__FUNCTION__) << "mod_SHIFT   : " << (mod_SHIFT ? "ON" : "OFF");
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "mod_COMMAND : " << (mod_COMMAND ? "ON" : "OFF");
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "mod_CONTROL : " << (mod_CONTROL ? "ON" : "OFF");
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "mod_ALT     : " << (mod_ALT ? "ON" : "OFF");
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "mod_SHIFT   : " << (mod_SHIFT ? "ON" : "OFF");
 	}
 
 	if (0) {}
@@ -1892,7 +1892,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 void ofxSurfingPresets::keyReleased(ofKeyEventArgs& eventArgs)
 {
 	const int& key = eventArgs.key;
-	ofLogNotice(__FUNCTION__) << (char)key << " [" << key << "]";
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << (char)key << " [" << key << "]";
 
 	// Modifiers
 	bool mod_COMMAND = eventArgs.hasModifier(OF_KEY_COMMAND);
@@ -1968,7 +1968,7 @@ void ofxSurfingPresets::setGuiVisible(bool b)
 //		if (name != "exclude"
 //			&& name != "exclude")
 //		{
-//			ofLogNotice(__FUNCTION__) << "Changed_Params: " << name << " : " << e;
+//			ofLogNotice("ofxSurfingPresets")<<(__FUNCTION__) << "Changed_Params: " << name << " : " << e;
 //
 //		}
 //
@@ -1989,7 +1989,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 	// Exclude debugs
 	//if (name != "exclude" && name != "exclude")
 	{
-		ofLogNotice(__FUNCTION__) << name << " : " << e;
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << name << " : " << e;
 	}
 
 	//--
@@ -2010,7 +2010,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 		{
 			if (index_PRE != -1)
 			{
-				ofLogNotice(__FUNCTION__) << "\n\n  Changed \n  Preset Index : "
+				ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "\n\n  Changed \n  Preset Index : "
 					<< ofToString(index_PRE) << " > " << ofToString(index)
 					<< "      \t(" << ofToString(keyCommandsChars[index_PRE]) << " > " << ofToString(keyCommandsChars[index]) << ")"
 					<< "\n";
@@ -2040,7 +2040,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 
 				// Load
 
-				ofLogNotice(__FUNCTION__) << index.getName() + " : " << ofToString(index);
+				ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << index.getName() + " : " << ofToString(index);
 
 				if (dir.size() > 0 && index < dir.size())
 				{
@@ -2076,7 +2076,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 				//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 				refreshToggleNotes();
 #endif
-				ofLogNotice(__FUNCTION__) << "PRESET COPY!";
+				ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "PRESET COPY!";
 
 				index_PRE = index;
 			}
@@ -2104,11 +2104,11 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 				save(_fTo);
 
 				if (bf && bt) {
-					ofLogNotice(__FUNCTION__) << "PRESET SWAP!";
-					ofLogNotice(__FUNCTION__) << _fFrom << " <-> " << _fTo;
+					ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "PRESET SWAP!";
+					ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << _fFrom << " <-> " << _fTo;
 				}
 				else {
-					ofLogError(__FUNCTION__) << "WRONG SWAP!";
+					ofLogError("ofxSurfingPresets") << "WRONG SWAP!";
 				}
 
 				index_PRE = index;
@@ -2191,7 +2191,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter& e)
 		if (notesIndex[i].get() && name == notesIndex[i].getName())
 		{
 			index = i;
-			ofLogNotice(__FUNCTION__) << name << " : TRUE";
+			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << name << " : TRUE";
 			bdone = true;
 			continue;
 		}
@@ -2215,7 +2215,7 @@ void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter& e)
 //--------------------------------------------------------------
 void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter& e)
 {
-	//ofLogVerbose(__FUNCTION__);
+	//ofLogVerbose("ofxSurfingPresets")<<(__FUNCTION__);
 
 	bSyncRemote = true;
 	// update on next frame to reduce calls when multiple params changed.
@@ -2235,7 +2235,7 @@ void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter& e)
 //--------------------------------------------------------------
 void ofxSurfingPresets::setPathGlobal(std::string s) // Must call before setup or addGroup. disabled by default
 {
-	ofLogNotice(__FUNCTION__) << s;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << s;
 	path_Global = s;
 
 	ofxSurfingHelpers::CheckFolder(path_Global);
@@ -2243,7 +2243,7 @@ void ofxSurfingPresets::setPathGlobal(std::string s) // Must call before setup o
 //--------------------------------------------------------------
 void ofxSurfingPresets::setPathPresets(std::string s)
 {
-	ofLogNotice(__FUNCTION__) << s;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << s;
 	path_Presets = s;
 
 	ofxSurfingHelpers::CheckFolder(path_Presets);
@@ -2254,7 +2254,7 @@ void ofxSurfingPresets::setPathPresets(std::string s)
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRecallState()
 {
-	ofLogNotice(__FUNCTION__) << path_Global + path_filePreset + _ext;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << path_Global + path_filePreset + _ext;
 	ofxSurfingHelpers::loadGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	DONE_load = true;
@@ -2268,7 +2268,7 @@ void ofxSurfingPresets::doRecallState()
 //--------------------------------------------------------------
 void ofxSurfingPresets::doStoreState()
 {
-	ofLogNotice(__FUNCTION__) << path_Global + path_filePreset + _ext;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << path_Global + path_filePreset + _ext;
 	ofxSurfingHelpers::saveGroup(params_Preset, path_Global + path_filePreset + _ext);
 
 	bResetDefined = true;
@@ -2282,14 +2282,14 @@ void ofxSurfingPresets::doStoreState()
 //--------------------------------------------------------------
 void ofxSurfingPresets::doSaveCurrent()
 {
-	ofLogNotice(__FUNCTION__) << filePath;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << filePath;
 	save(filePath);
 }
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::load(int _index)
 {
-	ofLogNotice(__FUNCTION__) << _index;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << _index;
 
 	index = _index;
 }
@@ -2297,14 +2297,14 @@ void ofxSurfingPresets::load(int _index)
 //--------------------------------------------------------------
 void ofxSurfingPresets::load(std::string path)
 {
-	ofLogNotice(__FUNCTION__) << path;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << path;
 	ofxSurfingHelpers::loadGroup(params_Preset, path);
 
 	//-
 
 	// Callback
 	// MODE A. it's important if this line is before or after ofSerialize
-	ofLogVerbose(__FUNCTION__) << "DONE LOAD";
+	ofLogVerbose("ofxSurfingPresets") << (__FUNCTION__) << "DONE LOAD";
 	DONE_load = true;
 
 	// Simple callback
@@ -2314,14 +2314,14 @@ void ofxSurfingPresets::load(std::string path)
 //--------------------------------------------------------------
 void ofxSurfingPresets::save(std::string path)
 {
-	ofLogNotice(__FUNCTION__) << path;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << path;
 	ofxSurfingHelpers::saveGroup(params_Preset, path, false); // exclude debug
 
 	//-
 
 	// Callback
 	// MODE A. it's important if this line is before or after ofSerialize
-	ofLogVerbose(__FUNCTION__) << "DONE SAVE";
+	ofLogVerbose("ofxSurfingPresets") << (__FUNCTION__) << "DONE SAVE";
 	DONE_save = true;
 
 	// Simple callback
@@ -2339,7 +2339,7 @@ void ofxSurfingPresets::doNewPreset()
 	std::string ss = name_Root + "_" + s;
 	fileName = ss;
 	filePath = path_Presets + "/" + ss + _ext;
-	ofLogNotice(__FUNCTION__) << filePath;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << filePath;
 
 	ofxSurfingHelpers::saveGroup(params_Preset, filePath);
 
@@ -2349,7 +2349,7 @@ void ofxSurfingPresets::doNewPreset()
 	{
 		if (fileNames[i] == fileName)
 		{
-			ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
+			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
 			index = i;
 			continue;
 		}
@@ -2391,7 +2391,7 @@ void ofxSurfingPresets::doDeletePreset(int pos)
 	{
 		index = index.getMax(); // Go to last. name will be updated
 		ofFile::removeFile(filePath); // Remove last
-		ofLogNotice(__FUNCTION__) << "Remove last: " << filePath;
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "Remove last: " << filePath;
 
 		doRefreshFiles();
 
@@ -2407,7 +2407,7 @@ void ofxSurfingPresets::doDeletePreset(int pos)
 		std::string ss = name_Root + "_" + si;
 		fileName = ss;
 		filePath = path_Presets + "/" + ss + _ext;
-		ofLogNotice(__FUNCTION__) << "Remove: " << filePath;
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "Remove: " << filePath;
 		ofFile::removeFile(filePath);
 
 		//-
@@ -2436,7 +2436,7 @@ void ofxSurfingPresets::doDeletePreset(int pos)
 //--------------------------------------------------------------
 void ofxSurfingPresets::doPopulatePresets(int amount)
 {
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
 
 	doClearPresets(true);
 
@@ -2467,7 +2467,7 @@ void ofxSurfingPresets::doPopulatePresets(int amount)
 //--------------------------------------------------------------
 void ofxSurfingPresets::doPopulatePresetsRandomized()
 {
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
 
 	doClearPresets(true);
 
@@ -2494,7 +2494,7 @@ void ofxSurfingPresets::doPopulatePresetsRandomized()
 //--------------------------------------------------------------
 void ofxSurfingPresets::doClearPresets(bool createOne)
 {
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
 
 	// Remove all files
 	for (int i = 0; i < dir.size(); i++)
@@ -2521,7 +2521,7 @@ void ofxSurfingPresets::doClearPresets(bool createOne)
 //
 //	//fileName = ss;
 //	//filePath = path_Presets + "/" + fileName + _ext;
-//	//ofLogNotice(__FUNCTION__) << filePath;
+//	//ofLogNotice("ofxSurfingPresets")<<(__FUNCTION__) << filePath;
 //
 //	//ofxSurfingHelpers::saveGroup(params_Preset, filePath);
 //
@@ -2538,7 +2538,7 @@ void ofxSurfingPresets::doClearPresets(bool createOne)
 //
 //	//	if (fileNames[i] == _filename)
 //	//	{
-//	//		ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
+//	//		ofLogNotice("ofxSurfingPresets")<<(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
 //	//		index = i;
 //	//	}
 //	//}
@@ -2548,7 +2548,7 @@ void ofxSurfingPresets::doClearPresets(bool createOne)
 bool ofxSurfingPresets::doRefreshFiles()
 {
 	// Load dragged images folder
-	ofLogNotice(__FUNCTION__) << "list files " << path_Presets;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "list files " << path_Presets;
 
 	bool b = false;
 
@@ -2561,7 +2561,7 @@ bool ofxSurfingPresets::doRefreshFiles()
 	fileNames.clear();
 	for (int i = 0; i < dir.size(); i++)
 	{
-		ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
 
 		std::string _name = "NoName"; // without ext
 		auto _names = ofSplitString(dir.getName(i), ".");
@@ -2630,7 +2630,7 @@ bool ofxSurfingPresets::doRefreshFiles()
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRefreshFilesAndRename()
 {
-	ofLogNotice(__FUNCTION__) << "list files " << path_Presets;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "list files " << path_Presets;
 
 	// Dir
 	dir.listDir(path_Presets);
@@ -2642,14 +2642,14 @@ void ofxSurfingPresets::doRefreshFilesAndRename()
 	fileNames.clear();
 	for (int i = 0; i < dir.size(); i++)
 	{
-		ofLogNotice(__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
 
 		std::string si = ofToString(i);
 		if (i < 10) si = "0" + si;
 		std::string ss = name_Root + "_" + si;
 		fileName = ss;
 		filePath = path_Presets + "/" + ss + _ext;
-		ofLogNotice(__FUNCTION__) << "Remove: " << filePath;
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "Remove: " << filePath;
 
 		ofFile f;
 		f.open(dir[i].getAbsolutePath());
@@ -2674,7 +2674,7 @@ void ofxSurfingPresets::doRefreshFilesAndRename()
 //--------------------------------------------------------------
 void ofxSurfingPresets::setPath()
 {
-	ofLogNotice(__FUNCTION__) << "Set presets path";
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "Set presets path";
 
 	// Open the Open File Dialog
 	std::string str = "Select the presets kit path.\n";
@@ -2685,13 +2685,13 @@ void ofxSurfingPresets::setPath()
 	{
 		path_Presets = openFileResult.getPath();
 		path_Presets += "\\"; // windows
-		ofLogNotice(__FUNCTION__) << "User selected a path: " << path_Presets;
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "User selected a path: " << path_Presets;
 
 		doRefreshFiles();
 	}
 	else
 	{
-		ofLogNotice(__FUNCTION__) << "User hit cancel";
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "User hit cancel";
 	}
 }
 
@@ -2700,7 +2700,7 @@ void ofxSurfingPresets::doLoadPrevious()
 {
 	if (dir.size() == 0) return;
 
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
 	if (bCycled)
 	{
 		int i = index.get();
@@ -2718,7 +2718,7 @@ void ofxSurfingPresets::doLoadNext()
 {
 	if (dir.size() == 0) return;
 
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
 	if (bCycled)
 	{
 		int i = index.get();
@@ -2739,7 +2739,7 @@ void ofxSurfingPresets::doRandomizeIndex() {
 		i++;
 		i = i % index.getMax();
 	}
-	ofLogNotice(__FUNCTION__) << i;
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << i;
 	load(i);
 }
 
@@ -2749,7 +2749,7 @@ void ofxSurfingPresets::doRandomizeIndex() {
 //void ofxSurfingPresets::doSortParams(int i) {
 //	//TODO: this is a workaround to autopopulate presets on ofxSurfingPresets...
 //
-//	ofLogNotice(__FUNCTION__);
+//	ofLogNotice("ofxSurfingPresets")<<(__FUNCTION__);
 //
 //	for (int i = 0; i < params_Preset.size(); i++)
 //	{
@@ -2785,7 +2785,7 @@ void ofxSurfingPresets::doRandomizeIndex() {
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doRandomizeParams(bool bSilent) {
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
 
 	//TODO:
 	// this is not recursive inside the group content!
@@ -2801,7 +2801,7 @@ void ofxSurfingPresets::doRandomizeParams(bool bSilent) {
 			float v = ofRandom(pr.getMin(), pr.getMax());
 			if (bSilent) pr.setWithoutEventNotifications(v);
 			else pr.set(v);
-			ofLogNotice(__FUNCTION__) << pr.getName() << " = " << pr.get();
+			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << pr.getName() << " = " << pr.get();
 		}
 
 		else if (p.type() == typeid(ofParameter<int>).name())
@@ -2810,7 +2810,7 @@ void ofxSurfingPresets::doRandomizeParams(bool bSilent) {
 			int v = ofRandom(pr.getMin(), pr.getMax());
 			if (bSilent) pr.setWithoutEventNotifications(v);
 			else pr.set(v);
-			ofLogNotice(__FUNCTION__) << pr.getName() << " = " << pr.get();
+			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << pr.getName() << " = " << pr.get();
 		}
 
 		// include booleans
@@ -2820,7 +2820,7 @@ void ofxSurfingPresets::doRandomizeParams(bool bSilent) {
 			bool b = (ofRandom(1.f) >= 0.5f);
 			if (bSilent) pr.setWithoutEventNotifications(b);
 			else pr.set(b);
-			ofLogNotice(__FUNCTION__) << pr.getName() << " = " << pr.get();
+			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << pr.getName() << " = " << pr.get();
 		}
 	}
 
@@ -2838,7 +2838,7 @@ void ofxSurfingPresets::doRandomizeParams(bool bSilent) {
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doResetParams(bool bSilent) {
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
 
 	for (int i = 0; i < params_Preset.size(); i++)
 	{
@@ -2849,7 +2849,7 @@ void ofxSurfingPresets::doResetParams(bool bSilent) {
 			ofParameter<float> pr = p.cast<float>();
 			if (bSilent) pr.setWithoutEventNotifications(pr.getMin());
 			else pr.set(pr.getMin());
-			ofLogNotice(__FUNCTION__) << pr.getName() << " = " << pr.get();
+			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << pr.getName() << " = " << pr.get();
 
 		}
 
@@ -2858,7 +2858,7 @@ void ofxSurfingPresets::doResetParams(bool bSilent) {
 			ofParameter<int> pr = p.cast<int>();
 			if (bSilent) pr.setWithoutEventNotifications(pr.getMin());
 			else pr.set(pr.getMin());
-			ofLogNotice(__FUNCTION__) << pr.getName() << " = " << pr.get();
+			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << pr.getName() << " = " << pr.get();
 		}
 
 		// include booleans
@@ -2868,7 +2868,7 @@ void ofxSurfingPresets::doResetParams(bool bSilent) {
 			bool b = false;
 			if (bSilent) pr.setWithoutEventNotifications(b);
 			else pr.set(b);
-			ofLogNotice(__FUNCTION__) << pr.getName() << " = " << pr.get();
+			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << pr.getName() << " = " << pr.get();
 		}
 	}
 
