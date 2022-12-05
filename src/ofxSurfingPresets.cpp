@@ -1225,33 +1225,36 @@ void ofxSurfingPresets::draw_ImGui_Main()
 			// Keys
 			if (!bMinimize) ui.Add(bKeys, OFX_IM_TOGGLE_BUTTON_ROUNDED);
 
-			//ui.AddSpacing();
-			ui.AddSpacingSeparated();
+			if (!bMinimize) ui.AddSpacingSeparated();
 
-			bool b = true;
-			if (bMinimize) {
-				b = ui.BeginTree("Panels");
-			}
-
-			if (b)
-			{
-				// Editor
-				ui.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			// Editor
+			if (!bMinimize) ui.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
 
-#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-				// Player
-				if (!bGui_Editor)
-					if (!bDisablePlayer)
-					{
-						ui.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-					}
-#endif
-			}
-
-			if (bMinimize) {
-				if (b) ui.EndTree();
-			}
+//			bool b = true;
+//			if (bMinimize) {
+//				b = ui.BeginTree("Panels");
+//			}
+//
+//			if (b)
+//			{
+//				// Editor
+//				ui.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+//
+//
+//#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+//				// Player
+//				if (!bGui_Editor)
+//					if (!bDisablePlayer)
+//					{
+//						ui.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+//					}
+//#endif
+//			}
+//
+//			if (bMinimize) {
+//				if (b) ui.EndTree();
+//			}
 
 			//----
 
