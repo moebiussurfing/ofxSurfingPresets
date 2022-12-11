@@ -247,6 +247,21 @@ void ofxSurfingPresets::setup()
 
 	//--
 
+	//TODO:
+	// matrix colors
+	colors.clear();
+	for (size_t i = 0; i < 9; i++)
+	{
+		ofColor c;
+		if (i < 3) c = ofColor::green;
+		else if (i < 6) c = ofColor::yellow;
+		else if (i < 10) c = ofColor::red;
+
+		colors.push_back(c);
+	}
+
+	//--
+
 	// Gui
 	setupGui();
 
@@ -1231,32 +1246,32 @@ void ofxSurfingPresets::draw_ImGui_Main()
 			if (!bMinimize) ui.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
 
 
-//			bool b = true;
-//			if (bMinimize) {
-//				b = ui.BeginTree("Panels");
-//			}
-//
-//			if (b)
-//			{
-//				// Editor
-//				ui.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-//
-//
-//#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
-//				// Player
-//				if (!bGui_Editor)
-//					if (!bDisablePlayer)
-//					{
-//						ui.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
-//					}
-//#endif
-//			}
-//
-//			if (bMinimize) {
-//				if (b) ui.EndTree();
-//			}
+			//			bool b = true;
+			//			if (bMinimize) {
+			//				b = ui.BeginTree("Panels");
+			//			}
+			//
+			//			if (b)
+			//			{
+			//				// Editor
+			//				ui.Add(bGui_Editor, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			//
+			//
+			//#ifdef USE__OFX_SURFING_PRESETS__OFX_SURFING_PLAYER 
+			//				// Player
+			//				if (!bGui_Editor)
+			//					if (!bDisablePlayer)
+			//					{
+			//						ui.Add(playerSurfer.bGui, OFX_IM_TOGGLE_BUTTON_ROUNDED_MEDIUM);
+			//					}
+			//#endif
+			//			}
+			//
+			//			if (bMinimize) {
+			//				if (b) ui.EndTree();
+			//			}
 
-			//----
+						//----
 
 			ui.AddSpacingSeparated();
 
@@ -1276,7 +1291,11 @@ void ofxSurfingPresets::draw_ImGui_Main()
 				string toolTip = "";
 				if (bKeyCtrl) toolTip = "Copy To";
 				else if (bKeyAlt) toolTip = "Swap With";
-				ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2, toolTip, bFlip);
+
+				if (bUseColorizedMatrices)
+					ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, colors, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2, toolTip, bFlip);
+				else
+					ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2, toolTip, bFlip);
 
 				//TODO:
 				// using Ptr
@@ -1330,8 +1349,8 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 						// Bang
 						ui.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
-					}
-				}
+		}
+	}
 			}
 #endif
 			//--
@@ -1347,7 +1366,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 				// History
 				undoManager.drawImGuiWidgetsHistoryInfo(true);
-			}
+}
 #endif
 			//--
 
@@ -1485,7 +1504,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 
 				ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
 					_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
-			}
+	}
 #endif
 
 			if (!ui.bMinimize && !bMinimal)
@@ -1499,7 +1518,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 
 				if (!bEditMode.get()) ui.Add(bSave, OFX_IM_BUTTON);
 			}
-		}
+}
 	}
 
 	if (bHeader && b) ImGui::TreePop();
@@ -1777,7 +1796,7 @@ void ofxSurfingPresets::draw_ImGui()
 			//--
 
 			//playerSurfer.draw();
-		}
+}
 	}
 #endif
 
@@ -1852,7 +1871,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 		if (!bDisablePlayer)
 		{
 			playerSurfer.setPlayToggle();
-		}
+}
 		return;
 	}
 
@@ -1992,7 +2011,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 	// Exclude debugs
 	//if (name != "exclude" && name != "exclude")
 	{
-		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << name << " : " << e;
+		ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << " " << name << " : " << e;
 	}
 
 	//--
@@ -2034,7 +2053,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 						filePath = getFilepathForIndexPreset(index_PRE);
 						save(filePath);
 					}
-					else { ofLogError(__FUNCTION__) << "Preset Index points an out of range file!"; }
+					else { ofLogError("ofxSurfingPresets") << "Preset Index points an out of range file!"; }
 				}
 
 				index_PRE = index;
@@ -2059,7 +2078,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 				}
 				else
 				{
-					ofLogError(__FUNCTION__) << "File out of range";
+					ofLogError("ofxSurfingPresets") << "File out of range";
 				}
 			}
 
@@ -2082,7 +2101,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 				ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "PRESET COPY!";
 
 				index_PRE = index;
-			}
+		}
 
 			//--
 
@@ -2116,7 +2135,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 
 				index_PRE = index;
 			}
-		}
+	}
 
 		//--
 
@@ -2126,7 +2145,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 		{
 			bIsRetrigged = true;
 		}
-	}
+}
 
 	//--
 
@@ -2380,7 +2399,7 @@ void ofxSurfingPresets::doNewPreset()
 #endif
 
 		//doRecreateMidi();
-	}
+}
 #endif
 }
 

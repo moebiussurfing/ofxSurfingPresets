@@ -426,6 +426,9 @@ private:
 
 	// These methods allows to customize key commands assignments to trig the presets selector.
 
+	//TODO:
+	// Could add mode without triggers and using just numbers
+
 private:
 
 #define NUM_KEY_COMMANDS 36
@@ -445,9 +448,25 @@ private:
 	int keyFirstPos = -1;
 	char keyFirstChar = '0';
 	vector<char> keyCommandsChars;
+	vector<ofColor> colors;
+	bool bUseColorizedMatrices = false;
+public:
+	void setColorized(bool b) { bUseColorizedMatrices = b; }
+	bool isColorized() { return bUseColorizedMatrices; }
+	ofColor getColor() {
+		return getColorIndex(index.get());
+	}
+	ofColor getColorIndex(int i) {
+		if (i > colors.size() - 1) return ofColor();//error
+		else {
+			ofColor _c;
+			if (bFlip)_c = colors[colors.size() - i - 1];
+			else _c = colors[i];
+			return _c;
+		}
+	}
 
-	//TODO:
-	// add mode without triggers and using just numbers
+private:
 
 	bool bFlip = false;
 
@@ -854,7 +873,7 @@ private:
 	ofParameter<bool> bKeysArrows;
 
 	// Floating Clicker Layout
-	ofParameter<int> amountButtonsPerRowClicker{ "ButtsRow", -1, 1, 1 };
+	ofParameter<int> amountButtonsPerRowClicker{ "Amount", -1, 1, 1 };
 	ofParameter<bool> bResponsiveButtonsClicker{ "Responsive", true };
 	ofParameter<bool> bExtra_Main{ "Extra", false };
 	ofParameter<bool> bAutoResize_Clicker{ "Auto Resize ", true };
