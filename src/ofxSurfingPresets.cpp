@@ -57,8 +57,11 @@ ofxSurfingPresets::~ofxSurfingPresets()
 	exit();
 }
 
+//----
+
 //TODO:
 #ifdef USE_TOGGLE_TRIGGERS
+
 //--------------------------------------------------------------
 void ofxSurfingPresets::refreshToggleNotes()
 {
@@ -68,15 +71,21 @@ void ofxSurfingPresets::refreshToggleNotes()
 
 	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
 	{
+		if (i > notesIndex.size() - 1) break;
+
 		notesIndex[i].set(false);
 	}
 	if (index <= index.getMax() && index < notesIndex.size())
-		notesIndex[index].set(true);
+	{
+		if (index <= notesIndex.size() - 1)
+			notesIndex[index].set(true);
+	}
 
 #ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 	bSyncRemote = true;
 #endif
 }
+
 #endif
 
 //--------------------------------------------------------------
@@ -418,22 +427,7 @@ void ofxSurfingPresets::startup()
 		// Prepare. Exclusive for index selector
 
 #ifdef USE_TOGGLE_TRIGGERS
-
-		notesIndex.clear();
-		params_PresetToggles.clear();
-
-		for (int i = 0; i <= index.getMax(); i++)
-		{
-			std::string n = "Preset ";
-			//n += ofToString(i < 10 ? "0" : "");
-			n += ofToString(i);
-
-			ofParameter<bool> b{ n, false };
-			notesIndex.push_back(b);
-			params_PresetToggles.add(b);
-		}
-
-		ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+		doBuildMidiNotes();
 #endif
 
 		//--
@@ -534,7 +528,7 @@ void ofxSurfingPresets::startup()
 
 		//ui.getWindowsSpecialsGuiToggle().set(false);
 		//ui.getWindowsAlignHelpersGuiToggle().set(false);
-	}
+		}
 
 	//--
 
@@ -584,7 +578,7 @@ void ofxSurfingPresets::startup()
 	//index = 0;
 
 	buildHelp();
-}
+	}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::update(ofEventArgs& args)
@@ -1060,7 +1054,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 						ImGui::TreePop();
 					}
-				}
+					}
 
 				//-
 
@@ -1192,11 +1186,11 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 				ui.EndWindowSpecial();
 				//ui.EndWindowSpecial(bGui_Editor);
+				}
 			}
-		}
 		//if (bGui_Editor) ImGui::PopID();
+		}
 	}
-}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_Main()
@@ -1349,8 +1343,8 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 						// Bang
 						ui.Add(playerSurfer.bPlayerBeatBang, OFX_IM_BUTTON);
-		}
-	}
+					}
+				}
 			}
 #endif
 			//--
@@ -1366,7 +1360,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 				// History
 				undoManager.drawImGuiWidgetsHistoryInfo(true);
-}
+			}
 #endif
 			//--
 
@@ -1385,7 +1379,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 				// Extra
 				ui.Add(bExtra_Main, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-			}
+				}
 
 			//--
 
@@ -1426,7 +1420,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 						}
 					}
 					ui.Unindent();
-				}
+			}
 
 			// Help
 			if (!bMinimize) {
@@ -1504,7 +1498,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 
 				ofxImGuiSurfing::AddBigToggleNamed(playerSurfer.bPlay,
 					_w1, _r * _h, "PLAYING", "PLAY", true, playerSurfer.getPlayerProgress());
-	}
+			}
 #endif
 
 			if (!ui.bMinimize && !bMinimal)
@@ -1518,11 +1512,11 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 
 				if (!bEditMode.get()) ui.Add(bSave, OFX_IM_BUTTON);
 			}
-}
+		}
 	}
 
 	if (bHeader && b) ImGui::TreePop();
-}
+			}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
@@ -1796,7 +1790,7 @@ void ofxSurfingPresets::draw_ImGui()
 			//--
 
 			//playerSurfer.draw();
-}
+		}
 	}
 #endif
 
@@ -1871,7 +1865,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 		if (!bDisablePlayer)
 		{
 			playerSurfer.setPlayToggle();
-}
+		}
 		return;
 	}
 
@@ -1891,7 +1885,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 	else if (key == 'S') {
 		doStoreState();
 		return;
-	}
+}
 	else if (key == 'R') {
 		doRecallState();
 		return;
@@ -1908,7 +1902,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 				return;
 			}
 		}
-}
+		}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::keyReleased(ofKeyEventArgs& eventArgs)
@@ -2101,7 +2095,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 				ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "PRESET COPY!";
 
 				index_PRE = index;
-		}
+			}
 
 			//--
 
@@ -2135,7 +2129,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 
 				index_PRE = index;
 			}
-	}
+		}
 
 		//--
 
@@ -2145,7 +2139,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 		{
 			bIsRetrigged = true;
 		}
-}
+	}
 
 	//--
 
@@ -2197,57 +2191,6 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 //		}
 }
 
-#ifdef USE_TOGGLE_TRIGGERS
-//--------------------------------------------------------------
-void ofxSurfingPresets::Changed_Params_PresetToggles(ofAbstractParameter& e)
-{
-	if (bDISABLE_CALLBACKS) return;
-
-	std::string name = e.getName();
-
-	bool bdone = false;
-
-	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
-	{
-		// true
-		if (notesIndex[i].get() && name == notesIndex[i].getName())
-		{
-			index = i;
-			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << name << " : TRUE";
-			bdone = true;
-			continue;
-		}
-	}
-	if (!bdone) return; // Not any detected note true
-
-	//-
-
-	// Make exclusive. All others to false
-	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
-	{
-		if (i != index && notesIndex[i].get())
-		{
-			notesIndex[i] = false;
-		}
-	}
-}
-#endif
-
-#ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
-//--------------------------------------------------------------
-void ofxSurfingPresets::Changed_Params_Preset(ofAbstractParameter& e)
-{
-	//ofLogVerbose("ofxSurfingPresets")<<(__FUNCTION__);
-
-	bSyncRemote = true;
-	// update on next frame to reduce calls when multiple params changed.
-
-	//// Note that if you use the GUI the client does not update automatically. If you want the client to update
-	//// you will need to call paramServer.syncParameters() whenever a parameter does change.
-	//remoteServer.syncParameters();
-}
-#endif
-
 ////--------------------------------------------------------------
 //void ofxSurfingPresets::setKey_MODE_App(int k)
 //{
@@ -2262,6 +2205,7 @@ void ofxSurfingPresets::setPathGlobal(std::string s) // Must call before setup o
 
 	ofxSurfingHelpers::CheckFolder(path_Global);
 }
+
 //--------------------------------------------------------------
 void ofxSurfingPresets::setPathPresets(std::string s)
 {
@@ -2373,33 +2317,37 @@ void ofxSurfingPresets::doNewPreset()
 		{
 			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "file " << "[" << ofToString(i) << "] " << dir.getName(i);
 			index = i;
+
 			continue;
 		}
 	}
 
-	//-
+	//--
 
 	//TODO:
 	// Must fix!
 	// Should be a method 
-	// Autocreate notes for each index preset
+	// Auto create notes for each index preset
 #ifdef USE_TOGGLE_TRIGGERS
 	int diff = index.getMax() - (notesIndex.size() - 1);
 	if (diff <= 0) return;//trick?
 
-	for (int i = 0; i < diff; i++) {
+	for (int i = 0; i < diff; i++)
+	{
 		std::string n = "Preset ";
 		n += ofToString(notesIndex.size() + i);
 		ofParameter<bool> b{ n, false };
 		notesIndex.push_back(b);
 		params_PresetToggles.add(b);
 
+		//-
+
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		surfingMIDI.add(b);
 #endif
 
 		//doRecreateMidi();
-}
+	}
 #endif
 }
 
@@ -2613,7 +2561,7 @@ bool ofxSurfingPresets::doRefreshFiles()
 
 	return b;
 
-	//-
+	//--
 
 #ifdef USE_TOGGLE_TRIGGERS
 
@@ -2892,7 +2840,7 @@ void ofxSurfingPresets::doResetParams(bool bSilent) {
 			else pr.set(b);
 			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << pr.getName() << " = " << pr.get();
 		}
-	}
+}
 
 	//if (!bSilent) bIsRetrigged = true;
 }

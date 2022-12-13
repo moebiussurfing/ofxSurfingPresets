@@ -190,6 +190,9 @@ public:
 
 	//--
 
+	// Force to allow using by external midi manager!
+#define USE_TOGGLE_TRIGGERS
+
 //#ifdef USE__OFX_SURFING_PRESET__MIDI__
 #if defined(USE__OFX_SURFING_PRESET__MIDI__) || defined(USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER) || defined(USE__OFX_SURFING_PRESETS__INDEX_SELECTOR_TOGGLES)
 #define USE_TOGGLE_TRIGGERS
@@ -201,39 +204,102 @@ public:
 
 	vector<ofParameter<bool>> notesIndex;
 	ofParameterGroup params_PresetToggles{ "Presets" };
-	void Changed_Params_PresetToggles(ofAbstractParameter& e);
+	//void Changed_Params_PresetToggles(ofAbstractParameter& e);
 	void refreshToggleNotes();
 	bool bSyncRemote;
 
 	//TODO:
-	//--------------------------------------------------------------
 	// To select index preset using bool toggle parameters triggers!
-	ofParameterGroup& getParametersSelectorToggles() {
-
-		//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-		//	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-		//notesIndex.clear();
-		//params_PresetToggles.clear();
-		//for (int i = 0; i <= index.getMax(); i++)
-		//{
-		//	std::string n = "Preset ";
-		//	//n += ofToString(i < 10 ? "0" : "");
-		//	n += ofToString(i);
-		//
-		//	ofParameter<bool> b{ n, false };
-		//	notesIndex.push_back(b);
-		//	params_PresetToggles.add(b);
-		//}
-		//ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-		//
-		//	surfingMIDI.clear();
-		//	surfingMIDI.add(params_Preset); // -> to control preset params
-		//	surfingMIDI.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
-		//#endif
+	//--------------------------------------------------------------
+	ofParameterGroup& getParametersSelectorToggles()
+	{
+		//doBuildMidiNotes();
 
 		return params_PresetToggles;
 	}
 
+	//--------------------------------------------------------------
+	void doBuildMidiNotes()
+	{
+		notesIndex.clear();
+		params_PresetToggles.clear();
+
+		for (int i = 0; i <= index.getMax(); i++)
+		{
+			std::string n = "Preset ";
+			//n += ofToString(i < 10 ? "0" : "");
+			n += ofToString(i);
+
+			ofParameter<bool> b{ n, false };
+			notesIndex.push_back(b);
+			params_PresetToggles.add(b);
+		}
+
+		ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+
+		ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+
+		//--
+
+		//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+		//	surfingMIDI.clear();
+		//	surfingMIDI.add(params_Preset); // -> to control preset params
+		//	surfingMIDI.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
+		//#endif
+	}
+
+	//--------------------------------------------------------------
+	void Changed_Params_PresetToggles(ofAbstractParameter& e)
+	{
+		if (bDISABLE_CALLBACKS) return;
+
+		std::string name = e.getName();
+
+		bool bdone = false;
+
+		for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
+		{
+			//if (i >= notesIndex.size()) break;
+
+			// true
+			if (notesIndex[i].get() && name == notesIndex[i].getName())
+			{
+				index = i;
+				ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << " " << name << " : TRUE";
+				bdone = true;
+
+				continue;
+			}
+		}
+		if (!bdone) return; // Not any detected note true
+
+		//-
+
+		// Make exclusive. All others to false
+		for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
+		{
+			if (i != index && notesIndex[i].get())
+			{
+				notesIndex[i] = false;
+			}
+		}
+	}
+
+#endif
+
+#ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+	//--------------------------------------------------------------
+	void Changed_Params_Preset(ofAbstractParameter& e)
+	{
+		//ofLogVerbose("ofxSurfingPresets")<<(__FUNCTION__);
+
+		bSyncRemote = true;
+		// update on next frame to reduce calls when multiple params changed.
+
+		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
+		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
+		//remoteServer.syncParameters();
+}
 #endif
 
 	//----
