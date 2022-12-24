@@ -148,6 +148,8 @@ public:
 	void draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal = false, bool bShowMinimize = true, bool bExtras = true); // inner clicker to fast integrate clicker to an external ImGui panel windows.
 	void draw_ImGui_ClickerSimple();//forced simple clicker!
 
+	void draw_ImGui_GameMode(); // final user selected / most important controls!
+
 	//--
 
 private:
@@ -985,7 +987,7 @@ public:
 	}
 
 	//--------------------------------------------------------------
-	void setName(std::string s)// Customize global name to avoid collide with other preset manager instances
+	void setName(std::string s)// Customize global name to avoid window name collide with other preset manager instances
 	{
 		//if (s == "-1") s = "PRESETS EDITOR";
 		//else

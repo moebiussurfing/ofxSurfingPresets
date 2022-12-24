@@ -528,7 +528,7 @@ void ofxSurfingPresets::startup()
 
 		//ui.getWindowsSpecialsGuiToggle().set(false);
 		//ui.getWindowsAlignHelpersGuiToggle().set(false);
-		}
+	}
 
 	//--
 
@@ -578,7 +578,7 @@ void ofxSurfingPresets::startup()
 	//index = 0;
 
 	buildHelp();
-	}
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::update(ofEventArgs& args)
@@ -1054,7 +1054,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 						ImGui::TreePop();
 					}
-					}
+				}
 
 				//-
 
@@ -1186,11 +1186,11 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 				ui.EndWindowSpecial();
 				//ui.EndWindowSpecial(bGui_Editor);
-				}
 			}
-		//if (bGui_Editor) ImGui::PopID();
 		}
+		//if (bGui_Editor) ImGui::PopID();
 	}
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_Main()
@@ -1379,7 +1379,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 
 				// Extra
 				ui.Add(bExtra_Main, OFX_IM_TOGGLE_BUTTON_ROUNDED);
-				}
+			}
 
 			//--
 
@@ -1420,7 +1420,7 @@ void ofxSurfingPresets::draw_ImGui_Main()
 						}
 					}
 					ui.Unindent();
-			}
+				}
 
 			// Help
 			if (!bMinimize) {
@@ -1443,7 +1443,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple()
 }
 
 /*
-//snippet
+// Snippet
 bool bHeader = true;
 bool bMinimal = true;
 bool bShowMinimize = true;
@@ -1516,7 +1516,7 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 	}
 
 	if (bHeader && b) ImGui::TreePop();
-			}
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::draw_ImGui_ClickerMinimal()
@@ -1797,6 +1797,32 @@ void ofxSurfingPresets::draw_ImGui()
 	//--
 }
 
+//--
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::draw_ImGui_GameMode()
+{
+	//if (ui.bGui_GameMode)
+	{
+		//if (ui.BeginWindow(ui.bGui_GameMode))
+		{
+			// Snippet
+			bool bHeader = true;
+			bool bMinimal = true;
+			bool bShowMinimize = true;
+			bool bNoExtras = false;
+
+			draw_ImGui_ClickerSimple(bHeader, bMinimal, bShowMinimize, bNoExtras);
+
+			//--
+
+			//ui.EndWindow();
+		}
+	}
+}
+
+//--
+
 //--------------------------------------------------------------
 void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 {
@@ -1885,7 +1911,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 	else if (key == 'S') {
 		doStoreState();
 		return;
-}
+	}
 	else if (key == 'R') {
 		doRecallState();
 		return;
@@ -1902,7 +1928,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 				return;
 			}
 		}
-		}
+}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::keyReleased(ofKeyEventArgs& eventArgs)
@@ -2069,12 +2095,12 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 //#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					refreshToggleNotes();
 #endif
-				}
+			}
 				else
 				{
 					ofLogError("ofxSurfingPresets") << "File out of range";
 				}
-			}
+		}
 
 			//--
 
@@ -2095,7 +2121,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 				ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "PRESET COPY!";
 
 				index_PRE = index;
-			}
+	}
 
 			//--
 
@@ -2129,7 +2155,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 
 				index_PRE = index;
 			}
-		}
+}
 
 		//--
 
@@ -2804,7 +2830,7 @@ void ofxSurfingPresets::doRandomizeParams(bool bSilent) {
 	//--
 
 	//if (!bSilent) bIsRetrigged = true;
-}
+		}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doResetParams(bool bSilent) {
@@ -2840,7 +2866,7 @@ void ofxSurfingPresets::doResetParams(bool bSilent) {
 			else pr.set(b);
 			ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << pr.getName() << " = " << pr.get();
 		}
-}
+	}
 
 	//if (!bSilent) bIsRetrigged = true;
 }
