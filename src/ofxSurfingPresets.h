@@ -143,6 +143,9 @@ public:
 
 	// Minimal
 	void draw_ImGui_ClickerMinimal();
+	
+	// Super Minimal
+	void draw_ImGui_ClickerMatrix();
 
 	// Clicker Simple (Inner)
 	void draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal = false, bool bShowMinimize = true, bool bExtras = true); // inner clicker to fast integrate clicker to an external ImGui panel windows.

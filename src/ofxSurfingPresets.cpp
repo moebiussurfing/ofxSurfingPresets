@@ -1484,6 +1484,8 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 
 		ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClickerSimple, amountButtonsPerRowClickerMini, true, _hm);
 
+		//--
+
 		ui.AddSpacing();
 
 		if (!bNoExtras)
@@ -1516,6 +1518,42 @@ void ofxSurfingPresets::draw_ImGui_ClickerSimple(bool bHeader, bool bMinimal, bo
 	}
 
 	if (bHeader && b) ImGui::TreePop();
+}
+
+//--------------------------------------------------------------
+void ofxSurfingPresets::draw_ImGui_ClickerMatrix()
+{
+	//--
+
+	////bool b = true;
+	////bool b = ui.bMinimize;
+
+	//float _hm = ui.getWidgetsHeightUnit();
+	////_hm *= b ? 1.2f : 1.5f;
+
+	//ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClickerSimple, amountButtonsPerRowClickerMini, true, _hm);
+
+	//--
+
+	// Clicker Matrix
+	{
+		float _h2 = ui.getWidgetsHeightUnit();
+
+		string toolTip = "";
+		if (bKeyCtrl) toolTip = "Copy To";
+		else if (bKeyAlt) toolTip = "Swap With";
+
+		if (bUseColorizedMatrices)
+			ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, colors, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2, toolTip, bFlip);
+		else
+			ofxImGuiSurfing::AddMatrixClickerLabels(index, keyCommandsChars, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2, toolTip, bFlip);
+
+		//TODO:
+		// using Ptr
+		//ofxImGuiSurfing::AddMatrixClickerLabels(index, (char *) keyCommandsChars, bResponsiveButtonsClicker, amountButtonsPerRowClicker, true, _h2);
+	}
+
+	//--
 }
 
 //--------------------------------------------------------------
@@ -1790,8 +1828,8 @@ void ofxSurfingPresets::draw_ImGui()
 			//--
 
 			//playerSurfer.draw();
-		}
-	}
+}
+}
 #endif
 
 	//--
@@ -1806,13 +1844,17 @@ void ofxSurfingPresets::draw_ImGui_GameMode()
 	{
 		//if (ui.BeginWindow(ui.bGui_GameMode))
 		{
-			// Snippet
-			bool bHeader = true;
-			bool bMinimal = true;
-			bool bShowMinimize = true;
-			bool bNoExtras = false;
+			//// Snippet
+			//bool bHeader = true;
+			//bool bMinimal = true;
+			//bool bShowMinimize = true;
+			//bool bNoExtras = true;
 
-			draw_ImGui_ClickerSimple(bHeader, bMinimal, bShowMinimize, bNoExtras);
+			//draw_ImGui_ClickerSimple(bHeader, bMinimal, bShowMinimize, bNoExtras);
+
+			//draw_ImGui_ClickerMinimal();
+			
+			draw_ImGui_ClickerMatrix();
 
 			//--
 
@@ -1891,7 +1933,7 @@ void ofxSurfingPresets::keyPressed(ofKeyEventArgs& eventArgs)
 		if (!bDisablePlayer)
 		{
 			playerSurfer.setPlayToggle();
-		}
+}
 		return;
 	}
 
@@ -2095,12 +2137,12 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 //#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 					refreshToggleNotes();
 #endif
-			}
+				}
 				else
 				{
 					ofLogError("ofxSurfingPresets") << "File out of range";
 				}
-		}
+			}
 
 			//--
 
@@ -2121,7 +2163,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 				ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "PRESET COPY!";
 
 				index_PRE = index;
-	}
+		}
 
 			//--
 
@@ -2155,7 +2197,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 
 				index_PRE = index;
 			}
-}
+	}
 
 		//--
 
@@ -2165,7 +2207,7 @@ void ofxSurfingPresets::Changed_Control(ofAbstractParameter& e)
 		{
 			bIsRetrigged = true;
 		}
-	}
+}
 
 	//--
 
@@ -2830,7 +2872,7 @@ void ofxSurfingPresets::doRandomizeParams(bool bSilent) {
 	//--
 
 	//if (!bSilent) bIsRetrigged = true;
-		}
+	}
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::doResetParams(bool bSilent) {
