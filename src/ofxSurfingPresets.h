@@ -143,7 +143,7 @@ public:
 
 	// Minimal
 	void draw_ImGui_ClickerMinimal();
-	
+
 	// Super Minimal
 	void draw_ImGui_ClickerMatrix();
 
@@ -196,6 +196,7 @@ public:
 	//--
 
 	// Force to allow using by external midi manager!
+
 #define USE_TOGGLE_TRIGGERS
 
 //#ifdef USE__OFX_SURFING_PRESET__MIDI__
@@ -205,13 +206,15 @@ public:
 
 #ifdef USE_TOGGLE_TRIGGERS
 
-public:
+private:
 
 	vector<ofParameter<bool>> notesIndex;
 	ofParameterGroup params_PresetToggles{ "Presets" };
 	//void Changed_Params_PresetToggles(ofAbstractParameter& e);
 	void refreshToggleNotes();
 	bool bSyncRemote;
+
+public:
 
 	//TODO:
 	// To select index preset using bool toggle parameters triggers!
@@ -228,11 +231,15 @@ public:
 	{
 		notesIndex.clear();
 		params_PresetToggles.clear();
-
+		params_PresetToggles.setName(bGui.getName());
 		for (int i = 0; i <= index.getMax(); i++)
 		{
-			std::string n = "Preset ";
+			std::string n = bGui.getName();
+			//std::string n = "P";
+			//std::string n = "Preset ";
 			//n += ofToString(i < 10 ? "0" : "");
+			
+			n += "_";
 			n += ofToString(i);
 
 			ofParameter<bool> b{ n, false };
@@ -249,9 +256,11 @@ public:
 		//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
 		//	surfingMIDI.clear();
 		//	surfingMIDI.add(params_Preset); // -> to control preset params
-		//	surfingMIDI.add(params_PresetToggles); // -> to select index prest by note/toggle and exclusive
+		//	surfingMIDI.add(params_PresetToggles); // -> to select index preset by note/toggle and exclusive
 		//#endif
 	}
+
+private:
 
 	//--------------------------------------------------------------
 	void Changed_Params_PresetToggles(ofAbstractParameter& e)
@@ -292,6 +301,8 @@ public:
 
 #endif
 
+	//--
+
 #ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
 	//--------------------------------------------------------------
 	void Changed_Params_Preset(ofAbstractParameter& e)
@@ -304,7 +315,7 @@ public:
 		//// Note that if you use the GUI the client does not update automatically. If you want the client to update
 		//// you will need to call paramServer.syncParameters() whenever a parameter does change.
 		//remoteServer.syncParameters();
-}
+	}
 #endif
 
 	//----
@@ -986,11 +997,15 @@ public:
 		playerSurfer.bPlay = b;
 		return;
 #endif
-		ofLogWarning(__FUNCTION__) << "Player module is disabled!";
+		ofLogWarning("ofxSurfingPresets") << " " << (__FUNCTION__) << "Player module is disabled!";
 	}
 
+	//--
+
+	// Customize global name to avoid window name collide with other preset manager instances
+	// Must be called after addGroup or Setup!
 	//--------------------------------------------------------------
-	void setName(std::string s)// Customize global name to avoid window name collide with other preset manager instances
+	void setName(std::string s)
 	{
 		//if (s == "-1") s = "PRESETS EDITOR";
 		//else
