@@ -59,34 +59,34 @@ ofxSurfingPresets::~ofxSurfingPresets()
 
 //----
 
-//TODO:
-#ifdef USE_TOGGLE_TRIGGERS
-
-//--------------------------------------------------------------
-void ofxSurfingPresets::refreshToggleNotes()
-{
-	if (bDISABLE_CALLBACKS) return;
-
-	// Sets to true the respective toggle for current index and set to false for the others.
-
-	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
-	{
-		if (i > notesIndex.size() - 1) break;
-
-		notesIndex[i].set(false);
-	}
-	if (index <= index.getMax() && index < notesIndex.size())
-	{
-		if (index <= notesIndex.size() - 1)
-			notesIndex[index].set(true);
-	}
-
-#ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
-	bSyncRemote = true;
-#endif
-}
-
-#endif
+////TODO:
+//#ifdef USE_TOGGLE_TRIGGERS
+//
+////--------------------------------------------------------------
+//void ofxSurfingPresets::refreshToggleNotes()
+//{
+//	if (bDISABLE_CALLBACKS) return;
+//
+//	// Sets to true the respective toggle for current index and set to false for the others.
+//
+//	for (int i = 0; i <= index.getMax() && i < notesIndex.size(); i++)
+//	{
+//		if (i > notesIndex.size() - 1) break;
+//
+//		notesIndex[i].set(false);
+//	}
+//	if (index <= index.getMax() && index < notesIndex.size())
+//	{
+//		if (index <= notesIndex.size() - 1)
+//			notesIndex[index].set(true);
+//	}
+//
+//#ifdef USE__OFX_SURFING_CONTROL__OFX_REMOTE_PARAMETERS__SERVER
+//	bSyncRemote = true;
+//#endif
+//}
+//
+//#endif
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::setup()
@@ -426,9 +426,10 @@ void ofxSurfingPresets::startup()
 		// Toggles 
 		// Prepare. Exclusive for index selector
 
-#ifdef USE_TOGGLE_TRIGGERS
-		doBuildMidiNotes();
-#endif
+//#ifdef USE_TOGGLE_TRIGGERS
+//		doBuildMidiNotes();
+//#endif
+		toggles_Target.setup(index);
 
 		//--
 
@@ -2396,27 +2397,28 @@ void ofxSurfingPresets::doNewPreset()
 	// Must fix!
 	// Should be a method 
 	// Auto create notes for each index preset
-#ifdef USE_TOGGLE_TRIGGERS
-	int diff = index.getMax() - (notesIndex.size() - 1);
-	if (diff <= 0) return;//trick?
-
-	for (int i = 0; i < diff; i++)
-	{
-		std::string n = "Preset ";
-		n += ofToString(notesIndex.size() + i);
-		ofParameter<bool> b{ n, false };
-		notesIndex.push_back(b);
-		params_PresetToggles.add(b);
-
-		//-
-
-#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-		surfingMIDI.add(b);
-#endif
-
-		//doRecreateMidi();
-	}
-#endif
+//#ifdef USE_TOGGLE_TRIGGERS
+//	int diff = index.getMax() - (notesIndex.size() - 1);
+//	if (diff <= 0) return;//trick?// amount not changed
+//
+//	for (int i = 0; i < diff; i++)
+//	{
+//		std::string n = "Preset ";
+//		n += ofToString(notesIndex.size() + i);
+//		ofParameter<bool> b{ n, false };
+//		notesIndex.push_back(b);
+//		params_PresetToggles.add(b);
+//
+//		//-
+//
+//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+//		surfingMIDI.add(b);
+//#endif
+//
+//		//doRecreateMidi();
+//	}
+//#endif
+	toggles_Target.setup(index);
 }
 
 //--------------------------------------------------------------
@@ -2631,38 +2633,40 @@ bool ofxSurfingPresets::doRefreshFiles()
 
 	//--
 
-#ifdef USE_TOGGLE_TRIGGERS
+	toggles_Target.setup(index);
 
-	//TODO:
-	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-	notesIndex.clear();
-	params_PresetToggles.clear();
-
-	for (int i = 0; i <= index.getMax(); i++)
-	{
-		std::string n = "Preset ";
-		//n += ofToString(i < 10 ? "0" : "");
-		n += ofToString(i);
-
-		ofParameter<bool> b{ n, false };
-		notesIndex.push_back(b);
-		params_PresetToggles.add(b);
-	}
-	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
-
-#ifdef USE__OFX_SURFING_PRESET__MIDI__
-	doRecreateMidi();
-#endif
-
-	//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
-	//	// Splitted
-	//	surfingMIDI.clear();
-	//	surfingMIDI.add(params_Preset); // -> The ofParams of each Preset 
-	//	surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
-	//	surfingMIDI.add(index); // -> Add an int to select the index preset
-	//#endif
-
-#endif
+//#ifdef USE_TOGGLE_TRIGGERS
+//
+//	//TODO:
+//	ofRemoveListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+//	notesIndex.clear();
+//	params_PresetToggles.clear();
+//
+//	for (int i = 0; i <= index.getMax(); i++)
+//	{
+//		std::string n = "Preset ";
+//		//n += ofToString(i < 10 ? "0" : "");
+//		n += ofToString(i);
+//
+//		ofParameter<bool> b{ n, false };
+//		notesIndex.push_back(b);
+//		params_PresetToggles.add(b);
+//	}
+//	ofAddListener(params_PresetToggles.parameterChangedE(), this, &ofxSurfingPresets::Changed_Params_PresetToggles);
+//
+//#ifdef USE__OFX_SURFING_PRESET__MIDI__
+//	doRecreateMidi();
+//#endif
+//
+//	//#ifdef INCLUDE__OFX_SURFING_PRESET__OFX_MIDI_PARAMS
+//	//	// Splitted
+//	//	surfingMIDI.clear();
+//	//	surfingMIDI.add(params_Preset); // -> The ofParams of each Preset 
+//	//	surfingMIDI.add(params_PresetToggles); // -> To select the index preset by note/toggle (exclusive)
+//	//	surfingMIDI.add(index); // -> Add an int to select the index preset
+//	//#endif
+//
+//#endif
 }
 
 //--------------------------------------------------------------
