@@ -91,6 +91,8 @@ ofxSurfingPresets::~ofxSurfingPresets()
 //--------------------------------------------------------------
 void ofxSurfingPresets::setup()
 {
+	if (bDoneSetup)return;
+
 	// It's auto called after addGroup!
 
 	// Log Mode
@@ -281,14 +283,9 @@ void ofxSurfingPresets::setup()
 
 	//--
 
-	// Help
-	textBoxWidget.setPath(path_Global + "HelpBox_" + name_Root + "/");//customize path before call setup
-	textBoxWidget.setup();
-	textBoxWidget.bGui.makeReferenceTo(ui.bHelpInternal);
-
-	//--
-
 	//startup(); // Auto called from AddGroup
+
+	bDoneSetup = 1;
 }
 
 //--------------------------------------------------------------
@@ -317,7 +314,7 @@ void ofxSurfingPresets::buildHelp()
 		helpInfo += "+CTRL            COPY \n";
 		helpInfo += "+ALT             SWAP \n";
 		helpInfo += "\n";
-		helpInfo += "1-9              BROWSE \n";
+		helpInfo += "0-9              BROWSE \n";
 		helpInfo += "< > \n";
 		helpInfo += "SPACE            NEXT \n";
 		helpInfo += "+CTRL            PLAY \n";
@@ -330,14 +327,20 @@ void ofxSurfingPresets::buildHelp()
 		helpInfo += "R                RECALL \n";
 	}
 
-	textBoxWidget.setText(helpInfo);
+	ui.setHelpInfoApp(helpInfo);
 }
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::setupGui()
 {
 	ui.setName("Presets");
-	// customizing name helps to organize folder settings files on bin/data/  
+	//ui.setName(path_Global);
+	//ui.setName(params_Preset.getName());
+	//ui.setName(name_Root);
+	//ui.setName("ofxSurfingPresets");
+	
+	// Customizing name helps to organize 
+	// folder settings files on bin/data/  
 	// when using multiple GUI instances!
 
 	//--
@@ -369,6 +372,11 @@ void ofxSurfingPresets::setupGui()
 	// could be useful in some scenarios.
 	ui.bMinimize.makeReferenceTo(bMinimize);
 	//bMinimize.makeReferenceTo(ui.bMinimize);
+
+	//--
+
+	// Help
+	ui.setEnableHelpInfoApp();
 }
 
 #ifdef USE__OFX_SURFING_PRESET__MIDI__
@@ -415,8 +423,10 @@ void ofxSurfingPresets::doRecreateMidi()
 //--------------------------------------------------------------
 void ofxSurfingPresets::startup()
 {
-	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
+	if (bDoneStartup)return;
 
+	ofLogNotice("ofxSurfingPresets") << (__FUNCTION__);
+	
 	//--
 
 	// MIDI
@@ -579,12 +589,15 @@ void ofxSurfingPresets::startup()
 	//index = 0;
 
 	buildHelp();
+
+	bDoneStartup = 1;
 }
 
 //--------------------------------------------------------------
 void ofxSurfingPresets::update(ofEventArgs& args)
 {
-	//return;
+	if(!bDoneSetup) setup();
+	if(!bDoneStartup) startup();
 
 	// auto reload preset when clicked. that's to undo current editing!
 	if (bAutoLoadOnReTrig)
@@ -656,6 +669,18 @@ void ofxSurfingPresets::update(ofEventArgs& args)
 #ifdef USE__OFX_SURFING_PRESETS__BASIC_SMOOTHER
 	updateSmoother();
 #endif
+
+	//--
+
+	if (ui.bHelpInternal)
+	{
+		static bool bKeys_PRE = false;
+		if (bKeys != bKeys_PRE) {
+			bKeys_PRE = bKeys;
+
+			buildHelp();
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -676,17 +701,6 @@ void ofxSurfingPresets::draw()
 #ifdef INCLUDE__OFX_SURFING_PRESET__OFX_PARAMETER_MIDI_SYNC
 	surfingMIDI.drawImGui();
 #endif
-
-	if (ui.bHelpInternal)
-	{
-		static bool bKeys_PRE = false;
-		if (bKeys != bKeys_PRE) {
-			bKeys_PRE = bKeys;
-			buildHelp();
-		}
-
-		textBoxWidget.draw();
-	}
 }
 
 //--
@@ -1142,9 +1156,11 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 										}
 									}
 
+									/*
+									//TODO: must replace filesPicker!
 									// Files
 									// Buttons Selector for each file
-									if (ofxImGuiSurfing::filesPicker(path_Presets, nameSelected, index, { "json" }))
+									if (ofxSurfingHelpers::filesPicker(path_Presets, nameSelected, index, { "json" }))
 									{
 										// Buttons Matrix
 
@@ -1174,6 +1190,7 @@ void ofxSurfingPresets::draw_ImGui_Editor()
 
 										ofLogNotice("ofxSurfingPresets") << (__FUNCTION__) << "Picked file " << nameSelected << " > " << index;
 									}
+									*/
 								}
 								ui.Unindent();
 							}
@@ -1426,7 +1443,8 @@ void ofxSurfingPresets::draw_ImGui_Main()
 			// Help
 			if (!bMinimize) {
 				ui.AddSpacingSeparated();
-				ui.Add(ui.bHelpInternal, OFX_IM_TOGGLE_BUTTON_ROUNDED);
+				ui.Add(ui.bHelp, OFX_IM_TOGGLE_BUTTON_ROUNDED);
+				//ui.Add(ui.bHelpInternal, OFX_IM_TOGGLE_BUTTON_ROUNDED);
 			}
 
 			ui.EndWindowSpecial();

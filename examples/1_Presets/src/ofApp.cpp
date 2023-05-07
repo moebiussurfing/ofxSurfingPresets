@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup() 
 {
-	ofxSurfingHelpers::setMonitorsLayout(-1, true, true); // Left monitor portrait
+	ofSetWindowPosition(-1920, 25);
 
 	// Group
 	params.setName("myScene");
@@ -13,16 +13,9 @@ void ofApp::setup()
 	params.add(rotation2.set("rotation2", 180, 0, 360));
 	params.add(indexColor.set("indexColor", 0, 0, 2));
 
-	//--
-
-	//TODO:
-	// +add name / path global to help info bc multi instances
-	//presetsManager.setPathGlobal("myAddonData"); // Optional
-	//presetsManager.setName("myName");
-
-	presetsManager.addGroup(params); // Add a Group
+	//presetsManager.setFliped(true);
 	
-	presetsManager.setGuiVisible(); // Optional
+	presetsManager.addGroup(params); // Add a Group
 }
 
 //--------------------------------------------------------------

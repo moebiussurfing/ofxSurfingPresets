@@ -8,10 +8,12 @@
 
 	TODO:
 
-	+ fix locked params. cant randomize/reset
+	+ add name/path global to help info bc multi instances
+
+	+ fix locked params. can't randomize/reset
 	+ fix startup grow amount presets!
 	+ add / check undo engine workflow.
-	+ amount selector for kit populator
+	+ add int as amount selector for kit populator
 
 	+ simple smoothing fails sometimes...
 	+ add multiple group as ofxPresetsManager does.
@@ -68,10 +70,6 @@
 // 5. Undo Engine
 //#define USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER // -> Declarations to help integrate into our apps/add-ons
 
-#ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
-#include "ofxSurfingUndoHelper.h"
-#endif
-
 //--------------------------------------
 
 
@@ -79,8 +77,12 @@
 
 #include "ofxSurfingHelpers.h"
 #include "ofxSurfingImGui.h"
-#include "TextBoxWidget.h"
-#include "surfingParamIndexToggles.h" // to create and expose toggles to each used index (target and presets ABC)
+#include "surfingParamIndexToggles.h" 
+// to create and expose toggles to each used index (target and presets ABC)
+
+#ifdef USE__OFX_SURFING__OFX_SURFING_UNDO_HELPER 
+#include "ofxSurfingUndoHelper.h"
+#endif
 
 //--
 
@@ -129,6 +131,8 @@ public:
 	void setupGui();
 
 private:
+	bool bDoneSetup = 0;
+	bool bDoneStartup= 0;
 
 	void update(ofEventArgs& args);
 	void exit();
@@ -670,12 +674,17 @@ public:
 	}
 
 	//--------------------------------------------------------------
-	void addGroup(ofParameterGroup& group) { // Main group add. WARNING! You must add only one group. Call this only once! Setup wil be called here!
-		setup();
+	void addGroup(ofParameterGroup& group) { 
+		// Main group add. WARNING! You must add only one group. 
+		// Call this only once! Setup will be called here!
+		//setup();
 
-		params_Preset = group;
+		params_Preset = group;//TODO: there's a better way to do this?
 
 		if (name_Root == "-1") name_Root = params_Preset.getName();
+		
+		//TODO:
+		setup();
 
 		//-
 
@@ -876,7 +885,7 @@ public:
 
 	//void setName(string name);
 	void setActive(bool b);
-	void setGuiVisible(bool b);
+	void setGuiVisible(bool b=true);
 	//--------------------------------------------------------------
 	void setGuiVisibleToggle() { bGui = !bGui; }
 	void setLogLevel(ofLogLevel level);
@@ -1342,6 +1351,5 @@ private:
 
 private:
 
-	TextBoxWidget textBoxWidget;
 	void buildHelp();
 };
