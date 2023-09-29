@@ -327,7 +327,7 @@ void ofxSurfingPresets::buildHelp()
 		helpInfo += "R                RECALL \n";
 	}
 
-	ui.setHelpInfoApp(helpInfo);
+	ui.setHelpAppText(helpInfo);
 }
 
 //--------------------------------------------------------------
@@ -376,7 +376,7 @@ void ofxSurfingPresets::setupGui()
 	//--
 
 	// Help
-	ui.setEnableHelpInfoApp();
+	ui.setEnableHelpApp();
 }
 
 #ifdef USE__OFX_SURFING_PRESET__MIDI__
